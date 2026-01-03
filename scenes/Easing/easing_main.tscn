@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://to1fid7bcun"]
+[gd_scene load_steps=3 format=3 uid="uid://to1fid7bcun"]
 
 [ext_resource type="PackedScene" uid="uid://bspll818f18ug" path="res://scenes/Easing/easing_sample.tscn" id="1_3sf2c"]
+[ext_resource type="Script" uid="uid://bxcs20koualer" path="res://scripts/utils/setup.gd" id="1_ima52"]
 
 [node name="Easing_Main" type="Node2D"]
+script = ExtResource("1_ima52")
 
 [node name="Easing_sample_linear" parent="." instance=ExtResource("1_3sf2c")]
 end = Vector2(2500, 200)

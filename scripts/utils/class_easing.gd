@@ -1,4 +1,4 @@
-# res://scripts/utils/func_easing.gd
+# res://scripts/utils/class_easing.gd
 class_name Easing
 
 # For the function which doe not have _lerp, the variables are expected

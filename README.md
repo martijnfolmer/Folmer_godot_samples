@@ -1,6 +1,8 @@
 # Folmer_godot_samples
-A collection of Sample scenes, scripts, that can be used in godot projects. 
+A collection of Sample scenes, scripts, that can be used in godot projects (mostly for my own education, but feel free
+to use any of it if you wish)
 It should be noted that there can be overlap between these samples and build in godot functionality. 
+This is an ongoing project and will be updated regularly
 
 
 ## Easing

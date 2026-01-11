@@ -7,6 +7,7 @@ This is an ongoing project and will be updated regularly
 ## Particles
 ### particle explosion
 ### Torch Flame
+### Torch explosion
 
 ## Easing
 Common easing functions, created in gdscript in scripts/utils/class_easing, and their visualisations.

@@ -1,0 +1,28 @@
+[gd_scene load_steps=7 format=3 uid="uid://wlphhcacih5i"]
+
+[ext_resource type="PackedScene" uid="uid://iptedgxedqee" path="res://scenes/Samples/particles/partFlameExplosion.tscn" id="1_83uwg"]
+[ext_resource type="PackedScene" uid="uid://corghhtuatjgc" path="res://scenes/Samples/particles/partElectricTrail.tscn" id="1_mbybj"]
+[ext_resource type="PackedScene" uid="uid://hyt6tt1ui73r" path="res://scenes/Samples/particles/partFlameTorch.tscn" id="2_wxmx5"]
+[ext_resource type="PackedScene" uid="uid://dd42c28xqdh76" path="res://scenes/Samples/particles/partExplosionsSparks.tscn" id="3_hx7bl"]
+[ext_resource type="PackedScene" uid="uid://btv5xm1hx2a4j" path="res://scenes/Samples/particles/partAnimatedPixelExplosion.tscn" id="4_wxmx5"]
+[ext_resource type="PackedScene" uid="uid://532rr2vqt3ci" path="res://scenes/Samples/particles/partImplosionSparks.tscn" id="5_hx7bl"]
+
+[node name="ParticlesMain" type="Node2D"]
+
+[node name="PartElectricTrail" parent="." instance=ExtResource("1_mbybj")]
+position = Vector2(1704, 808)
+
+[node name="partFlameExplosion" parent="." instance=ExtResource("1_83uwg")]
+position = Vector2(673, 304)
+
+[node name="partFlame" parent="." instance=ExtResource("2_wxmx5")]
+position = Vector2(1045, 339)
+
+[node name="PartExplosionSparks" parent="." instance=ExtResource("3_hx7bl")]
+position = Vector2(1308, 336)
+
+[node name="PartAnimatedPixelExplosion" parent="." instance=ExtResource("4_wxmx5")]
+position = Vector2(273, 281)
+
+[node name="PartImplosionSparks" parent="." instance=ExtResource("5_hx7bl")]
+position = Vector2(1663, 319)

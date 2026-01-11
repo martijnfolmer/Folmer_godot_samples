@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3 uid="uid://532rr2vqt3ci"]
+
+[ext_resource type="Texture2D" uid="uid://chvhprwtccc7i" path="res://png/particles/partWhiteLine.png" id="1_4osdx"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_wtik5"]
+
+[sub_resource type="Gradient" id="Gradient_6ruhm"]
+offsets = PackedFloat32Array(0.052287582, 0.1459695, 0.4192872, 0.5115304)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 0.011764706, 0.011764706, 0.011764706, 0.29803923, 0.23529412, 0.23529412, 0.23529412, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_etj3a"]
+gradient = SubResource("Gradient_6ruhm")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3nmxi"]
+particle_flag_align_y = true
+particle_flag_disable_z = true
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 1.0
+emission_ring_radius = 150.0
+emission_ring_inner_radius = 120.0
+emission_ring_cone_angle = 90.0
+radial_velocity_min = -200.00002
+radial_velocity_max = -200.00002
+gravity = Vector3(0, 0, 0)
+scale_min = 2.0
+scale_max = 2.0
+color_ramp = SubResource("GradientTexture1D_etj3a")
+hue_variation_min = -0.44000003
+hue_variation_max = 0.42999998
+
+[node name="PartImplosionSparks" type="GPUParticles2D"]
+material = SubResource("CanvasItemMaterial_wtik5")
+amount = 50
+texture = ExtResource("1_4osdx")
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_3nmxi")

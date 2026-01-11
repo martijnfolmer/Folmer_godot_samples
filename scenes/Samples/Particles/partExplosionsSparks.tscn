@@ -1,4 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://dd42c28xqdh76"]
+[gd_scene load_steps=6 format=3 uid="uid://dd42c28xqdh76"]
+
+[sub_resource type="Gradient" id="Gradient_y2ygb"]
+colors = PackedColorArray(0.9137255, 0, 0, 0.39215687, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_s6u25"]
+gradient = SubResource("Gradient_y2ygb")
 
 [sub_resource type="Curve" id="Curve_h4ixx"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -10,13 +16,13 @@ curve = SubResource("Curve_h4ixx")
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_28mrn"]
 particle_flag_disable_z = true
 spread = 180.0
-initial_velocity_min = 50.0
-initial_velocity_max = 100.0
+initial_velocity_min = 233.25
+initial_velocity_max = 283.25
 gravity = Vector3(0, 0, 0)
-scale_min = 2.0
-scale_max = 3.0
+scale_min = 20.02
+scale_max = 35.43
 scale_curve = SubResource("CurveTexture_u0j2m")
-color = Color(0.97590375, 0.1443598, 0.26315182, 1)
+color_ramp = SubResource("GradientTexture1D_s6u25")
 
 [node name="PartExplosionSparks" type="GPUParticles2D"]
 amount = 20

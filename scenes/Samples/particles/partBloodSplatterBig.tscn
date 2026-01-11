@@ -1,0 +1,48 @@
+[gd_scene load_steps=10 format=3 uid="uid://dt6nsya0v3o8a"]
+
+[ext_resource type="Texture2D" uid="uid://b531o11daaxir" path="res://png/particles/partWhiteCircle64x64.png" id="1_8i46c"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ajduu"]
+
+[sub_resource type="Gradient" id="Gradient_un7qh"]
+offsets = PackedFloat32Array(0, 0.040983606, 0.9467213, 1)
+colors = PackedColorArray(0.91764706, 0, 0, 0, 0.9249554, 0.08874459, 0.08874459, 1, 0.7409358, 0.097791396, 2.8878452e-07, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_cr4nk"]
+gradient = SubResource("Gradient_un7qh")
+
+[sub_resource type="Curve" id="Curve_thdl5"]
+_limits = [0.0, 100.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 49.506073), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_w2aya"]
+curve = SubResource("Curve_thdl5")
+
+[sub_resource type="Curve" id="Curve_u75lj"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.86975765), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_j68it"]
+curve = SubResource("Curve_u75lj")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_kjwgw"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 607.87
+initial_velocity_max = 650.68
+gravity = Vector3(0, 0, 0)
+damping_min = 250.00002
+damping_max = 900.00006
+damping_curve = SubResource("CurveTexture_w2aya")
+scale_min = 0.099999994
+scale_max = 0.79999995
+scale_curve = SubResource("CurveTexture_j68it")
+color_ramp = SubResource("GradientTexture1D_cr4nk")
+
+[node name="PartBloodSplatterBig" type="GPUParticles2D"]
+material = SubResource("CanvasItemMaterial_ajduu")
+amount = 40
+texture = ExtResource("1_8i46c")
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_kjwgw")

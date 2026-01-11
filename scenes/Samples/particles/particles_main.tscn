@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://wlphhcacih5i"]
+[gd_scene load_steps=8 format=3 uid="uid://wlphhcacih5i"]
 
 [ext_resource type="PackedScene" uid="uid://iptedgxedqee" path="res://scenes/Samples/particles/partFlameExplosion.tscn" id="1_83uwg"]
 [ext_resource type="PackedScene" uid="uid://corghhtuatjgc" path="res://scenes/Samples/particles/partElectricTrail.tscn" id="1_mbybj"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dd42c28xqdh76" path="res://scenes/Samples/particles/partExplosionsSparks.tscn" id="3_hx7bl"]
 [ext_resource type="PackedScene" uid="uid://btv5xm1hx2a4j" path="res://scenes/Samples/particles/partAnimatedPixelExplosion.tscn" id="4_wxmx5"]
 [ext_resource type="PackedScene" uid="uid://532rr2vqt3ci" path="res://scenes/Samples/particles/partImplosionSparks.tscn" id="5_hx7bl"]
+[ext_resource type="PackedScene" uid="uid://dt6nsya0v3o8a" path="res://scenes/Samples/particles/partBloodSplatterBig.tscn" id="7_muhtl"]
 
 [node name="ParticlesMain" type="Node2D"]
 
@@ -26,3 +27,6 @@ position = Vector2(273, 281)
 
 [node name="PartImplosionSparks" parent="." instance=ExtResource("5_hx7bl")]
 position = Vector2(1663, 319)
+
+[node name="PartBloodSplatterBig" parent="." instance=ExtResource("7_muhtl")]
+position = Vector2(503, 788)

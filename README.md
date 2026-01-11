@@ -8,11 +8,15 @@ This is an ongoing project and will be updated regularly
 ### particle explosion
 ### Torch Flame
 ### Torch explosion
+### particle implosion
+### blood splatter
+### sparks from moving object
+![Particle visualisation](README_IMG/particles.png)
 
 ## Easing
 Common easing functions, created in gdscript in scripts/utils/class_easing, and their visualisations.
 NOTE  There are build-in versions of these easing functions in godot, more information can be found here : https://docs.godotengine.org/en/stable/classes/class_tween.html
-![Visualisations of different easing functions](README_IMG/img.png)
+![Visualisations of different easing functions](README_IMG/easing.png)
 
 ## Geometry
 Some common geometry functions for gamedev

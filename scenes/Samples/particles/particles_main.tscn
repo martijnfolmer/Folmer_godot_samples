@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://wlphhcacih5i"]
+[gd_scene format=3 uid="uid://wlphhcacih5i"]
 
 [ext_resource type="PackedScene" uid="uid://iptedgxedqee" path="res://scenes/Samples/particles/partFlameExplosion.tscn" id="1_83uwg"]
 [ext_resource type="PackedScene" uid="uid://corghhtuatjgc" path="res://scenes/Samples/particles/partElectricTrail.tscn" id="1_mbybj"]
@@ -8,25 +8,25 @@
 [ext_resource type="PackedScene" uid="uid://532rr2vqt3ci" path="res://scenes/Samples/particles/partImplosionSparks.tscn" id="5_hx7bl"]
 [ext_resource type="PackedScene" uid="uid://dt6nsya0v3o8a" path="res://scenes/Samples/particles/partBloodSplatterBig.tscn" id="7_muhtl"]
 
-[node name="ParticlesMain" type="Node2D"]
+[node name="ParticlesMain" type="Node2D" unique_id=31462689]
 
-[node name="PartElectricTrail" parent="." instance=ExtResource("1_mbybj")]
+[node name="PartElectricTrail" parent="." unique_id=1662784211 instance=ExtResource("1_mbybj")]
 position = Vector2(1704, 808)
 
-[node name="partFlameExplosion" parent="." instance=ExtResource("1_83uwg")]
+[node name="partFlameExplosion" parent="." unique_id=2077544755 instance=ExtResource("1_83uwg")]
 position = Vector2(673, 304)
 
-[node name="partFlame" parent="." instance=ExtResource("2_wxmx5")]
+[node name="partFlame" parent="." unique_id=483539803 instance=ExtResource("2_wxmx5")]
 position = Vector2(1045, 339)
 
-[node name="PartExplosionSparks" parent="." instance=ExtResource("3_hx7bl")]
+[node name="PartExplosionSparks" parent="." unique_id=631751326 instance=ExtResource("3_hx7bl")]
 position = Vector2(1308, 336)
 
-[node name="PartAnimatedPixelExplosion" parent="." instance=ExtResource("4_wxmx5")]
+[node name="PartAnimatedPixelExplosion" parent="." unique_id=716355940 instance=ExtResource("4_wxmx5")]
 position = Vector2(273, 281)
 
-[node name="PartImplosionSparks" parent="." instance=ExtResource("5_hx7bl")]
+[node name="PartImplosionSparks" parent="." unique_id=408191273 instance=ExtResource("5_hx7bl")]
 position = Vector2(1663, 319)
 
-[node name="PartBloodSplatterBig" parent="." instance=ExtResource("7_muhtl")]
+[node name="PartBloodSplatterBig" parent="." unique_id=1906559599 instance=ExtResource("7_muhtl")]
 position = Vector2(503, 788)

@@ -88,8 +88,11 @@ static func closest_point_to_polygon(p: Vector2, poly: PackedVector2Array, inclu
 # Overlaps
 # -----------------------------
 
-## Polygon overlap (true if they intersect or one contains the other)
-## Partly uses godot build in
+## Polygon overlap
+##
+## @param a: First polygon to check
+## @param b: Second polygon to check
+## @return True if the polygons overlap, False if they do not
 static func polygons_overlap(a: PackedVector2Array, b: PackedVector2Array) -> bool:
 	if a.size() < 3 or b.size() < 3:
 		return false
@@ -102,18 +105,30 @@ static func polygons_overlap(a: PackedVector2Array, b: PackedVector2Array) -> bo
 	return point_in_polygon(a[0], b, true) or point_in_polygon(b[0], a, true)
 
 ## Circle-circle overlap.
-## distance_squared_to returns faster than distance_to,
+##
+## @param c0: center coordinates of first circle
+## @param r0: radius of the first circle
+## @param c1: center coordinate of the second circle
+## @param r1: radius of the second circle
+## @return: True if the circles overlap, False if they are not
 static func circles_overlap(c0: Vector2, r0: float, c1: Vector2, r1: float) -> bool:
 	var rr := r0 + r1
 	return c0.distance_squared_to(c1) <= rr * rr
 
-## Axis-aligned rectangle overlap (Rect2 vs Rect2)
-## Using build-in functionality, but including it for completeness
+## Axis-aligned rectangle overlap
+##
+## @param r0: first rectangle to overlap
+## @param r1: second rectangle to overlap
+## @return : True if rectangles overlap, False if not
 static func rects_overlap(r0: Rect2, r1: Rect2) -> bool:
 	return r0.intersects(r1, true)
 
-## Circle vs axis-aligned rect overlap (often handy).
-## distance_squared_to returns faster than distance_to,
+## Circle vs axis-aligned rect overlap.
+##
+## @param center: Center point of the circle
+## @param radius: Radius of the circle
+## @param rect: rectangle defined by position.x, position.y, size.x, size.y
+## @return: True if the circle overlaps with the rectangle, false if not
 static func circle_overlaps_rect(center: Vector2, radius: float, rect: Rect2) -> bool:
 	var closest := Vector2(
 		clamp(center.x, rect.position.x, rect.position.x + rect.size.x),
@@ -122,9 +137,14 @@ static func circle_overlaps_rect(center: Vector2, radius: float, rect: Rect2) ->
 	return center.distance_squared_to(closest) <= radius * radius
 
 
-##Return true if a point p is on a segment between point a and point b, with epsilon
+## Check if point is on segment
+##
+## @param p: The point to test
+## @param a: (x1, x1) start of the line segment
+## @param b: (x2, y2) end of the line segment
+## @param eps: Allowed offset from the line
+## @return: Return true if a point p is on a segment between point a and point b, within epsilon offset
 static func point_on_segment(p: Vector2, a: Vector2, b: Vector2, eps: float = 0.00001) -> bool:
-	
 	# direction vector
 	var ab := b - a
 	var ap := p - a
@@ -144,8 +164,7 @@ static func point_on_segment(p: Vector2, a: Vector2, b: Vector2, eps: float = 0.
 
 	return true
 
-
-## Returns `true` if the given point lies inside or on the border of the specified circle.
+## Check if a point is inside of a circle
 ##
 ## @param point The point to test
 ## @param circle_center The center position of the circle.
@@ -154,7 +173,7 @@ static func point_on_segment(p: Vector2, a: Vector2, b: Vector2, eps: float = 0.
 static func point_in_circle(point: Vector2, circle_center: Vector2, circle_radius: float) -> bool:
 	return point.distance_to(circle_center) <= circle_radius
 
-## Returns `true` if the given point lies inside or on the border of the specified rectangle.
+## Check if a point is inside of a rectangle
 ##
 ## The rectangle is defined by two opposite corners (`pointTopLeft` and
 ## `pointBottomRight`). The function is robust to corner order and will

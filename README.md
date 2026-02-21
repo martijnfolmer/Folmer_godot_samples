@@ -4,6 +4,8 @@ to use any of it if you wish)
 It should be noted that there can be overlap between these samples and build in godot functionality. 
 This is an ongoing project and will be updated regularly
 
+Current version we tested on : Godot 4.6.1
+
 ## Particles
 ### particle explosion
 ### Torch Flame

@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://dsf0xhgp0hrv"]
+
+[ext_resource type="Script" uid="uid://dct3iv1o37x8t" path="res://scripts/Samples/GridSquare/cell_square.gd" id="1_qd5sf"]
+[ext_resource type="Texture2D" uid="uid://cyda6c4248nwx" path="res://png/cells/cell_square.png" id="2_fdg2k"]
+
+[node name="SquareCell" type="Node2D" unique_id=1411340074]
+script = ExtResource("1_qd5sf")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=329206860]
+texture = ExtResource("2_fdg2k")

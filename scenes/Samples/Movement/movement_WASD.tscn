@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dmqrwpp2fg11w"]
+
+[ext_resource type="Script" uid="uid://c2e8xve880a8h" path="res://scripts/utils/set_player_input_controls.gd" id="1_85t8h"]
+[ext_resource type="Script" uid="uid://dq3yko31gv8oh" path="res://scripts/Samples/Movement/movement_WASD.gd" id="2_tbgim"]
+[ext_resource type="Texture2D" uid="uid://56k3hva45wqr" path="res://icon.svg" id="3_j4mhm"]
+
+[node name="Movement_WASD" type="Node2D" unique_id=809464679]
+
+[node name="set_player_input_controls" type="Node2D" parent="." unique_id=690288573]
+script = ExtResource("1_85t8h")
+
+[node name="movement_WASD" type="CharacterBody2D" parent="." unique_id=857540664]
+position = Vector2(1146, 630)
+script = ExtResource("2_tbgim")
+texture = ExtResource("3_j4mhm")

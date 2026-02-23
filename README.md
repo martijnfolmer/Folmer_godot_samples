@@ -20,6 +20,10 @@ Common easing functions, created in gdscript in scripts/utils/class_easing, and 
 NOTE  There are build-in versions of these easing functions in godot, more information can be found here : https://docs.godotengine.org/en/stable/classes/class_tween.html
 ![Visualisations of different easing functions](README_IMG/easing.png)
 
+## Movement
+### movement_WASD
+player movement using WASD, some acceleration/decceleration and being able to use WASD or Key arrows
+
 ## Geometry
 Some common geometry functions for gamedev
 

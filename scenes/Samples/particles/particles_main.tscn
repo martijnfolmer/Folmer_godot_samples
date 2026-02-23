@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://wlphhcacih5i"]
 
-[ext_resource type="PackedScene" uid="uid://iptedgxedqee" path="res://scenes/Samples/particles/partFlameExplosion.tscn" id="1_83uwg"]
-[ext_resource type="PackedScene" uid="uid://corghhtuatjgc" path="res://scenes/Samples/particles/partElectricTrail.tscn" id="1_mbybj"]
-[ext_resource type="PackedScene" uid="uid://hyt6tt1ui73r" path="res://scenes/Samples/particles/partFlameTorch.tscn" id="2_wxmx5"]
-[ext_resource type="PackedScene" uid="uid://dd42c28xqdh76" path="res://scenes/Samples/particles/partExplosionsSparks.tscn" id="3_hx7bl"]
-[ext_resource type="PackedScene" uid="uid://btv5xm1hx2a4j" path="res://scenes/Samples/particles/partAnimatedPixelExplosion.tscn" id="4_wxmx5"]
-[ext_resource type="PackedScene" uid="uid://532rr2vqt3ci" path="res://scenes/Samples/particles/partImplosionSparks.tscn" id="5_hx7bl"]
-[ext_resource type="PackedScene" uid="uid://dt6nsya0v3o8a" path="res://scenes/Samples/particles/partBloodSplatterBig.tscn" id="7_muhtl"]
+[ext_resource type="PackedScene" uid="uid://iptedgxedqee" path="res://scenes/Samples/Particles/partFlameExplosion.tscn" id="1_83uwg"]
+[ext_resource type="PackedScene" uid="uid://corghhtuatjgc" path="res://scenes/Samples/Particles/partElectricTrail.tscn" id="1_mbybj"]
+[ext_resource type="PackedScene" uid="uid://hyt6tt1ui73r" path="res://scenes/Samples/Particles/partFlameTorch.tscn" id="2_wxmx5"]
+[ext_resource type="PackedScene" uid="uid://dd42c28xqdh76" path="res://scenes/Samples/Particles/partExplosionsSparks.tscn" id="3_hx7bl"]
+[ext_resource type="PackedScene" uid="uid://btv5xm1hx2a4j" path="res://scenes/Samples/Particles/partAnimatedPixelExplosion.tscn" id="4_wxmx5"]
+[ext_resource type="PackedScene" uid="uid://532rr2vqt3ci" path="res://scenes/Samples/Particles/partImplosionSparks.tscn" id="5_hx7bl"]
+[ext_resource type="PackedScene" uid="uid://dt6nsya0v3o8a" path="res://scenes/Samples/Particles/partBloodSplatterBig.tscn" id="7_muhtl"]
 
 [node name="ParticlesMain" type="Node2D" unique_id=31462689]
 

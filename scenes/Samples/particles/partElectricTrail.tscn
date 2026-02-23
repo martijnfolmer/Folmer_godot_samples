@@ -1,6 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://corghhtuatjgc"]
+[gd_scene format=3 uid="uid://corghhtuatjgc"]
 
-[ext_resource type="Script" uid="uid://bn6de87khl8p4" path="res://scripts/Samples/PartElectricTrail_center.gd" id="1_orvs2"]
+[ext_resource type="Script" uid="uid://bn6de87khl8p4" path="res://scripts/Samples/Particles/PartElectricTrail_center.gd" id="1_orvs2"]
 [ext_resource type="Texture2D" uid="uid://b531o11daaxir" path="res://png/particles/partWhiteCircle64x64.png" id="1_ybnmo"]
 [ext_resource type="Texture2D" uid="uid://chvhprwtccc7i" path="res://png/particles/partWhiteLine.png" id="3_g2vxe"]
 
@@ -33,13 +33,13 @@ hue_variation_max = 0.019999977
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_orvs2"]
 blend_mode = 1
 
-[node name="PartElectricTrail" type="Node2D"]
+[node name="PartElectricTrail" type="Node2D" unique_id=1514111576]
 
-[node name="Center" type="Node2D" parent="."]
+[node name="Center" type="Node2D" parent="." unique_id=998492708]
 z_as_relative = false
 script = ExtResource("1_orvs2")
 
-[node name="Sparks" type="GPUParticles2D" parent="Center"]
+[node name="Sparks" type="GPUParticles2D" parent="Center" unique_id=1832360723]
 z_as_relative = false
 material = SubResource("CanvasItemMaterial_a08t6")
 amount = 400
@@ -47,7 +47,7 @@ texture = ExtResource("3_g2vxe")
 lifetime = 0.39
 process_material = SubResource("ParticleProcessMaterial_fli2v")
 
-[node name="Ball" type="Sprite2D" parent="Center"]
+[node name="Ball" type="Sprite2D" parent="Center" unique_id=1141500038]
 modulate = Color(0, 0.2509804, 1, 1)
 z_index = 10
 z_as_relative = false
@@ -55,7 +55,7 @@ material = SubResource("CanvasItemMaterial_orvs2")
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_ybnmo")
 
-[node name="PointLight2D" type="PointLight2D" parent="Center/Ball"]
+[node name="PointLight2D" type="PointLight2D" parent="Center/Ball" unique_id=1158107827]
 scale = Vector2(0.5, 0.5)
 energy = 1.32
 texture = ExtResource("1_ybnmo")

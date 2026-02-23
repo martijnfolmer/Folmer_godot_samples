@@ -20,7 +20,6 @@ func _process(delta: float) -> void:
 	# Emitter has the same position as the ball
 	sparks.position = Vector2(cos(angle), sin(angle)) * radius
 	
-
 	# estimate velocity
 	var diffPosition = ball.position - last_ball_position
 	var v = diffPosition / max(delta, 0.0001)

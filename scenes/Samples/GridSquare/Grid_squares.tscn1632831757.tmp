@@ -5,5 +5,4 @@
 
 [node name="GridSquares" type="Node" unique_id=237438149]
 script = ExtResource("1_bvpfx")
-cell_size = Vector2(64, 64)
 cell_scene = ExtResource("2_xio5h")

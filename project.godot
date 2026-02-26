@@ -19,6 +19,10 @@ run/main_scene="uid://to1fid7bcun"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GlobalGrid="*uid://d10w3ljhide4c"
+
 [display]
 
 window/size/viewport_width=2200

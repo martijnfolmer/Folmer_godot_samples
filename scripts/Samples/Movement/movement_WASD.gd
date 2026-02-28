@@ -107,7 +107,8 @@ func _physics_process(delta: float) -> void:
 	var rate: float = accelerate if input_dir != Vector2.ZERO else deccelerate
 	velocity.x = move_toward(velocity.x, target_velocity.x, rate * delta)
 	velocity.y = move_toward(velocity.y, target_velocity.y, rate * delta)
-	move_and_slide()
+	var coll = move_and_slide()
+
 
 	# Get direction of the movement
 	var moving: bool = velocity.length() > 0.05

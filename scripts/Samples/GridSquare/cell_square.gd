@@ -60,4 +60,3 @@ func resize(w: int, h: int) -> void:
 
 	sprite.scale = Vector2(float(w) / tex_size.x, float(h) / tex_size.y)
 	area.scale = Vector2(float(w) / tex_size.x, float(h) / tex_size.y)
-	

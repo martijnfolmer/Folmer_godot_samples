@@ -4,6 +4,9 @@
 [ext_resource type="Script" uid="uid://dq3yko31gv8oh" path="res://scripts/Samples/Movement/movement_WASD.gd" id="2_tbgim"]
 [ext_resource type="Texture2D" uid="uid://b4okd2oo0o2j" path="res://png/player/simple_torso.png" id="3_tbgim"]
 [ext_resource type="Texture2D" uid="uid://1w5uc3givdd" path="res://png/player/leg.png" id="4_tbgim"]
+[ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/Samples/Components/comp_damage.tscn" id="5_72rnh"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tbgim"]
 
 [node name="Movement_WASD" type="Node2D" unique_id=809464679]
 
@@ -11,7 +14,6 @@
 script = ExtResource("1_85t8h")
 
 [node name="movement_WASD" type="CharacterBody2D" parent="." unique_id=857540664]
-position = Vector2(1146, 630)
 script = ExtResource("2_tbgim")
 speed = 750.0
 texture = ExtResource("3_tbgim")
@@ -22,3 +24,8 @@ step_length_pixels_at_scale_1 = 400.0
 step_fade_smooth = 20.0
 leg_base_scale_x = 1.2
 leg_extend_amount_y = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="movement_WASD" unique_id=345265054]
+shape = SubResource("RectangleShape2D_tbgim")
+
+[node name="CompDamage" parent="." unique_id=1256099559 instance=ExtResource("5_72rnh")]

@@ -30,7 +30,7 @@ func _ready() -> void:
 	set_process(false)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"ui_accept") or _is_space_pressed(event):
+	if _is_space_pressed(event):
 		_toggle()
 
 func _toggle() -> void:

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://coyvtxyqheeh"]
+
+[ext_resource type="PackedScene" uid="uid://c2v34hlugvkwk" path="res://scenes/Samples/Movement/pillar.tscn" id="1_bjjws"]
+[ext_resource type="PackedScene" uid="uid://dmqrwpp2fg11w" path="res://scenes/Samples/Movement/player_movement_WASD.tscn" id="2_00l21"]
+
+[node name="BasicArena" type="Node2D" unique_id=667505686]
+
+[node name="Pillar" parent="." unique_id=1493386293 instance=ExtResource("1_bjjws")]
+position = Vector2(231, 430)
+
+[node name="Pillar2" parent="." unique_id=139601998 instance=ExtResource("1_bjjws")]
+position = Vector2(1306, 482)
+
+[node name="Pillar3" parent="." unique_id=411479620 instance=ExtResource("1_bjjws")]
+position = Vector2(1005, 944)
+
+[node name="Pillar4" parent="." unique_id=1840937098 instance=ExtResource("1_bjjws")]
+position = Vector2(229, 911)
+
+[node name="Pillar5" parent="." unique_id=468483794 instance=ExtResource("1_bjjws")]
+position = Vector2(792, 194)
+
+[node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
+position = Vector2(784, 639)

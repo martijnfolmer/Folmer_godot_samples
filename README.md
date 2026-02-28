@@ -23,6 +23,7 @@ NOTE  There are build-in versions of these easing functions in godot, more infor
 ## Movement
 ### movement_WASD
 player movement using WASD, some acceleration/decceleration and being able to use WASD or Key arrows
+Legs under the player, looking like a hotline-miami esque movement
 
 ## Geometry
 Some common geometry functions for gamedev
@@ -51,3 +52,9 @@ Returns true if point is in circle or on the border of it
 Returns true if point is in rectangle or on the border of it
 ### IOU
 Intersection over union, tells you how much two rectangles overlap
+
+# Screentransitions
+Transitioning using a canvaslayer so we can hide scene transitions
+
+## blackBars
+![black bars with an angle over screen](README_IMG/transition_black_bars.png)

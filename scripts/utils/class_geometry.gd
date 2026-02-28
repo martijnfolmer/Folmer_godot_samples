@@ -25,6 +25,70 @@ static func closest_point_on_segment(p: Vector2, a: Vector2, b: Vector2) -> Vect
 	t = clamp(t, 0.0, 1.0)
 	return a + ab * t
 
+## Intersection line and rectangle border
+# Returns the point where a ray from the rectangle center at angle theta intersects the rectangle border.
+# Rect is axis-aligned and given by corners (x1,y1) and (x2,y2).
+static func ray_rect_intersection(
+		x1: float, y1: float,
+		x2: float, y2: float,
+		xc: float, yc: float,
+		theta: float
+	) -> Vector2:
+
+	var left: float = minf(x1, x2)
+	var right: float = maxf(x1, x2)
+	var top: float = minf(y1, y2)
+	var bottom: float = maxf(y1, y2)
+
+	var origin: Vector2 = Vector2(xc, yc)
+	var dir: Vector2 = Vector2(cos(theta), sin(theta))
+
+	# Direction is too small -> no meaningful ray
+	if dir.length_squared() < 1e-16:
+		return origin
+
+	var tmin: float = -INF
+	var tmax: float = INF
+
+	# X slab
+	if absf(dir.x) < 1e-12:
+		# Ray parallel to Y axis: origin must be within x bounds
+		if origin.x < left or origin.x > right:
+			return origin
+	else:
+		var tx1: float = (left - origin.x) / dir.x
+		var tx2: float = (right - origin.x) / dir.x
+		var txmin: float = minf(tx1, tx2)
+		var txmax: float = maxf(tx1, tx2)
+		tmin = maxf(tmin, txmin)
+		tmax = minf(tmax, txmax)
+
+	# Y slab
+	if absf(dir.y) < 1e-12:
+		# Ray parallel to X axis: origin must be within y bounds
+		if origin.y < top or origin.y > bottom:
+			return origin
+	else:
+		var ty1: float = (top - origin.y) / dir.y
+		var ty2: float = (bottom - origin.y) / dir.y
+		var tymin: float = minf(ty1, ty2)
+		var tymax: float = maxf(ty1, ty2)
+		tmin = maxf(tmin, tymin)
+		tmax = minf(tmax, tymax)
+
+	# No overlap => no intersection
+	if tmax < tmin:
+		return origin
+
+	# First hit in forward direction. If origin is inside rect, tmin < 0 and tmax is the exit.
+	var t_hit: float = tmax
+	if tmin >= 0.0:
+		t_hit = tmin
+
+	if t_hit < 0.0 or is_inf(t_hit):
+		return origin
+
+	return origin + dir * t_hit
 
 # -----------------------------
 # Point in polygon / closest to polygon

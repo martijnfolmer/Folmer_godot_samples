@@ -1,17 +1,13 @@
 [gd_scene format=3 uid="uid://dmqrwpp2fg11w"]
 
-[ext_resource type="Script" uid="uid://c2e8xve880a8h" path="res://scripts/utils/set_player_input_controls.gd" id="1_85t8h"]
 [ext_resource type="Script" uid="uid://dq3yko31gv8oh" path="res://scripts/Samples/Movement/movement_WASD.gd" id="2_tbgim"]
 [ext_resource type="Texture2D" uid="uid://b4okd2oo0o2j" path="res://png/player/simple_torso.png" id="3_tbgim"]
 [ext_resource type="Texture2D" uid="uid://1w5uc3givdd" path="res://png/player/leg.png" id="4_tbgim"]
-[ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/Samples/Components/comp_damage.tscn" id="5_72rnh"]
+[ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="5_72rnh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tbgim"]
 
 [node name="Movement_WASD" type="Node2D" unique_id=809464679]
-
-[node name="set_player_input_controls" type="Node2D" parent="." unique_id=690288573]
-script = ExtResource("1_85t8h")
 
 [node name="movement_WASD" type="CharacterBody2D" parent="." unique_id=857540664]
 script = ExtResource("2_tbgim")

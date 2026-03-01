@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GlobalGrid="*uid://d10w3ljhide4c"
+GlPlayerInput="*uid://c2e8xve880a8h"
 
 [display]
 

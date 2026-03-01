@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dtmo8o2f3bd7b"]
 
-[ext_resource type="Script" uid="uid://j581n1llh2s6" path="res://scripts/ScreenTransitions/transition_black_bars.gd" id="1_qj6on"]
+[ext_resource type="Script" uid="uid://j581n1llh2s6" path="res://scripts/Samples/ScreenTransitions/transition_black_bars.gd" id="1_qj6on"]
 
 [node name="ScreenTransitionBlackBars" type="Node2D" unique_id=696868686]
 

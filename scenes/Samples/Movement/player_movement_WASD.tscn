@@ -12,6 +12,7 @@
 [node name="movement_WASD" type="CharacterBody2D" parent="." unique_id=857540664]
 script = ExtResource("2_tbgim")
 speed = 750.0
+deccelerate = 5000.0
 texture = ExtResource("3_tbgim")
 legTexture = ExtResource("4_tbgim")
 trail_distance = 1.0
@@ -20,6 +21,7 @@ step_length_pixels_at_scale_1 = 400.0
 step_fade_smooth = 20.0
 leg_base_scale_x = 1.2
 leg_extend_amount_y = 0.0
+attack_dist = 300.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="movement_WASD" unique_id=345265054]
 shape = SubResource("RectangleShape2D_tbgim")

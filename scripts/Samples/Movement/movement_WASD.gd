@@ -48,6 +48,12 @@ extends CharacterBody2D
 ## Extra Y scaling added at the extremes of each step
 @export var leg_extend_amount_y: float = 0.35
 
+
+@export_group("Attacking")
+@export var attack_dist: float = 1000
+@export var attack_v: float = 1000
+
+
 var sprite: Sprite2D
 var leg_left: Sprite2D
 var leg_right: Sprite2D
@@ -65,12 +71,18 @@ var _last_move_dir: Vector2 = Vector2.RIGHT
 var _legs_center: Vector2 = Vector2.ZERO
 var _legs_rotation: float = 0.0
 
+var _attack: Dictionary
+
 func _ready() -> void:
 	
 	# Main body sprite
 	sprite = Sprite2D.new()
 	add_child(sprite)
 	sprite.texture = texture
+
+	# attacking
+	_attack = {"dist_c": 0, "dist_t": attack_dist, "v":attack_v, "ang":0, "state" : false}
+
 
 	# Leg sprites
 	leg_left = Sprite2D.new()
@@ -94,21 +106,40 @@ func _ready() -> void:
 	_legs_rotation = 0.0
 
 func _physics_process(delta: float) -> void:
-	# Input
-	var input_dir: Vector2 = Vector2(
-		Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
-		Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
-	)
-	if input_dir.length() > 0.0:
-		input_dir = input_dir.normalized()
 
-	# Movement
-	var target_velocity: Vector2 = input_dir * speed
-	var rate: float = accelerate if input_dir != Vector2.ZERO else deccelerate
-	velocity.x = move_toward(velocity.x, target_velocity.x, rate * delta)
-	velocity.y = move_toward(velocity.y, target_velocity.y, rate * delta)
+	# primary attack
+	var local_mouse_ang := get_local_mouse_position().angle()
+
+	# Start attack (use just_pressed so it doesn't re-trigger every frame held)
+	if !_attack["state"] and Input.is_action_just_pressed("ui_primary_action"):
+		_attack["state"] = true
+		_attack["ang"] = local_mouse_ang
+		_attack["dist_c"] = 0.0
+
+	# Movement (normal) only when not attacking
+	if !_attack["state"]:
+		var input_dir: Vector2 = Vector2(
+			Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
+			Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+		)
+		if input_dir.length() > 0.0:
+			input_dir = input_dir.normalized()
+
+		var target_velocity: Vector2 = input_dir * speed
+		var rate: float = accelerate if input_dir != Vector2.ZERO else deccelerate
+		velocity.x = move_toward(velocity.x, target_velocity.x, rate * delta)
+		velocity.y = move_toward(velocity.y, target_velocity.y, rate * delta)
+	else:
+		# Attack overrides velocity completely (NO * delta here)
+		var dir := Vector2(cos(_attack["ang"]), sin(_attack["ang"]))
+		velocity = dir * float(_attack["v"])
+
+		_attack["dist_c"] += float(_attack["v"]) * delta
+		if _attack["dist_c"] >= float(_attack["dist_t"]):
+			_attack["state"] = false
+		
+	# actual movement
 	var coll = move_and_slide()
-
 
 	# Get direction of the movement
 	var moving: bool = velocity.length() > 0.05
@@ -118,7 +149,7 @@ func _physics_process(delta: float) -> void:
 	var move_dir: Vector2 = _last_move_dir.normalized()
 
 	# Body rotates toward mouse
-	var desired_body_rot: float = get_local_mouse_position().angle()
+	var desired_body_rot: float = local_mouse_ang
 	sprite.rotation = lerp_angle(sprite.rotation, desired_body_rot, angular_speed * delta)
 
 	# Legs rotate toward movement direction

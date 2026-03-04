@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://csjysumvwrhys" path="res://scripts/Samples/Movement/pillar.gd" id="1_dootu"]
 [ext_resource type="Texture2D" uid="uid://byemf2mmv80ll" path="res://png/particles/partWhiteSquare64x64.png" id="1_ls6d4"]
 [ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="3_0vmoy"]
+[ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_rigidbody_kickback.tscn" id="4_nu50h"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ls6d4"]
 size = Vector2(64, 64)
@@ -10,12 +11,17 @@ size = Vector2(64, 64)
 [node name="Pillar" type="Node2D" unique_id=1493386293]
 script = ExtResource("1_dootu")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=14654227]
-texture = ExtResource("1_ls6d4")
+[node name="CompDamage" parent="." unique_id=1256099559 instance=ExtResource("3_0vmoy")]
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=768766226]
+[node name="CompBodyKickback" parent="." unique_id=876922541 instance=ExtResource("4_nu50h")]
+weight = 1.0
+friction = 0.1
+body_path = NodePath("../CharacterBody2D")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=697070522]
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1791689986]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=697070522]
 shape = SubResource("RectangleShape2D_ls6d4")
 
-[node name="CompDamage" parent="." unique_id=1256099559 instance=ExtResource("3_0vmoy")]
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=14654227]
+texture = ExtResource("1_ls6d4")

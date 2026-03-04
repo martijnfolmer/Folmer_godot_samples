@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://b33a6t85b1200"]
+
+[ext_resource type="Script" uid="uid://cpw3twlcad0ux" path="res://scripts/components/comp_rigidbody_kickback.gd" id="1_d4aba"]
+
+[node name="CompBodyKickback" type="Node" unique_id=876922541]
+script = ExtResource("1_d4aba")
+weight = null
+friction = null

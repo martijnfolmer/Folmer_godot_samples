@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://dmqrwpp2fg11w"]
 
+[ext_resource type="Script" uid="uid://tpet2ik384fb" path="res://scripts/Samples/Movement/player_movement_testing.gd" id="1_72rnh"]
 [ext_resource type="Script" uid="uid://dq3yko31gv8oh" path="res://scripts/Samples/Movement/movement_WASD.gd" id="2_tbgim"]
 [ext_resource type="Texture2D" uid="uid://b4okd2oo0o2j" path="res://png/player/simple_torso.png" id="3_tbgim"]
 [ext_resource type="Texture2D" uid="uid://1w5uc3givdd" path="res://png/player/leg.png" id="4_tbgim"]
@@ -8,6 +9,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tbgim"]
 
 [node name="Movement_WASD" type="Node2D" unique_id=809464679]
+script = ExtResource("1_72rnh")
 
 [node name="movement_WASD" type="CharacterBody2D" parent="." unique_id=857540664]
 script = ExtResource("2_tbgim")

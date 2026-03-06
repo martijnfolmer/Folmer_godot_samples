@@ -1,9 +1,7 @@
 extends Node2D
 
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
+@export var kick_force : float = 100
+@export var kick_radius : float = 600
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -13,11 +11,15 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_space_pressed(event):
-		print("Pillar")
 		var pillars := get_tree().get_nodes_in_group("pillar")
 		for pillar in pillars:
-			pillar.get_node("CompDamage").take_damage(1)
-			pillar.get_node("CompBodyKickback").impact(10, 0)
+
+			# apply force to pillars based on their distance
+			var distance = pillar.global_position.distance_to($movement_WASD.global_position)
+			if distance< kick_radius:
+				var ang = (pillar.global_position - $movement_WASD.global_position).angle()
+				pillar.get_node("CompDamage").take_damage(1)
+				pillar.get_node("CompBodyKickback").impact(kick_force * (1.0 - distance / kick_radius), ang)
 
 
 

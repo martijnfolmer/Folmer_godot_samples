@@ -48,10 +48,12 @@ extends CharacterBody2D
 ## Extra Y scaling added at the extremes of each step
 @export var leg_extend_amount_y: float = 0.35
 
-
 @export_group("Attacking")
 @export var attack_dist: float = 1000
 @export var attack_v: float = 1000
+@export var kick_leg_length_mult: float = 2.5
+@export var kick_leg_forward_offset: float = 28.0
+@export var kick_leg_thickness_mult: float = 1.2
 
 
 var sprite: Sprite2D
@@ -82,7 +84,6 @@ func _ready() -> void:
 
 	# attacking
 	_attack = {"dist_c": 0, "dist_t": attack_dist, "v":attack_v, "ang":0, "state" : false}
-
 
 	# Leg sprites
 	leg_left = Sprite2D.new()
@@ -148,19 +149,20 @@ func _physics_process(delta: float) -> void:
 		_last_move_dir = vel_dir
 	var move_dir: Vector2 = _last_move_dir.normalized()
 
-	# Body rotates toward mouse
-	var desired_body_rot: float = local_mouse_ang
-	sprite.rotation = lerp_angle(sprite.rotation, desired_body_rot, angular_speed * delta)
+	# Body rotates toward mouse (not during kick — keep pose fixed)
+	if !_attack["state"]:
+		var desired_body_rot: float = local_mouse_ang
+		sprite.rotation = lerp_angle(sprite.rotation, desired_body_rot, angular_speed * delta)
 
-	# Legs rotate toward movement direction
-	var desired_legs_rot: float = move_dir.angle()
+	# Legs rotate toward movement direction (or kick direction when attacking)
+	var desired_legs_rot: float = _attack["ang"] if _attack["state"] else move_dir.angle()
 	_legs_rotation = lerp_angle(_legs_rotation, desired_legs_rot, 1.0 - exp(-legs_rot_smooth * delta))
 	leg_left.rotation = _legs_rotation
 	leg_right.rotation = _legs_rotation
 
-	# Legs position: centered under body, trailing behind movement
+	# Legs position: centered under body, trailing behind movement (no trailing during kick)
 	var center_target: Vector2 = sprite.global_position
-	if moving:
+	if moving and !_attack["state"]:
 		center_target -= vel_dir * trail_distance
 	_legs_center = _legs_center.lerp(center_target, 1.0 - exp(-leg_follow_smooth * delta))
 
@@ -168,31 +170,49 @@ func _physics_process(delta: float) -> void:
 	var perp: Vector2 = Vector2.RIGHT.rotated(sprite.rotation).orthogonal().normalized()
 	leg_left.global_position = _legs_center - perp * leg_side_offset
 	leg_right.global_position = _legs_center + perp * leg_side_offset
+	if _attack["state"]:
+		var kick_forward: Vector2 = Vector2.RIGHT.rotated(_legs_rotation)
+		leg_left.global_position += kick_forward * kick_leg_forward_offset
+	
+	#Set depth of leg	
+	leg_left.z_index = sprite.z_index - 1
+	leg_right.z_index = sprite.z_index - 1
 
-	# Stepping strength (fade in/out when you start/stop)
-	var target_strength: float = 1.0 if moving else 0.0
+	# Stepping strength (fade in/out when you start/stop; no stepping during kick)
+	var target_strength: float = 0.0 if _attack["state"] else (1.0 if moving else 0.0)
 	_step_strength = lerp(_step_strength, target_strength, 1.0 - exp(-step_fade_smooth * delta))
 
-	# Step rate based on speed and leg length
-	var movement_speed: float = velocity.length()
-	var stride_length_pixels: float = max(1.0, step_length_pixels_at_scale_1 * max(0.05, leg_base_scale_x))
-	var steps_per_second: float = movement_speed / stride_length_pixels
+	var desired_lx: float
+	var desired_rx: float
+	var desired_ly: float
+	var desired_ry: float
 
-	# Convert to radians/sec for sin() phase and smooth it so it doesn't jitter
-	var desired_step_angular_speed: float = TAU * steps_per_second
-	_step_angular_speed = lerp(_step_angular_speed, desired_step_angular_speed, 1.0 - exp(-step_rate_smooth * delta))
-	_step_time += _step_angular_speed * delta
+	if _attack["state"]:
+		# Kick pose: one leg forward, one still (no _step_time advance)
+		desired_lx = leg_base_scale_x * kick_leg_length_mult
+		desired_rx = 0.0
+		desired_ly = leg_base_scale_y * kick_leg_thickness_mult
+		desired_ry = leg_base_scale_y
+	else:
+		# Step rate based on speed and leg length
+		var movement_speed: float = velocity.length()
+		var stride_length_pixels: float = max(1.0, step_length_pixels_at_scale_1 * max(0.05, leg_base_scale_x))
+		var steps_per_second: float = movement_speed / stride_length_pixels
 
-	# Left/right opposite phase
-	var phase_l: float = sin(_step_time) * _step_strength
-	var phase_r: float = sin(_step_time + PI) * _step_strength
+		# Convert to radians/sec for sin() phase and smooth it so it doesn't jitter
+		var desired_step_angular_speed: float = TAU * steps_per_second
+		_step_angular_speed = lerp(_step_angular_speed, desired_step_angular_speed, 1.0 - exp(-step_rate_smooth * delta))
+		_step_time += _step_angular_speed * delta
 
-	# X swing and Y extension
-	var desired_lx: float = phase_l * leg_base_scale_x
-	var desired_rx: float = phase_r * leg_base_scale_x
+		# Left/right opposite phase
+		var phase_l: float = sin(_step_time) * _step_strength
+		var phase_r: float = sin(_step_time + PI) * _step_strength
 
-	var desired_ly: float = leg_base_scale_y + leg_extend_amount_y * abs(float(phase_l))
-	var desired_ry: float = leg_base_scale_y + leg_extend_amount_y * abs(float(phase_r))
+		# X swing and Y extension
+		desired_lx = phase_l * leg_base_scale_x
+		desired_rx = phase_r * leg_base_scale_x
+		desired_ly = leg_base_scale_y + leg_extend_amount_y * abs(float(phase_l))
+		desired_ry = leg_base_scale_y + leg_extend_amount_y * abs(float(phase_r))
 
 	# Smooth the scale change
 	_cur_lx = lerp(_cur_lx, desired_lx, 1.0 - exp(-scale_smooth_x * delta))

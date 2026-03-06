@@ -4,11 +4,11 @@ extends Node2D
 @export var kick_radius : float = 600
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+## Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta: float) -> void:
+	#pass
 
-
+# TODO: kickback explosion
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_space_pressed(event):
 		var pillars := get_tree().get_nodes_in_group("pillar")
@@ -20,7 +20,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				var ang = (pillar.global_position - $movement_WASD.global_position).angle()
 				pillar.get_node("CompDamage").take_damage(1)
 				pillar.get_node("CompBodyKickback").impact(kick_force * (1.0 - distance / kick_radius), ang)
-
 
 
 func _is_space_pressed(event: InputEvent) -> bool:

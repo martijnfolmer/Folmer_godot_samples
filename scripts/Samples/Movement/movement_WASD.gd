@@ -55,6 +55,8 @@ extends CharacterBody2D
 @export var kick_leg_length_mult: float = 2.5
 @export var kick_leg_forward_offset: float = 28.0
 @export var kick_leg_thickness_mult: float = 1.2
+## Speed multiplier while kicking (player can still move from input but slower)
+@export var kick_speed_mult: float = 0.5
 
 
 var sprite: Sprite2D
@@ -118,7 +120,7 @@ func _ready() -> void:
 	kick_hitbox.collision_mask = 1
 	add_child(kick_hitbox)
 	var kick_shape := CircleShape2D.new()
-	kick_shape.radius = 25.0
+	kick_shape.radius = 32.0
 	var kick_col := CollisionShape2D.new()
 	kick_col.shape = kick_shape
 	kick_hitbox.add_child(kick_col)
@@ -136,28 +138,33 @@ func _physics_process(delta: float) -> void:
 		_attack["dist_c"] = 0.0
 		_kick_hit_bodies.clear()
 
-	# Movement (normal) only when not attacking
-	if !_attack["state"]:
-		var input_dir: Vector2 = Vector2(
-			Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
-			Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
-		)
-		if input_dir.length() > 0.0:
-			input_dir = input_dir.normalized()
+	# When attacking, check overlapping bodies so we don't miss pillars when close (hitbox can tunnel through)
+	if _attack["state"]:
+		for body in kick_hitbox.get_overlapping_bodies():
+			var pillar: Node = body.get_parent()
+			if pillar.is_in_group("pillar") and pillar not in _kick_hit_bodies:
+				_apply_kick_to_pillar(pillar)
 
-		var target_velocity: Vector2 = input_dir * speed
-		var rate: float = accelerate if input_dir != Vector2.ZERO else deccelerate
-		velocity.x = move_toward(velocity.x, target_velocity.x, rate * delta)
-		velocity.y = move_toward(velocity.y, target_velocity.y, rate * delta)
-	else:
-		# Attack overrides velocity completely (NO * delta here)
-		var dir := Vector2(cos(_attack["ang"]), sin(_attack["ang"]))
-		velocity = dir * float(_attack["v"])
+	# Movement: always input-based; slow down while kicking
+	var input_dir: Vector2 = Vector2(
+		Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
+		Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+	)
+	if input_dir.length() > 0.0:
+		input_dir = input_dir.normalized()
 
+	var effective_speed: float = speed * (kick_speed_mult if _attack["state"] else 1.0)
+	var target_velocity: Vector2 = input_dir * effective_speed
+	var rate: float = accelerate if input_dir != Vector2.ZERO else deccelerate
+	velocity.x = move_toward(velocity.x, target_velocity.x, rate * delta)
+	velocity.y = move_toward(velocity.y, target_velocity.y, rate * delta)
+
+	# Attack duration: advance virtual distance and end kick after attack_dist/attack_v time
+	if _attack["state"]:
 		_attack["dist_c"] += float(_attack["v"]) * delta
 		if _attack["dist_c"] >= float(_attack["dist_t"]):
 			_attack["state"] = false
-		
+
 	# actual movement
 	move_and_slide()
 
@@ -174,7 +181,7 @@ func _physics_process(delta: float) -> void:
 			if pillar.is_in_group("pillar") and pillar not in _kick_hit_bodies:
 				_kick_hit_bodies.append(pillar)
 				pillar.get_node("CompDamage").take_damage(1)
-				var ang: float = (pillar.global_position - global_position).angle()
+				var ang: float = (get_global_mouse_position() - global_position).angle()
 				pillar.get_node("CompBodyKickback").impact(kick_force, ang)
 		_attack["state"] = false
 		velocity = Vector2.ZERO
@@ -267,24 +274,26 @@ func _physics_process(delta: float) -> void:
 	leg_right.global_position = leg_right.global_position.round()
 
 	if _attack["state"]:
-		kick_hitbox.global_position = leg_left.global_position
+		# Place hitbox at tip of extended leg so it matches where the foot visually hits
+		var leg_half_length: float = leg_left.texture.get_size().x * leg_left.scale.x * 0.5
+		var foot_tip: Vector2 = leg_left.global_position + Vector2.RIGHT.rotated(leg_left.global_rotation) * leg_half_length
+		kick_hitbox.global_position = foot_tip
+
+
+func _apply_kick_to_pillar(pillar: Node) -> void:
+	_kick_hit_bodies.append(pillar)
+	pillar.get_node("CompDamage").take_damage(1)
+	var ang: float = (get_global_mouse_position() - global_position).angle()
+	pillar.get_node("CompBodyKickback").impact(kick_force, ang)
 
 
 # Kicking! collision with foot
 func _on_kick_hitbox_body_entered(body: Node2D) -> void:
-	
-	# We only care about this when we are attacking
 	if !_attack["state"]:
 		return
-	
-	# only kick the pillars for now
 	var pillar: Node = body.get_parent()
 	if !pillar.is_in_group("pillar"):
 		return
 	if pillar in _kick_hit_bodies:
 		return
-	_kick_hit_bodies.append(pillar) # make sure we don't kick the same thing twice
-	pillar.get_node("CompDamage").take_damage(1)
-	#var ang: float = (pillar.global_position - global_position).angle()
-	var ang: float = rotation
-	pillar.get_node("CompBodyKickback").impact(kick_force, ang)
+	_apply_kick_to_pillar(pillar)

@@ -51,12 +51,14 @@ extends CharacterBody2D
 @export_group("Attacking")
 @export var attack_dist: float = 1000
 @export var attack_v: float = 1000
+@export var kick_force: float = 100.0
 @export var kick_leg_length_mult: float = 2.5
 @export var kick_leg_forward_offset: float = 28.0
 @export var kick_leg_thickness_mult: float = 1.2
 
 
 var sprite: Sprite2D
+var kick_hitbox: Area2D
 var leg_left: Sprite2D
 var leg_right: Sprite2D
 
@@ -74,6 +76,7 @@ var _legs_center: Vector2 = Vector2.ZERO
 var _legs_rotation: float = 0.0
 
 var _attack: Dictionary
+var _kick_hit_bodies: Array[Node] = []
 
 func _ready() -> void:
 	
@@ -106,16 +109,32 @@ func _ready() -> void:
 	_legs_center = sprite.global_position
 	_legs_rotation = 0.0
 
+	# Kick hitbox: follows extended leg during attack, applies damage/kickback to pillars on overlap
+	kick_hitbox = Area2D.new()
+	kick_hitbox.name = "KickHitbox"
+	kick_hitbox.monitoring = true
+	kick_hitbox.monitorable = false
+	kick_hitbox.collision_layer = 0
+	kick_hitbox.collision_mask = 1
+	add_child(kick_hitbox)
+	var kick_shape := CircleShape2D.new()
+	kick_shape.radius = 25.0
+	var kick_col := CollisionShape2D.new()
+	kick_col.shape = kick_shape
+	kick_hitbox.add_child(kick_col)
+	kick_hitbox.body_entered.connect(_on_kick_hitbox_body_entered) # this happens every time
+
 func _physics_process(delta: float) -> void:
 
-	# primary attack
-	var local_mouse_ang := get_local_mouse_position().angle()
+	# primary attack (use global position so desired angle is correct when body is already rotated)
+	var desired_body_rot: float = (get_global_mouse_position() - global_position).angle()
 
 	# Start attack (use just_pressed so it doesn't re-trigger every frame held)
 	if !_attack["state"] and Input.is_action_just_pressed("ui_primary_action"):
 		_attack["state"] = true
-		_attack["ang"] = local_mouse_ang
+		_attack["ang"] = desired_body_rot
 		_attack["dist_c"] = 0.0
+		_kick_hit_bodies.clear()
 
 	# Movement (normal) only when not attacking
 	if !_attack["state"]:
@@ -140,7 +159,25 @@ func _physics_process(delta: float) -> void:
 			_attack["state"] = false
 		
 	# actual movement
-	var coll = move_and_slide()
+	move_and_slide()
+
+	# Stop attack if we hit something; apply impact/damage to any pillars we collided with
+	if _attack["state"] and get_slide_collision_count() > 0:
+		for i in get_slide_collision_count():
+			var col := get_slide_collision(i)
+			if !col:
+				continue
+			var body := col.get_collider() as Node2D
+			if !body:
+				continue
+			var pillar: Node = body.get_parent()
+			if pillar.is_in_group("pillar") and pillar not in _kick_hit_bodies:
+				_kick_hit_bodies.append(pillar)
+				pillar.get_node("CompDamage").take_damage(1)
+				var ang: float = (pillar.global_position - global_position).angle()
+				pillar.get_node("CompBodyKickback").impact(kick_force, ang)
+		_attack["state"] = false
+		velocity = Vector2.ZERO
 
 	# Get direction of the movement
 	var moving: bool = velocity.length() > 0.05
@@ -149,13 +186,14 @@ func _physics_process(delta: float) -> void:
 		_last_move_dir = vel_dir
 	var move_dir: Vector2 = _last_move_dir.normalized()
 
-	# Body rotates toward mouse (not during kick — keep pose fixed)
-	if !_attack["state"]:
-		var desired_body_rot: float = local_mouse_ang
-		sprite.rotation = lerp_angle(sprite.rotation, desired_body_rot, angular_speed * delta)
+	# Body (and hitbox) always rotate toward mouse; sprite stays aligned with body
+	rotation = lerp_angle(rotation, desired_body_rot, angular_speed * delta)
+	sprite.rotation = 0.0
 
 	# Legs rotate toward movement direction (or kick direction when attacking)
-	var desired_legs_rot: float = _attack["ang"] if _attack["state"] else move_dir.angle()
+	# Legs are body children so use local angle: desired world angle minus body rotation
+	var legs_world_ang: float = _attack["ang"] if _attack["state"] else move_dir.angle()
+	var desired_legs_rot: float = legs_world_ang - rotation
 	_legs_rotation = lerp_angle(_legs_rotation, desired_legs_rot, 1.0 - exp(-legs_rot_smooth * delta))
 	leg_left.rotation = _legs_rotation
 	leg_right.rotation = _legs_rotation
@@ -167,11 +205,11 @@ func _physics_process(delta: float) -> void:
 	_legs_center = _legs_center.lerp(center_target, 1.0 - exp(-leg_follow_smooth * delta))
 
 	# Split left/right relative to body facing (top-down)
-	var perp: Vector2 = Vector2.RIGHT.rotated(sprite.rotation).orthogonal().normalized()
+	var perp: Vector2 = Vector2.RIGHT.rotated(rotation).orthogonal().normalized()
 	leg_left.global_position = _legs_center - perp * leg_side_offset
 	leg_right.global_position = _legs_center + perp * leg_side_offset
 	if _attack["state"]:
-		var kick_forward: Vector2 = Vector2.RIGHT.rotated(_legs_rotation)
+		var kick_forward: Vector2 = Vector2.RIGHT.rotated(_attack["ang"])
 		leg_left.global_position += kick_forward * kick_leg_forward_offset
 	
 	#Set depth of leg	
@@ -227,3 +265,26 @@ func _physics_process(delta: float) -> void:
 	sprite.global_position = sprite.global_position.round()
 	leg_left.global_position = leg_left.global_position.round()
 	leg_right.global_position = leg_right.global_position.round()
+
+	if _attack["state"]:
+		kick_hitbox.global_position = leg_left.global_position
+
+
+# Kicking! collision with foot
+func _on_kick_hitbox_body_entered(body: Node2D) -> void:
+	
+	# We only care about this when we are attacking
+	if !_attack["state"]:
+		return
+	
+	# only kick the pillars for now
+	var pillar: Node = body.get_parent()
+	if !pillar.is_in_group("pillar"):
+		return
+	if pillar in _kick_hit_bodies:
+		return
+	_kick_hit_bodies.append(pillar) # make sure we don't kick the same thing twice
+	pillar.get_node("CompDamage").take_damage(1)
+	#var ang: float = (pillar.global_position - global_position).angle()
+	var ang: float = rotation
+	pillar.get_node("CompBodyKickback").impact(kick_force, ang)

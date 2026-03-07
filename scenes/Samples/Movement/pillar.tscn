@@ -15,6 +15,7 @@ script = ExtResource("1_dootu")
 
 [node name="CompBodyKickback" parent="." unique_id=876922541 instance=ExtResource("4_nu50h")]
 body_path = NodePath("../CharacterBody2D")
+movement_shake_scale = 0.01
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1791689986]
 

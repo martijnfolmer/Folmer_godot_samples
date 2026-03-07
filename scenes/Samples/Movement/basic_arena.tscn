@@ -20,5 +20,23 @@ position = Vector2(229, 911)
 [node name="Pillar5" parent="." unique_id=468483794 instance=ExtResource("1_bjjws")]
 position = Vector2(792, 194)
 
+[node name="Pillar6" parent="." unique_id=1377363234 instance=ExtResource("1_bjjws")]
+position = Vector2(1378, 774)
+
+[node name="Pillar7" parent="." unique_id=543767131 instance=ExtResource("1_bjjws")]
+position = Vector2(1086, 274)
+
+[node name="Pillar8" parent="." unique_id=953461983 instance=ExtResource("1_bjjws")]
+position = Vector2(937, 579)
+
+[node name="Pillar9" parent="." unique_id=1156426203 instance=ExtResource("1_bjjws")]
+position = Vector2(567, 772)
+
+[node name="Pillar10" parent="." unique_id=1224326118 instance=ExtResource("1_bjjws")]
+position = Vector2(569, 449)
+
+[node name="Pillar11" parent="." unique_id=1751347978 instance=ExtResource("1_bjjws")]
+position = Vector2(756, 996)
+
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
 position = Vector2(784, 639)

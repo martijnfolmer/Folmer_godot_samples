@@ -49,18 +49,21 @@ extends CharacterBody2D
 @export var leg_extend_amount_y: float = 0.35
 
 @export_group("Attacking")
-@export var attack_dist: float = 1000
+@export var attack_dist: float = 1000		# TODO: we don't use this anymore
 @export var attack_v: float = 1000
 @export var kick_force: float = 100.0
 @export var kick_leg_length_mult: float = 2.5
 @export var kick_leg_forward_offset: float = 28.0
+
+## increasing scale of leg when kicking
 @export var kick_leg_thickness_mult: float = 1.2
+
 ## Speed multiplier while kicking (player can still move from input but slower)
 @export var kick_speed_mult: float = 0.5
 
 
-var sprite: Sprite2D
-var kick_hitbox: Area2D
+var sprite: Sprite2D    # TODO: change name to something like player_sprite
+var kick_hitbox: Area2D # the hitbox for the kick
 var leg_left: Sprite2D
 var leg_right: Sprite2D
 
@@ -68,6 +71,7 @@ var _step_time: float = 0.0
 var _step_strength: float = 0.0
 var _step_angular_speed: float = 0.0  # smoothed radians/sec
 
+# The things 
 var _cur_lx: float = 0.0
 var _cur_rx: float = 0.0
 var _cur_ly: float = 1.0
@@ -88,7 +92,7 @@ func _ready() -> void:
 	sprite.texture = texture
 
 	# attacking
-	_attack = {"dist_c": 0, "dist_t": attack_dist, "v":attack_v, "ang":0, "state" : false}
+	_attack = {"dist_c": 0, "dist_t": attack_dist, "v":attack_v, "ang":0, "state" : false} # TODO: I don't think we use this anymore
 
 	# Leg sprites
 	leg_left = Sprite2D.new()
@@ -112,6 +116,7 @@ func _ready() -> void:
 	_legs_rotation = 0.0
 
 	# Kick hitbox: follows extended leg during attack, applies damage/kickback to pillars on overlap
+	# TODO: add comments for what each of the kick_hitbox 
 	kick_hitbox = Area2D.new()
 	kick_hitbox.name = "KickHitbox"
 	kick_hitbox.monitoring = true
@@ -124,14 +129,14 @@ func _ready() -> void:
 	var kick_col := CollisionShape2D.new()
 	kick_col.shape = kick_shape
 	kick_hitbox.add_child(kick_col)
-	kick_hitbox.body_entered.connect(_on_kick_hitbox_body_entered) # this happens every time
+	kick_hitbox.body_entered.connect(_on_kick_hitbox_body_entered) # this happens every time we do a kick_hitbox
 
 func _physics_process(delta: float) -> void:
 
-	# primary attack (use global position so desired angle is correct when body is already rotated)
+	# Turn the body towards the global position
 	var desired_body_rot: float = (get_global_mouse_position() - global_position).angle()
 
-	# Start attack (use just_pressed so it doesn't re-trigger every frame held)
+	# Start attack (use just_pressed so it doesn't re-trigger on the next frames)
 	if !_attack["state"] and Input.is_action_just_pressed("ui_primary_action"):
 		_attack["state"] = true
 		_attack["ang"] = desired_body_rot
@@ -153,7 +158,7 @@ func _physics_process(delta: float) -> void:
 	if input_dir.length() > 0.0:
 		input_dir = input_dir.normalized()
 
-	var effective_speed: float = speed * (kick_speed_mult if _attack["state"] else 1.0)
+	var effective_speed: float = speed * (kick_speed_mult if _attack["state"] else 1.0) # slower when we speed
 	var target_velocity: Vector2 = input_dir * effective_speed
 	var rate: float = accelerate if input_dir != Vector2.ZERO else deccelerate
 	velocity.x = move_toward(velocity.x, target_velocity.x, rate * delta)
@@ -165,10 +170,10 @@ func _physics_process(delta: float) -> void:
 		if _attack["dist_c"] >= float(_attack["dist_t"]):
 			_attack["state"] = false
 
-	# actual movement
+	# actual movement and collision with pillars and such
 	move_and_slide()
 
-	# Stop attack if we hit something; apply impact/damage to any pillars we collided with
+	# Stop attack if we hit something, stop moving and apply impact/damage to any pillars we collided with
 	if _attack["state"] and get_slide_collision_count() > 0:
 		for i in get_slide_collision_count():
 			var col := get_slide_collision(i)
@@ -187,7 +192,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 
 	# Get direction of the movement
-	var moving: bool = velocity.length() > 0.05
+	var moving: bool = velocity.length() > 0.05	# are we moving?
 	var vel_dir: Vector2 = velocity.normalized() if moving else Vector2.ZERO
 	if moving:
 		_last_move_dir = vel_dir

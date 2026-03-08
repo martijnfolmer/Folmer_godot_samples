@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://c2v34hlugvkwk" path="res://scenes/Samples/Movement/pillar.tscn" id="1_bjjws"]
 [ext_resource type="PackedScene" uid="uid://dmqrwpp2fg11w" path="res://scenes/Samples/Movement/player_movement_WASD.tscn" id="2_00l21"]
+[ext_resource type="PackedScene" uid="uid://cy6d05qriys22" path="res://scenes/Samples/Movement/goblin_basic.tscn" id="3_00l21"]
 
 [node name="BasicArena" type="Node2D" unique_id=667505686]
 
@@ -40,3 +41,6 @@ position = Vector2(756, 996)
 
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
 position = Vector2(784, 639)
+
+[node name="GoblinBasic" parent="." unique_id=574766309 instance=ExtResource("3_00l21")]
+position = Vector2(591, 1019)

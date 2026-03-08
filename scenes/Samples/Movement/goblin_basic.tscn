@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://cy6d05qriys22"]
+
+[ext_resource type="Texture2D" uid="uid://f8cg7pwfmvyk" path="res://png/goblin/goblin_base.png" id="1_7xiet"]
+[ext_resource type="Script" uid="uid://oyt3wxf0cj4i" path="res://scripts/Samples/Movement/goblin.gd" id="1_goblin"]
+[ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="2_5palr"]
+[ext_resource type="PackedScene" uid="uid://dt6nsya0v3o8a" path="res://scenes/Samples/Particles/partBloodSplatterBig.tscn" id="2_bawqr"]
+[ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="3_bawqr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lrtaf"]
+size = Vector2(40, 91)
+
+[node name="GoblinBasic" type="Node2D" unique_id=574766309]
+script = ExtResource("1_goblin")
+wall_slam_speed_min = 10.0
+blood_smear_scene = ExtResource("2_bawqr")
+
+[node name="CompDamage" parent="." unique_id=1256099559 instance=ExtResource("2_5palr")]
+
+[node name="CompBodyKickback" parent="." unique_id=876922541 instance=ExtResource("3_bawqr")]
+body_path = NodePath("../CharacterBody2D")
+movement_shake_scale = 0.01
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=2036670946]
+
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225520]
+texture = ExtResource("1_7xiet")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=296132105]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_lrtaf")

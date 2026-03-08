@@ -1,8 +1,13 @@
 extends Node
 
+signal impact_started()
+signal impact_ended()
+signal body_slammed(collision: KinematicCollision2D, speed: float)
+
 @export var weight:float = 1.0
-## Friction (velocity multiplier per second). With v0=100, stop_speed=8: ~1.25 gives ~2s slide.
+## Friction
 @export var friction: float = 1.25
+## If you are below this speed, we just stop
 @export var stop_speed: float = 8.0
 @export var body_path:NodePath
 ## Shake amplitude per unit of velocity (pixels) when moving from impact
@@ -21,6 +26,8 @@ func impact(_force: float, _ang: float) -> void:
 	parentBody.velocity.x = effective_force * cos(_ang)
 	parentBody.velocity.y = effective_force * sin(_ang)
 	_impact_active = parentBody.velocity.length_squared() > 0.0
+	if _impact_active:
+		impact_started.emit()
 
 
 func _physics_process(delta: float) -> void:
@@ -35,11 +42,17 @@ func _physics_process(delta: float) -> void:
 	if parentBody.velocity.length_squared() <= stop_speed * stop_speed:
 		parentBody.velocity = Vector2.ZERO
 		_impact_active = false
+		impact_ended.emit()
 		if _body_sprite:
 			_body_sprite.position = Vector2.ZERO
 		return
 
+	var speed_before_slide: float = parentBody.velocity.length()
 	parentBody.move_and_slide()
+
+	# Report collisions for wall-slam detection (e.g. goblin dazed state)
+	for i in parentBody.get_slide_collision_count():
+		body_slammed.emit(parentBody.get_slide_collision(i), speed_before_slide)
 
 	# Movement shake: harder when faster
 	if _body_sprite:

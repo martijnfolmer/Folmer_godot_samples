@@ -115,7 +115,7 @@ func _ready() -> void:
 	_legs_center = sprite.global_position
 	_legs_rotation = 0.0
 
-	# Kick hitbox: follows extended leg during attack, applies damage/kickback to pillars on overlap
+	# Kick hitbox: follows extended leg during attack, applies damage/kickback to pillars and goblins on overlap
 	# TODO: add comments for what each of the kick_hitbox 
 	kick_hitbox = Area2D.new()
 	kick_hitbox.name = "KickHitbox"
@@ -143,12 +143,12 @@ func _physics_process(delta: float) -> void:
 		_attack["dist_c"] = 0.0
 		_kick_hit_bodies.clear()
 
-	# When attacking, check overlapping bodies so we don't miss pillars when close (hitbox can tunnel through)
+	# When attacking, check overlapping bodies so we don't miss pillars/goblins when close (hitbox can tunnel through)
 	if _attack["state"]:
 		for body in kick_hitbox.get_overlapping_bodies():
-			var pillar: Node = body.get_parent()
-			if pillar.is_in_group("pillar") and pillar not in _kick_hit_bodies:
-				_apply_kick_to_pillar(pillar)
+			var target: Node = body.get_parent()
+			if (target.is_in_group("pillar") or target.is_in_group("goblin")) and target not in _kick_hit_bodies:
+				_apply_kick_to_target(target)
 
 	# Movement: always input-based; slow down while kicking
 	var input_dir: Vector2 = Vector2(
@@ -182,12 +182,13 @@ func _physics_process(delta: float) -> void:
 			var body := col.get_collider() as Node2D
 			if !body:
 				continue
-			var pillar: Node = body.get_parent()
-			if pillar.is_in_group("pillar") and pillar not in _kick_hit_bodies:
-				_kick_hit_bodies.append(pillar)
-				pillar.get_node("CompDamage").take_damage(1)
-				var ang: float = (get_global_mouse_position() - global_position).angle()
-				pillar.get_node("CompBodyKickback").impact(kick_force, ang)
+			
+			# Check what we are colliding with it
+			var collNode: Node = body.get_parent()
+			if (collNode.is_in_group("pillar") or collNode.is_in_group("goblin")) and collNode not in _kick_hit_bodies:
+				_apply_kick_to_target(collNode)
+				
+				
 		_attack["state"] = false
 		velocity = Vector2.ZERO
 
@@ -285,20 +286,20 @@ func _physics_process(delta: float) -> void:
 		kick_hitbox.global_position = foot_tip
 
 
-func _apply_kick_to_pillar(pillar: Node) -> void:
-	_kick_hit_bodies.append(pillar)
-	pillar.get_node("CompDamage").take_damage(1)
+func _apply_kick_to_target(target: Node) -> void:
+	_kick_hit_bodies.append(target)
+	target.get_node("CompDamage").take_damage(1)
 	var ang: float = (get_global_mouse_position() - global_position).angle()
-	pillar.get_node("CompBodyKickback").impact(kick_force, ang)
+	target.get_node("CompBodyKickback").impact(kick_force, ang)
 
 
-# Kicking! collision with foot
+# Kicking! collision with foot (pillars and goblins and other things we want to kick)
 func _on_kick_hitbox_body_entered(body: Node2D) -> void:
 	if !_attack["state"]:
 		return
-	var pillar: Node = body.get_parent()
-	if !pillar.is_in_group("pillar"):
+	var target: Node = body.get_parent()
+	if !target.is_in_group("pillar") and !target.is_in_group("goblin"):
 		return
-	if pillar in _kick_hit_bodies:
+	if target in _kick_hit_bodies:
 		return
-	_apply_kick_to_pillar(pillar)
+	_apply_kick_to_target(target)

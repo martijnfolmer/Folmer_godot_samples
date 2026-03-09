@@ -1,4 +1,5 @@
 extends Node2D
+##TODO: give the goblin a visual status effect when dazed. Little knights around the th head on horses?
 ##TODO: rotate collision When adding rotation (e.g. facing the player), rotate $CharacterBody2D so that sprite and collisionshape rotate
 ## Same kick behavior as pillar, root stays fixed, CharacterBody2D moves (and sprite follows).
 ## When kicked, goblin enters dazed state, if it slams a wall at sufficient speed, it becomes a blood smear.
@@ -41,10 +42,14 @@ func _on_impact_ended() -> void:
 func _on_body_slammed(collision: KinematicCollision2D, speed: float) -> void:
 	if !_dazed or speed < wall_slam_speed_min or !_is_wall(collision):
 		return
+	# Create the blood smear on our position
 	_spawn_blood_smear(collision.get_position())
+	# Delete the goblin
 	queue_free()
 
 
+# Check collision with a wall like object 
+# TODO: dynamically make it so we can check multiple groups, walls and pillars and other goblins
 func _is_wall(collision: KinematicCollision2D) -> bool:
 	var collider := collision.get_collider()
 	if collider == null:
@@ -64,7 +69,8 @@ func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 		current = current.get_parent()
 	return false
 
-
+# create the blood smear
+# TODO: pass on values to the blood smear, away from the pillar
 func _spawn_blood_smear(global_pos: Vector2) -> void:
 	if blood_smear_scene == null:
 		return

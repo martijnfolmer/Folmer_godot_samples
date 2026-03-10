@@ -40,7 +40,13 @@ position = Vector2(569, 449)
 position = Vector2(756, 996)
 
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
-position = Vector2(784, 639)
+position = Vector2(449, 1018)
 
 [node name="GoblinBasic" parent="." unique_id=574766309 instance=ExtResource("3_00l21")]
 position = Vector2(591, 1019)
+
+[node name="GoblinBasic2" parent="." unique_id=2052670920 instance=ExtResource("3_00l21")]
+position = Vector2(772, 726)
+
+[node name="GoblinBasic3" parent="." unique_id=503990667 instance=ExtResource("3_00l21")]
+position = Vector2(339, 647)

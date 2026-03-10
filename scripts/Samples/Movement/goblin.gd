@@ -3,7 +3,7 @@ extends Node2D
 ## Same kick behavior as pillar, root stays fixed, CharacterBody2D moves (and sprite follows).
 ## When kicked, goblin enters dazed state, if it slams a wall at sufficient speed, it becomes a blood smear.
 
-const DEFAULT_BLOOD_SMEAR_SCENE := preload("res://scenes/Samples/particles/partBloodSplatterBig.tscn")
+const DEFAULT_BLOOD_SMEAR_SCENE := preload("res://scenes/Samples/particles/partBloodSmearGreenPersistent.tscn")
 
 @export_group("Wall slam")
 ## Minimum speed when hitting a wall to turn into a blood smear (while dazed)
@@ -41,7 +41,7 @@ func _on_impact_ended() -> void:
 func _on_body_slammed(collision: KinematicCollision2D, speed: float) -> void:
 	if !_dazed or speed < wall_slam_speed_min or !_is_wall(collision):
 		return
-	_spawn_blood_smear(collision.get_position())
+	_spawn_blood_smear(collision.get_position(), collision.get_normal())
 	queue_free()
 
 
@@ -65,11 +65,14 @@ func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 	return false
 
 
-func _spawn_blood_smear(global_pos: Vector2) -> void:
+func _spawn_blood_smear(global_pos: Vector2, away_dir: Vector2) -> void:
 	if blood_smear_scene == null:
 		return
 	var instance := blood_smear_scene.instantiate()
 	var parent := get_tree().current_scene
 	if parent:
 		parent.add_child(instance)
-		instance.global_position = global_pos
+		if instance.has_method("setup_impact"):
+			instance.call("setup_impact", global_pos, away_dir)
+		else:
+			instance.global_position = global_pos

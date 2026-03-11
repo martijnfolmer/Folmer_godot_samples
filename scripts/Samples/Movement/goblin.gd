@@ -53,6 +53,9 @@ func _is_wall(collision: KinematicCollision2D) -> bool:
 	var collider := collision.get_collider()
 	if collider == null:
 		return false
+	# Goblin collisions should never trigger smear death.
+	if _node_or_ancestor_in_group(collider, "goblin"):
+		return false
 	if treat_static_as_wall and collider is StaticBody2D:
 		return true
 	if wall_collision_group.is_empty():

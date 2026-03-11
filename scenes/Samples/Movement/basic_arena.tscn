@@ -7,31 +7,31 @@
 [node name="BasicArena" type="Node2D" unique_id=667505686]
 
 [node name="Pillar" parent="." unique_id=1493386293 instance=ExtResource("1_bjjws")]
-position = Vector2(231, 430)
+position = Vector2(352, 432)
 
 [node name="Pillar2" parent="." unique_id=139601998 instance=ExtResource("1_bjjws")]
 position = Vector2(1306, 482)
 
 [node name="Pillar3" parent="." unique_id=411479620 instance=ExtResource("1_bjjws")]
-position = Vector2(1005, 944)
+position = Vector2(974, 994)
 
 [node name="Pillar4" parent="." unique_id=1840937098 instance=ExtResource("1_bjjws")]
-position = Vector2(229, 911)
+position = Vector2(344, 884)
 
 [node name="Pillar5" parent="." unique_id=468483794 instance=ExtResource("1_bjjws")]
-position = Vector2(792, 194)
+position = Vector2(672, 160)
 
 [node name="Pillar6" parent="." unique_id=1377363234 instance=ExtResource("1_bjjws")]
 position = Vector2(1378, 774)
 
 [node name="Pillar7" parent="." unique_id=543767131 instance=ExtResource("1_bjjws")]
-position = Vector2(1086, 274)
+position = Vector2(928, 160)
 
 [node name="Pillar8" parent="." unique_id=953461983 instance=ExtResource("1_bjjws")]
 position = Vector2(937, 579)
 
 [node name="Pillar9" parent="." unique_id=1156426203 instance=ExtResource("1_bjjws")]
-position = Vector2(567, 772)
+position = Vector2(615, 847)
 
 [node name="Pillar10" parent="." unique_id=1224326118 instance=ExtResource("1_bjjws")]
 position = Vector2(569, 449)
@@ -43,7 +43,7 @@ position = Vector2(756, 996)
 position = Vector2(449, 1018)
 
 [node name="GoblinBasic" parent="." unique_id=574766309 instance=ExtResource("3_00l21")]
-position = Vector2(591, 1019)
+position = Vector2(850, 992)
 
 [node name="GoblinBasic2" parent="." unique_id=2052670920 instance=ExtResource("3_00l21")]
 position = Vector2(772, 726)

@@ -22,5 +22,9 @@ extends Node2D
 				#pillar.get_node("CompBodyKickback").impact(kick_force * (1.0 - distance / kick_radius), ang)
 #
 #
-#func _is_space_pressed(event: InputEvent) -> bool:
-	#return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
+func _is_space_pressed(event: InputEvent) -> bool:
+	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _is_space_pressed(event):
+		$CompDamage.take_damage(1)

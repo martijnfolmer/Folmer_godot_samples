@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://f8cg7pwfmvyk" path="res://png/goblin/goblin_base.png" id="1_7xiet"]
 [ext_resource type="Script" uid="uid://oyt3wxf0cj4i" path="res://scripts/Samples/Movement/goblin.gd" id="1_goblin"]
 [ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="2_5palr"]
-[ext_resource type="PackedScene" path="res://scenes/Samples/particles/partBloodSmearGreenPersistent.tscn" id="2_bawqr"]
+[ext_resource type="PackedScene" uid="uid://cqf6eoofrp6j5" path="res://scenes/Samples/particles/partBloodSmearGreenPersistent.tscn" id="2_bawqr"]
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="3_bawqr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lrtaf"]

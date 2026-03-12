@@ -16,3 +16,6 @@ func setup_impact(impact_global_pos: Vector2, away_from_surface: Vector2) -> voi
 
 	global_position = impact_global_pos + away_dir * wall_push_offset
 	rotation = away_dir.angle()
+	
+func setup_color(color: Color) -> void:
+	process_material.color = color

@@ -42,9 +42,16 @@ func _on_impact_ended() -> void:
 func _on_body_slammed(collision: KinematicCollision2D, speed: float) -> void:
 	if !_dazed or speed < wall_slam_speed_min or !_is_wall(collision):
 		return
-	_spawn_blood_smear(collision.get_position(), collision.get_normal())
+	
+	# Destroy the instance
+	$CompDamage.blood_smear_enabled = true
+	$CompDamage.blood_smear_direction = collision.get_normal()
+	$CompDamage.blood_smear_location = collision.get_position()
+	$CompDamage._instance_destroy()
+	
+	#_spawn_blood_smear(collision.get_position(), collision.get_normal())
 	# Delete the goblin
-	queue_free()
+	#queue_free()
 
 
 # Check collision with a wall like object 

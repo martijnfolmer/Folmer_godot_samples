@@ -30,6 +30,7 @@ func _ready() -> void:
 	area.mouse_entered.connect(_on_mouse_entered)
 	area.mouse_exited.connect(_on_mouse_exited)
 
+## set hover_cell in globalGrid
 func _on_mouse_entered() -> void:
 	mouse_over = true
 	var gs := GlobalGrid.grid_state
@@ -39,10 +40,12 @@ func _on_mouse_entered() -> void:
 		pass
 	sprite.modulate = Color.YELLOW
 
+## reset_hover_cell when mouse exits
 func _on_mouse_exited() -> void:
 	mouse_over = false
 	sprite.modulate = Color.WHITE
 
+## set the cell type
 func set_type(t: CellType) -> void:
 	cell_type = t
 	# match cell_type:
@@ -50,6 +53,7 @@ func set_type(t: CellType) -> void:
 	# 	CellType.ROAD:  ...
 	# 	CellType.ROCK:  ...
 
+## resize the cell sprite to fit our size
 func resize(w: int, h: int) -> void:
 
 	if sprite == null:

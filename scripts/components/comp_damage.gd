@@ -14,7 +14,6 @@ extends Node
 
 const DEFAULT_BLOOD_SMEAR_SCENE := preload("res://scenes/Samples/particles/partBloodSmearGreenPersistent.tscn")
 
-
 var hp_c: int
 var _shake_timer: float = 0.0
 var _origin_pos: Vector2
@@ -23,7 +22,9 @@ var blood_smear_scene: PackedScene
 var blood_smear_direction = null
 var blood_smear_location = null
 
-# Lifecycle
+################
+# Initialization
+################
 ## Initialize health state and default blood smear resource.
 func _ready() -> void:
 	# Start with full health and disable shake processing until needed.
@@ -34,19 +35,21 @@ func _ready() -> void:
 	if blood_smear_scene == null:
 		blood_smear_scene = DEFAULT_BLOOD_SMEAR_SCENE
 
-# Public API
-## Apply damage and trigger shake or destruction depending on remaining HP.
-func take_damage(amount: int) -> void:
-	if amount == 0:
-		return
-	# Reduce health first, then branch to death or hit feedback.
-	hp_c -= amount
-	if hp_c <= 0:
-		_instance_destroy()
-		return
-	_start_shake()
+#################################################################
+# Processing
+##################################################################
 
+func _process(delta: float) -> void:
+	
+	# Shake if we are damaged
+	_shaking(delta)
+
+
+
+
+################
 # Shake feedback
+################
 ## Begin the short random shake effect on the parent node.
 func _start_shake() -> void:
 	# Capture original position so it can be restored when shake ends.
@@ -55,8 +58,7 @@ func _start_shake() -> void:
 	set_process(true)
 
 ## Update the active shake effect and decay amplitude over time.
-func _process(delta: float) -> void:
-	# End shake and restore parent position when timer expires.
+func _shaking(delta: float) -> void:
 	_shake_timer -= delta
 	if _shake_timer <= 0.0:
 		get_parent().position = _origin_pos
@@ -73,10 +75,30 @@ func _process(delta: float) -> void:
 	get_parent().position = _origin_pos + offset
 
 
-# Destroy flow
+###################
+# Getting damaged
+###################
+
+## Apply damage and trigger shake or destruction depending on remaining HP.
+func take_damage(amount: int) -> void:
+	if amount == 0:
+		return
+	
+	# Reduce health first, then branch to death or hit feedback.
+	hp_c -= amount
+	if hp_c <= 0:
+		_instance_destroy()
+		return
+	_start_shake()
+
+
+###############################
+# Destruction of the instance
+###############################
 ## Spawn configured blood smear and delete the owning entity hierarchy.
 func _instance_destroy() -> void:
-	# Resolve a stable world position for the smear if not pre-set.
+	
+	# Find out where the blood smear should be
 	if blood_smear_location == null:
 		var sibling = get_characterbody2d_sibling()
 		if sibling == null:
@@ -84,7 +106,7 @@ func _instance_destroy() -> void:
 		else:
 			blood_smear_location = sibling.global_position
 
-	# Spawn directional or omni smear depending on available direction.
+	# Spawn directional or omni smear depending on available direction
 	if blood_smear_direction == null:
 		spawn_blood_smear(blood_smear_location, blood_smear_color)
 	else:
@@ -97,21 +119,11 @@ func _instance_destroy() -> void:
 	parent.queue_free()
 
 
-# Helpers
-## Return the first CharacterBody2D sibling under the same parent, if any.
-func get_characterbody2d_sibling() -> CharacterBody2D:
-	var parent := get_parent()
-	if parent == null:
-		return null
 
-	for child in parent.get_children():
-		if child != self and child is CharacterBody2D:
-			return child
+##############
+# Generate Blood smear upon death
+#############
 
-	return null
-
-
-# Blood smear
 ## Spawn a directional blood smear effect aligned away from impact direction.
 func spawn_blood_smear_directional(global_pos: Vector2, away_dir: Vector2, color: Color = Color.GREEN) -> void:
 	# Respect effect enable flag and scene availability.
@@ -149,3 +161,19 @@ func spawn_blood_smear(global_pos: Vector2, color: Color = Color.GREEN) -> void:
 			instance.process_material.spread = 360.0
 			instance.process_material.color = color
 		instance.amount = 150
+
+
+###########
+# Helpers
+###########
+## Return the first CharacterBody2D sibling under the same parent, if any.
+func get_characterbody2d_sibling() -> CharacterBody2D:
+	var parent := get_parent()
+	if parent == null:
+		return null
+
+	for child in parent.get_children():
+		if child != self and child is CharacterBody2D:
+			return child
+
+	return null

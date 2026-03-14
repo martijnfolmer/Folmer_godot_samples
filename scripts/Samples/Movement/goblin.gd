@@ -23,12 +23,12 @@ var _dazed_orbit_phase: float = 0.0
 func _ready() -> void:
 	add_to_group("goblin")
 
-	# Bind kickback lifecycle callbacks used for dazed state and slam death.
+	# Bind kickback signals from CompBodyKickBack used for dazed state and slam death.
 	var kickback := get_node_or_null("CompBodyKickback")
 	if kickback:
-		kickback.impact_started.connect(_on_impact_started)
-		kickback.impact_ended.connect(_on_impact_ended)
-		kickback.body_slammed.connect(_on_body_slammed)
+		kickback.impact_started.connect(_on_impact_started)	# reads the signal impact_started
+		kickback.impact_ended.connect(_on_impact_ended)		# reads the signal impact_ended
+		kickback.body_slammed.connect(_on_body_slammed)		# reads the signal on_body_slammed
 
 	set_process(true)
 

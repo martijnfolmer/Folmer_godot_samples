@@ -1,10 +1,16 @@
 extends Node
 
+"""
+	Check if we are in collision with the cells (meaning, we are standing over them)
+	
+	Uses physics collision to check.
+"""
+
 signal on_cell_state_changed(is_on_cell: bool, area: Area2D)
 
-@export var body_path: NodePath = NodePath("../CharacterBody2D")
+@export var body_path: NodePath = NodePath("../CharacterBody2D") # our characterbody2d
 @export var cell_scene: PackedScene
-@export var poll_in_physics: bool = true
+@export var poll_in_physics: bool = true		# either poll in physics, or in normal process
 @export var debug_print_changes: bool = false
 
 var is_on_cell: bool = false
@@ -15,7 +21,7 @@ var _cell_scene_path: String = ""
 
 
 func _ready() -> void:
-	_body = get_node_or_null(body_path) as CollisionObject2D
+	_body = get_node_or_null(body_path) as CollisionObject2D		# get our collision
 	_cell_scene_path = cell_scene.resource_path if cell_scene != null else ""
 	_refresh_overlap_state()
 
@@ -30,6 +36,7 @@ func _process(_delta: float) -> void:
 		_refresh_overlap_state()
 
 
+## check if we are overlapping or not
 func _refresh_overlap_state() -> void:
 	var overlap_area := _find_overlapping_cell_area()
 	var next_is_on_cell: bool = overlap_area != null

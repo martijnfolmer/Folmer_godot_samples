@@ -1,6 +1,12 @@
 extends Node2D
 class_name Cell
 
+"""
+	Cells, which are part of a grid (like a chessboard)
+	
+	Cells can have different celltypes and have a mouse_over/mouse_exited event
+"""
+
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var area: Area2D = $Area2D
 
@@ -20,7 +26,7 @@ func init(x: int, y: int, w: int, h: int, t: CellType = CellType.EMPTY) -> void:
 	resize(w, h)
 
 func _ready() -> void:
-	add_to_group("cell_floor")
+	add_to_group("cells")
 	area.mouse_entered.connect(_on_mouse_entered)
 	area.mouse_exited.connect(_on_mouse_exited)
 

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://corghhtuatjgc"]
 
-[ext_resource type="Script" uid="uid://bn6de87khl8p4" path="res://scripts/Samples/Particles/PartElectricTrail_center.gd" id="1_orvs2"]
+[ext_resource type="Script" uid="uid://bn6de87khl8p4" path="res://scripts/Samples/Particles/part_electric_trail_center.gd" id="1_orvs2"]
 [ext_resource type="Texture2D" uid="uid://b531o11daaxir" path="res://png/particles/partWhiteCircle64x64.png" id="1_ybnmo"]
 [ext_resource type="Texture2D" uid="uid://chvhprwtccc7i" path="res://png/particles/partWhiteLine.png" id="3_g2vxe"]
 

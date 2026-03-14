@@ -1,77 +1,69 @@
 extends CharacterBody2D
 
 @export_group("Movement")
-## Speed of the player (pixels/second)
 @export var speed: float = 500.0
-## How fast the player accelerates toward the desired speed (pixels/second²)
 @export var accelerate: float = 2000.0
-## How fast the player slows down to 0 when no input is given (pixels/second²)
 @export var deccelerate: float = 2500.0
-## How quickly the body turns to face the mouse (higher = snappier)
 @export var angular_speed: float = 8.0
 
 @export_group("Sprites")
-## Body sprite texture
 @export var texture: Texture2D
-## Leg sprite texture
 @export var legTexture: Texture2D
 
 @export_group("Leg visualisation")
-## How far the legs trail behind the body while moving (pixels)
 @export var trail_distance: float = 10.0
-## Side-to-side spacing between left/right legs (pixels)
 @export var leg_side_offset: float = 6.0
-## How quickly the leg pair position follows its target (higher = snappier)
 @export var leg_follow_smooth: float = 22.0
-## How quickly the legs rotate to align with movement direction (higher = snappier)
 @export var legs_rot_smooth: float = 18.0
 
 @export_group("Stepping (rate + fading)")
-## Estimated stride length (pixels) when leg_base_scale_x = 1.0 (bigger = fewer steps)
 @export var step_length_pixels_at_scale_1: float = 24.0
-## Smoothing for changes in step rate (higher = less jitter when speed changes)
 @export var step_rate_smooth: float = 12.0
-## How quickly stepping fades in/out when starting or stopping (higher = faster fade)
 @export var step_fade_smooth: float = 16.0
 
 @export_group("Leg scale smoothing")
-## How quickly the leg X-scale (front/back flip) follows its target (higher = snappier)
 @export var scale_smooth_x: float = 20.0
-## How quickly the leg Y-scale (thickness/extension) follows its target (higher = snappier)
 @export var scale_smooth_y: float = 20.0
 
 @export_group("Leg shape")
-## Base X scale for legs, also treated as legt length for step rate calculation
+## Base X scale for legs, also treated as leg length for step rate calculation.
 @export var leg_base_scale_x: float = 1.0
-## Base Y scale for legs (thickness)
 @export var leg_base_scale_y: float = 1.0
-## Extra Y scaling added at the extremes of each step
 @export var leg_extend_amount_y: float = 0.35
 
 @export_group("Attacking")
-@export var attack_dist: float = 1000		# TODO: we don't use this anymore
+@export var attack_dist: float = 1000
 @export var attack_v: float = 1000
 @export var kick_force: float = 100.0
 @export var kick_leg_length_mult: float = 2.5
 @export var kick_leg_forward_offset: float = 28.0
 
-## increasing scale of leg when kicking
 @export var kick_leg_thickness_mult: float = 1.2
 
-## Speed multiplier while kicking (player can still move from input but slower)
 @export var kick_speed_mult: float = 0.5
 
+@export_group("Pillar push")
+@export var pillar_push_carry_ratio: float = 1.0
+@export var pillar_push_escape_ratio: float = 0.8
+@export var pillar_push_follow_smooth: float = 20.0
+@export var pillar_push_decay: float = 1400.0
+@export var pillar_push_no_contact_decay_mult: float = 1.8
+@export var pillar_push_max_speed: float = 1400.0
+@export var pillar_push_contact_max_speed: float = 900.0
+@export var pillar_contact_memory_sec: float = 0.14
+@export var pillar_separation_epsilon: float = 1.2
+@export var pillar_separation_iterations: int = 3
 
-var sprite: Sprite2D    # TODO: change name to something like player_sprite
-var kick_hitbox: Area2D # the hitbox for the kick
+
+var sprite: Sprite2D
+var kick_hitbox: Area2D
 var leg_left: Sprite2D
 var leg_right: Sprite2D
 
 var _step_time: float = 0.0
 var _step_strength: float = 0.0
-var _step_angular_speed: float = 0.0  # smoothed radians/sec
+var _step_angular_speed: float = 0.0
 
-# The things 
 var _cur_lx: float = 0.0
 var _cur_rx: float = 0.0
 var _cur_ly: float = 1.0
@@ -83,18 +75,25 @@ var _legs_rotation: float = 0.0
 
 var _attack: Dictionary
 var _kick_hit_bodies: Array[Node] = []
+var _destroying_from_squash: bool = false
+var _input_velocity: Vector2 = Vector2.ZERO
+var _external_push_velocity: Vector2 = Vector2.ZERO
+var _recent_pillar_contacts: Dictionary = {}
 
+# Lifecycle
+## Create runtime sprites/hitbox and initialize player state.
 func _ready() -> void:
-	
-	# Main body sprite
+	add_to_group("player")
+
+	# Build body sprite.
 	sprite = Sprite2D.new()
 	add_child(sprite)
 	sprite.texture = texture
 
-	# attacking
-	_attack = {"dist_c": 0, "dist_t": attack_dist, "v":attack_v, "ang":0, "state" : false} # TODO: I don't think we use this anymore
+	# Initialize attack state container.
+	_attack = {"dist_c": 0, "dist_t": attack_dist, "v":attack_v, "ang":0, "state" : false}
 
-	# Leg sprites
+	# Build leg sprites.
 	leg_left = Sprite2D.new()
 	add_child(leg_left)
 	leg_left.texture = legTexture
@@ -115,8 +114,7 @@ func _ready() -> void:
 	_legs_center = sprite.global_position
 	_legs_rotation = 0.0
 
-	# Kick hitbox: follows extended leg during attack, applies damage/kickback to pillars and goblins on overlap
-	# TODO: add comments for what each of the kick_hitbox 
+	# Create kick hitbox used for close-range overlap detection.
 	kick_hitbox = Area2D.new()
 	kick_hitbox.name = "KickHitbox"
 	kick_hitbox.monitoring = true
@@ -129,28 +127,29 @@ func _ready() -> void:
 	var kick_col := CollisionShape2D.new()
 	kick_col.shape = kick_shape
 	kick_hitbox.add_child(kick_col)
-	kick_hitbox.body_entered.connect(_on_kick_hitbox_body_entered) # this happens every time we do a kick_hitbox
+	kick_hitbox.body_entered.connect(_on_kick_hitbox_body_entered)
 
+# Main loop
+## Process movement, combat, leg animation, and external push each frame.
 func _physics_process(delta: float) -> void:
-
-	# Turn the body towards the global position
+	# Aim body rotation toward mouse world position.
 	var desired_body_rot: float = (get_global_mouse_position() - global_position).angle()
 
-	# Start attack (use just_pressed so it doesn't re-trigger on the next frames)
+	# Start attack on press and reset hit tracking.
 	if !_attack["state"] and Input.is_action_just_pressed("ui_primary_action"):
 		_attack["state"] = true
 		_attack["ang"] = desired_body_rot
 		_attack["dist_c"] = 0.0
 		_kick_hit_bodies.clear()
 
-	# When attacking, check overlapping bodies so we don't miss pillars/goblins when close (hitbox can tunnel through)
+	# While attacking, apply hits to any overlapping valid targets.
 	if _attack["state"]:
 		for body in kick_hitbox.get_overlapping_bodies():
 			var target: Node = body.get_parent()
 			if (target.is_in_group("pillar") or target.is_in_group("goblin")) and target not in _kick_hit_bodies:
 				_apply_kick_to_target(target)
 
-	# Movement: always input-based; slow down while kicking
+	# Read WASD axis input and normalize direction.
 	var input_dir: Vector2 = Vector2(
 		Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
 		Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
@@ -158,22 +157,35 @@ func _physics_process(delta: float) -> void:
 	if input_dir.length() > 0.0:
 		input_dir = input_dir.normalized()
 
-	var effective_speed: float = speed * (kick_speed_mult if _attack["state"] else 1.0) # slower when we speed
+	# Accelerate/decelerate input velocity and combine with external push.
+	var effective_speed: float = speed * (kick_speed_mult if _attack["state"] else 1.0)
 	var target_velocity: Vector2 = input_dir * effective_speed
 	var rate: float = accelerate if input_dir != Vector2.ZERO else deccelerate
-	velocity.x = move_toward(velocity.x, target_velocity.x, rate * delta)
-	velocity.y = move_toward(velocity.y, target_velocity.y, rate * delta)
+	_input_velocity.x = move_toward(_input_velocity.x, target_velocity.x, rate * delta)
+	_input_velocity.y = move_toward(_input_velocity.y, target_velocity.y, rate * delta)
+	velocity = _input_velocity + _external_push_velocity
 
-	# Attack duration: advance virtual distance and end kick after attack_dist/attack_v time
+	# Advance attack duration timer and end when virtual distance is reached.
 	if _attack["state"]:
 		_attack["dist_c"] += float(_attack["v"]) * delta
 		if _attack["dist_c"] >= float(_attack["dist_t"]):
 			_attack["state"] = false
 
-	# actual movement and collision with pillars and such
+	# Run movement, carry pillar push, and resolve overlap nudges.
 	move_and_slide()
+	_update_external_push_from_pillars(delta)
+	_resolve_pillar_overlap()
+	velocity = _input_velocity + _external_push_velocity
 
-	# Stop attack if we hit something, stop moving and apply impact/damage to any pillars we collided with
+	# Trigger squash death when opposing pillar contacts are detected.
+	var squash_contacts: Array = _get_pillar_squash_contacts()
+	if squash_contacts.size() < 2:
+		squash_contacts = _get_recent_pillar_squash_contacts()
+	if squash_contacts.size() >= 2:
+		_destroy_from_squash(squash_contacts[0], squash_contacts[1])
+		return
+
+	# If kick collides during slide checks, apply kick once per target and stop attack.
 	if _attack["state"] and get_slide_collision_count() > 0:
 		for i in get_slide_collision_count():
 			var col := get_slide_collision(i)
@@ -182,54 +194,51 @@ func _physics_process(delta: float) -> void:
 			var body := col.get_collider() as Node2D
 			if !body:
 				continue
-			
-			# Check what we are colliding with it
+
 			var collNode: Node = body.get_parent()
 			if (collNode.is_in_group("pillar") or collNode.is_in_group("goblin")) and collNode not in _kick_hit_bodies:
 				_apply_kick_to_target(collNode)
-				
-				
-		_attack["state"] = false
-		velocity = Vector2.ZERO
 
-	# Get direction of the movement
-	var moving: bool = velocity.length() > 0.05	# are we moving?
+		_attack["state"] = false
+		_input_velocity = Vector2.ZERO
+		velocity = _external_push_velocity
+
+	# Compute movement direction used by body/legs visual logic.
+	var moving: bool = velocity.length() > 0.05
 	var vel_dir: Vector2 = velocity.normalized() if moving else Vector2.ZERO
 	if moving:
 		_last_move_dir = vel_dir
 	var move_dir: Vector2 = _last_move_dir.normalized()
 
-	# Body (and hitbox) always rotate toward mouse; sprite stays aligned with body
+	# Rotate body toward aim; sprite remains unrotated locally.
 	rotation = lerp_angle(rotation, desired_body_rot, angular_speed * delta)
 	sprite.rotation = 0.0
 
-	# Legs rotate toward movement direction (or kick direction when attacking)
-	# Legs are body children so use local angle: desired world angle minus body rotation
+	# Rotate legs toward kick angle or movement direction.
 	var legs_world_ang: float = _attack["ang"] if _attack["state"] else move_dir.angle()
 	var desired_legs_rot: float = legs_world_ang - rotation
 	_legs_rotation = lerp_angle(_legs_rotation, desired_legs_rot, 1.0 - exp(-legs_rot_smooth * delta))
 	leg_left.rotation = _legs_rotation
 	leg_right.rotation = _legs_rotation
 
-	# Legs position: centered under body, trailing behind movement (no trailing during kick)
+	# Update legs center and side offsets relative to body.
 	var center_target: Vector2 = sprite.global_position
 	if moving and !_attack["state"]:
 		center_target -= vel_dir * trail_distance
 	_legs_center = _legs_center.lerp(center_target, 1.0 - exp(-leg_follow_smooth * delta))
 
-	# Split left/right relative to body facing (top-down)
 	var perp: Vector2 = Vector2.RIGHT.rotated(rotation).orthogonal().normalized()
 	leg_left.global_position = _legs_center - perp * leg_side_offset
 	leg_right.global_position = _legs_center + perp * leg_side_offset
 	if _attack["state"]:
 		var kick_forward: Vector2 = Vector2.RIGHT.rotated(_attack["ang"])
 		leg_left.global_position += kick_forward * kick_leg_forward_offset
-	
-	#Set depth of leg	
+
+	# Keep legs behind body depth.
 	leg_left.z_index = sprite.z_index - 1
 	leg_right.z_index = sprite.z_index - 1
 
-	# Stepping strength (fade in/out when you start/stop; no stepping during kick)
+	# Blend stepping strength in/out depending on state.
 	var target_strength: float = 0.0 if _attack["state"] else (1.0 if moving else 0.0)
 	_step_strength = lerp(_step_strength, target_strength, 1.0 - exp(-step_fade_smooth * delta))
 
@@ -238,34 +247,32 @@ func _physics_process(delta: float) -> void:
 	var desired_ly: float
 	var desired_ry: float
 
+	# Choose pose for kick state or walking step cycle.
 	if _attack["state"]:
-		# Kick pose: one leg forward, one still (no _step_time advance)
 		desired_lx = leg_base_scale_x * kick_leg_length_mult
 		desired_rx = 0.0
 		desired_ly = leg_base_scale_y * kick_leg_thickness_mult
 		desired_ry = leg_base_scale_y
 	else:
-		# Step rate based on speed and leg length
+		# Derive stepping phase speed from movement speed and stride.
 		var movement_speed: float = velocity.length()
 		var stride_length_pixels: float = max(1.0, step_length_pixels_at_scale_1 * max(0.05, leg_base_scale_x))
 		var steps_per_second: float = movement_speed / stride_length_pixels
 
-		# Convert to radians/sec for sin() phase and smooth it so it doesn't jitter
 		var desired_step_angular_speed: float = TAU * steps_per_second
 		_step_angular_speed = lerp(_step_angular_speed, desired_step_angular_speed, 1.0 - exp(-step_rate_smooth * delta))
 		_step_time += _step_angular_speed * delta
 
-		# Left/right opposite phase
+		# Use opposite sine phase for left/right legs.
 		var phase_l: float = sin(_step_time) * _step_strength
 		var phase_r: float = sin(_step_time + PI) * _step_strength
 
-		# X swing and Y extension
 		desired_lx = phase_l * leg_base_scale_x
 		desired_rx = phase_r * leg_base_scale_x
 		desired_ly = leg_base_scale_y + leg_extend_amount_y * abs(float(phase_l))
 		desired_ry = leg_base_scale_y + leg_extend_amount_y * abs(float(phase_r))
 
-	# Smooth the scale change
+	# Smooth leg scale changes.
 	_cur_lx = lerp(_cur_lx, desired_lx, 1.0 - exp(-scale_smooth_x * delta))
 	_cur_rx = lerp(_cur_rx, desired_rx, 1.0 - exp(-scale_smooth_x * delta))
 	_cur_ly = lerp(_cur_ly, desired_ly, 1.0 - exp(-scale_smooth_y * delta))
@@ -274,18 +281,20 @@ func _physics_process(delta: float) -> void:
 	leg_left.scale = Vector2(_cur_lx, _cur_ly)
 	leg_right.scale = Vector2(_cur_rx, _cur_ry)
 
-	# Optional pixel snapping
+	# Snap visuals to integer pixels for crisp sprite rendering.
 	sprite.global_position = sprite.global_position.round()
 	leg_left.global_position = leg_left.global_position.round()
 	leg_right.global_position = leg_right.global_position.round()
 
+	# Keep kick hitbox at the tip of the active kicking leg.
 	if _attack["state"]:
-		# Place hitbox at tip of extended leg so it matches where the foot visually hits
 		var leg_half_length: float = leg_left.texture.get_size().x * leg_left.scale.x * 0.5
 		var foot_tip: Vector2 = leg_left.global_position + Vector2.RIGHT.rotated(leg_left.global_rotation) * leg_half_length
 		kick_hitbox.global_position = foot_tip
 
 
+# Kick
+## Apply damage and kickback to a target once per attack.
 func _apply_kick_to_target(target: Node) -> void:
 	_kick_hit_bodies.append(target)
 	target.get_node("CompDamage").take_damage(1)
@@ -293,7 +302,7 @@ func _apply_kick_to_target(target: Node) -> void:
 	target.get_node("CompBodyKickback").impact(kick_force, ang)
 
 
-# Kicking! collision with foot (pillars and goblins and other things we want to kick)
+## Handle hitbox overlap events and apply kick to valid targets.
 func _on_kick_hitbox_body_entered(body: Node2D) -> void:
 	if !_attack["state"]:
 		return
@@ -303,3 +312,234 @@ func _on_kick_hitbox_body_entered(body: Node2D) -> void:
 	if target in _kick_hit_bodies:
 		return
 	_apply_kick_to_target(target)
+
+
+# Squash and destroy
+## Return two opposing pillar contacts that indicate a crush scenario.
+func _get_pillar_squash_contacts() -> Array:
+	var contacts: Array = []
+	# Collect current pillar collisions.
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		if collision == null:
+			continue
+		var pillar := _node_or_ancestor_in_group(collision.get_collider() as Node, "pillar")
+		if pillar == null:
+			continue
+		contacts.append({"collision": collision, "pillar": pillar})
+	
+	if contacts.size() < 2:
+		return []
+
+	# Find two different pillars with opposing normals.
+	for i in contacts.size():
+		for j in range(i + 1, contacts.size()):
+			var first: Dictionary = contacts[i]
+			var second: Dictionary = contacts[j]
+			if first["pillar"] == second["pillar"]:
+				continue
+			var n1: Vector2 = first["collision"].get_normal()
+			var n2: Vector2 = second["collision"].get_normal()
+			if n1.dot(n2) <= -0.45:
+				return [first, second]
+	return []
+
+
+## Trigger destruction flow with smear direction/location from crush contacts.
+func _destroy_from_squash(contact_a: Dictionary, contact_b: Dictionary) -> void:
+	if _destroying_from_squash:
+		return
+	_destroying_from_squash = true
+	
+	var damage := $"../CompDamage"
+	if damage == null or !damage.has_method("_instance_destroy"):
+		_destroying_from_squash = false
+		return
+
+	# Build smear metadata from contact geometry and player velocity.
+	var normal_a: Vector2 = _get_contact_normal(contact_a)
+	var pos_a: Vector2 = _get_contact_position(contact_a)
+	var pos_b: Vector2 = _get_contact_position(contact_b)
+	var smear_location: Vector2 = (pos_a + pos_b) * 0.5
+	var smear_direction: Vector2 = -velocity.normalized() if velocity.length_squared() > 0.001 else normal_a
+	
+	damage.blood_smear_enabled = true
+	damage.blood_smear_direction = smear_direction
+	damage.blood_smear_location = smear_location
+	damage._instance_destroy()
+
+
+# External push
+## Blend carried velocity from pillar collisions into external push state.
+func _update_external_push_from_pillars(delta: float) -> void:
+	var now_sec: float = Time.get_ticks_msec() * 0.001
+	# Keep only recent contact records.
+	_expire_recent_pillar_contacts(now_sec)
+	var target_push: Vector2 = Vector2.ZERO
+	var has_pillar_contact: bool = false
+	# Build target push from pillar velocities pressing into the player.
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		if collision == null:
+			continue
+		var pillar := _node_or_ancestor_in_group(collision.get_collider() as Node, "pillar")
+		if pillar == null:
+			continue
+		_recent_pillar_contacts[pillar.get_instance_id()] = {
+			"normal": collision.get_normal(),
+			"position": collision.get_position(),
+			"until": now_sec + pillar_contact_memory_sec
+		}
+		has_pillar_contact = true
+		var pillar_body := pillar.get_node_or_null("CharacterBody2D") as CharacterBody2D
+		if pillar_body == null:
+			continue
+		var pillar_velocity: Vector2 = pillar_body.velocity
+		if pillar_velocity.length_squared() <= 0.001:
+			continue
+		var normal: Vector2 = collision.get_normal()
+		var push_into_player: float = pillar_velocity.dot(-normal)
+		if push_into_player <= 0.0:
+			continue
+		target_push += -normal * push_into_player * pillar_push_carry_ratio
+
+	# Clamp aggregate push to avoid unstable magnitudes.
+	if target_push.length() > pillar_push_max_speed:
+		target_push = target_push.normalized() * pillar_push_max_speed
+
+	# While in contact, apply escape reduction and follow smoothing.
+	if has_pillar_contact:
+		var input_escape: Vector2 = _input_velocity
+		if target_push.length_squared() > 0.001 and input_escape.length_squared() > 0.001:
+			var push_dir: Vector2 = target_push.normalized()
+			var escape_against_push: float = max(0.0, -input_escape.dot(push_dir))
+			if escape_against_push > 0.0:
+				var reduction: float = min(target_push.length(), escape_against_push * max(0.0, pillar_push_escape_ratio))
+				target_push -= push_dir * reduction
+		var contact_cap: float = min(pillar_push_max_speed, max(0.0, pillar_push_contact_max_speed))
+		if contact_cap > 0.0 and target_push.length() > contact_cap:
+			target_push = target_push.normalized() * contact_cap
+		var follow_weight: float = 1.0 - exp(-pillar_push_follow_smooth * delta)
+		_external_push_velocity = _external_push_velocity.lerp(target_push, follow_weight)
+	else:
+		# Without contact, decay external push toward zero.
+		_external_push_velocity = _external_push_velocity.move_toward(
+			Vector2.ZERO,
+			pillar_push_decay * max(1.0, pillar_push_no_contact_decay_mult) * delta
+		)
+
+
+## Accept a direct pushed velocity and merge it into external push state.
+func receive_external_push_velocity(pushed_velocity: Vector2) -> void:
+	if pushed_velocity.length_squared() <= 0.001:
+		return
+	var next_push: Vector2 = pushed_velocity * pillar_push_carry_ratio
+	var cap_speed: float = min(pillar_push_max_speed, max(0.0, pillar_push_contact_max_speed))
+	if cap_speed > 0.0 and next_push.length() > cap_speed:
+		next_push = next_push.normalized() * cap_speed
+	# Keep stronger push, or blend toward new push if weaker.
+	if next_push.length_squared() > _external_push_velocity.length_squared():
+		_external_push_velocity = next_push
+	else:
+		_external_push_velocity = _external_push_velocity.lerp(next_push, 0.4)
+
+
+## Convert force+direction input into velocity-based external push.
+func receive_external_push(push_force: float, push_dir: Vector2) -> void:
+	if push_force <= 0.0 or push_dir.length_squared() <= 0.001:
+		return
+	receive_external_push_velocity(push_dir.normalized() * push_force)
+
+
+# Contact helpers
+## Return recent cached contacts that satisfy squash opposition test.
+func _get_recent_pillar_squash_contacts() -> Array:
+	var contacts: Array = []
+	# Rebuild contact list from the short-lived cache.
+	for pillar_id in _recent_pillar_contacts.keys():
+		var contact: Dictionary = _recent_pillar_contacts[pillar_id]
+		contacts.append({
+			"pillar_id": pillar_id,
+			"normal": contact.get("normal", Vector2.ZERO),
+			"position": contact.get("position", global_position)
+		})
+	
+	if contacts.size() < 2:
+		return []
+
+	# Find opposing cached normals from different pillars.
+	for i in contacts.size():
+		for j in range(i + 1, contacts.size()):
+			var first: Dictionary = contacts[i]
+			var second: Dictionary = contacts[j]
+			var n1: Vector2 = first["normal"]
+			var n2: Vector2 = second["normal"]
+			if n1.dot(n2) <= -0.45:
+				return [first, second]
+	return []
+
+
+## Remove expired contact records from cache.
+func _expire_recent_pillar_contacts(now_sec: float) -> void:
+	for pillar_id in _recent_pillar_contacts.keys():
+		var contact: Dictionary = _recent_pillar_contacts[pillar_id]
+		if now_sec >= float(contact.get("until", 0.0)):
+			_recent_pillar_contacts.erase(pillar_id)
+
+
+# Collision/group helpers
+## Resolve collision normal from live collision entry or cached contact data.
+func _get_contact_normal(contact: Dictionary) -> Vector2:
+	if contact.has("collision") and contact["collision"] != null:
+		var collision: KinematicCollision2D = contact["collision"]
+		return collision.get_normal()
+	if contact.has("normal"):
+		return contact["normal"]
+	return Vector2.ZERO
+
+
+## Resolve collision position from live collision entry or cached contact data.
+func _get_contact_position(contact: Dictionary) -> Vector2:
+	if contact.has("collision") and contact["collision"] != null:
+		var collision: KinematicCollision2D = contact["collision"]
+		return collision.get_position()
+	if contact.has("position"):
+		return contact["position"]
+	return global_position
+
+
+## Return the nearest ancestor in a group, or null if not found.
+func _node_or_ancestor_in_group(node: Node, group: StringName) -> Node:
+	var current: Node = node
+	while current != null:
+		if current.is_in_group(group):
+			return current
+		current = current.get_parent()
+	return null
+
+
+# Overlap resolution
+## Nudge player out of pillar overlap across a few short passes.
+func _resolve_pillar_overlap() -> void:
+	var passes: int = max(1, pillar_separation_iterations)
+	var separation_step: float = max(0.1, pillar_separation_epsilon)
+	# Iterate small push-out attempts to resolve corner contacts.
+	for _i in range(passes):
+		var did_push_out: bool = false
+		for j in get_slide_collision_count():
+			var collision := get_slide_collision(j)
+			if collision == null:
+				continue
+			var pillar := _node_or_ancestor_in_group(collision.get_collider() as Node, "pillar")
+			if pillar == null:
+				continue
+			var normal: Vector2 = collision.get_normal()
+			if normal.length_squared() <= 0.001:
+				continue
+			var nudge: Vector2 = normal.normalized() * separation_step
+			var push_collision: KinematicCollision2D = move_and_collide(nudge)
+			# A null collision means the nudge succeeded.
+			if push_collision == null:
+				did_push_out = true
+		if !did_push_out:
+			break

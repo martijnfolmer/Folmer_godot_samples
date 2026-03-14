@@ -20,6 +20,7 @@ func init(x: int, y: int, w: int, h: int, t: CellType = CellType.EMPTY) -> void:
 	resize(w, h)
 
 func _ready() -> void:
+	add_to_group("cell_floor")
 	area.mouse_entered.connect(_on_mouse_entered)
 	area.mouse_exited.connect(_on_mouse_exited)
 

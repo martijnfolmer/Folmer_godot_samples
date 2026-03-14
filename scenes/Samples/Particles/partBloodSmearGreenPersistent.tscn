@@ -21,6 +21,7 @@ point_count = 2
 curve = SubResource("Curve_scale")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_kjwgw"]
+resource_local_to_scene = true
 particle_flag_disable_z = true
 spread = 54.288
 initial_velocity_min = 573.89996
@@ -45,4 +46,3 @@ one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_kjwgw")
 script = ExtResource("2_script")
-wall_push_offset = null

@@ -11,12 +11,10 @@
 [node name="cells" type="Node2D" parent="." unique_id=118779851]
 z_index = -100
 script = ExtResource("5_hwd22")
-W = 21
-H = 12
 cell_scene = ExtResource("1_vg2uj")
 
 [node name="Pillar" parent="." unique_id=1493386293 instance=ExtResource("1_bjjws")]
-position = Vector2(132, 513)
+position = Vector2(400, 449)
 
 [node name="Pillar2" parent="." unique_id=139601998 instance=ExtResource("1_bjjws")]
 position = Vector2(1306, 482)
@@ -25,7 +23,7 @@ position = Vector2(1306, 482)
 position = Vector2(974, 994)
 
 [node name="Pillar4" parent="." unique_id=1840937098 instance=ExtResource("1_bjjws")]
-position = Vector2(330, 723)
+position = Vector2(339, 784)
 
 [node name="Pillar5" parent="." unique_id=468483794 instance=ExtResource("1_bjjws")]
 position = Vector2(672, 160)
@@ -58,4 +56,4 @@ position = Vector2(1088, 992)
 position = Vector2(800, 544)
 
 [node name="GoblinBasic3" parent="." unique_id=503990667 instance=ExtResource("3_00l21")]
-position = Vector2(332, 554)
+position = Vector2(240, 417)

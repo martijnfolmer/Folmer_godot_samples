@@ -1,18 +1,21 @@
 [gd_scene format=3 uid="uid://dsf0xhgp0hrv"]
 
 [ext_resource type="Script" uid="uid://dct3iv1o37x8t" path="res://scripts/Samples/GridSquare/cell_square.gd" id="1_qd5sf"]
-[ext_resource type="Texture2D" uid="uid://cyda6c4248nwx" path="res://png/cells/cell_square.png" id="2_fdg2k"]
+[ext_resource type="Texture2D" uid="uid://no7ebdm7v2ue" path="res://png/cells/cell_square_100x100.png" id="2_fdg2k"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fdg2k"]
 size = Vector2(100, 100)
 
 [node name="SquareCell" type="Node2D" unique_id=1411340074]
+light_mask = 16
+visibility_layer = 16
 script = ExtResource("1_qd5sf")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=329206860]
 texture = ExtResource("2_fdg2k")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1013546480]
+monitorable = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1673365382]
 shape = SubResource("RectangleShape2D_fdg2k")

@@ -1,7 +1,7 @@
 extends Node2D
 
 @export_group("Enable")
-@export var movement_enabled: bool = true
+@export var movement_enabled: bool = true		# for debugging, if set to false, we don't update movement
 @export var pause_when_dazed: bool = true
 
 @export_group("Node paths")
@@ -32,9 +32,9 @@ extends Node2D
 @export var path_line_width: float = 2.0
 
 enum BehaviorState {
-	IDLE,
-	CHASE,
-	SEARCH_LAST_KNOWN
+	IDLE,				# we just stand there
+	CHASE,				# moving towards the last known location of the player
+	SEARCH_LAST_KNOWN	# search stuff
 }
 
 var _body: CharacterBody2D
@@ -48,8 +48,7 @@ var _repath_timer: float = 0.0
 var _behavior_state: BehaviorState = BehaviorState.IDLE
 var _last_known_player_pos: Vector2 = Vector2.ZERO
 
-# Lifecycle
-## Resolve node references and initialize staggered repath timer.
+
 func _ready() -> void:
 	_body = get_node_or_null(body_path) as CharacterBody2D
 	_kickback = get_node_or_null(kickback_path)
@@ -65,7 +64,7 @@ func _physics_process(delta: float) -> void:
 	if _body == null:
 		return
 
-	# Disable movement logic and clear path when feature is off.
+	# When we manually disable movement in the gui, we reset our path variables
 	if !_is_movement_active():
 		_set_state(BehaviorState.IDLE)
 		_clear_path()
@@ -73,12 +72,12 @@ func _physics_process(delta: float) -> void:
 			_body.velocity = Vector2.ZERO
 		return
 
-	# Let kickback own movement while impact is active.
+	# If the goblin has impact, we don't do anything with the path
 	if _is_impact_active():
 		_clear_path()
 		return
 
-	# Optional pause while goblin is dazed.
+	# The path stops when the goblin is dazed
 	if pause_when_dazed and _is_goblin_dazed():
 		_clear_path()
 		_body.velocity = Vector2.ZERO
@@ -88,6 +87,7 @@ func _physics_process(delta: float) -> void:
 	# Update behavior state and rebuild path on timer.
 	_update_behavior_state()
 
+	# Recalculate path every so often
 	_repath_timer -= delta
 	if _repath_timer <= 0.0:
 		_rebuild_path_for_state()
@@ -97,7 +97,7 @@ func _physics_process(delta: float) -> void:
 
 
 # Movement guards
-## Return whether this behavior component is enabled.
+## Return whether this behavior component is enabled. for debugging purposes, we set movement_enabled to false
 func _is_movement_active() -> bool:
 	return movement_enabled
 
@@ -117,12 +117,14 @@ func _next_repath_delay() -> float:
 # State machine
 ## Update behavior state using line-of-sight and last-known player position.
 func _update_behavior_state() -> void:
-	# Fall back to idle if no player body is found.
+	
+	# Fall back to idle if no player body is found (if the player is dead for example)
 	var player_body := _get_player_body()
 	if player_body == null:
 		_set_state(BehaviorState.IDLE)
 		return
 
+	# Check line of sight (if we have line of sight, we update the position of the player)
 	var has_los: bool = _has_clear_line_to_player(player_body)
 	if has_los:
 		_last_known_player_pos = player_body.global_position

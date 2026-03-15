@@ -33,6 +33,16 @@ func _ready() -> void:
 	set_process(true)
 
 
+## Update dazed orbit positions each frame while visuals are active.
+func _process(delta: float) -> void:
+	if !_dazed or _dazed_orbit_sprites.is_empty():
+		return
+	_update_dazed_orbit_visuals(delta)
+
+
+
+
+
 # Kickback handlers
 ## Enter dazed state and start orbit visuals when kickback begins.
 func _on_impact_started() -> void:
@@ -74,15 +84,6 @@ func _is_wall(collision: KinematicCollision2D) -> bool:
 	if wall_collision_group.is_empty():
 		return false
 	return _node_or_ancestor_in_group(collider, wall_collision_group)
-
-
-# Runtime/public state
-## Update dazed orbit positions each frame while visuals are active.
-func _process(delta: float) -> void:
-	if !_dazed or _dazed_orbit_sprites.is_empty():
-		return
-	_update_dazed_orbit_visuals(delta)
-
 
 ## Public helper used by other scripts to check goblin dazed state.
 func is_dazed() -> bool:
@@ -148,17 +149,3 @@ func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 			return true
 		current = current.get_parent()
 	return false
-
-
-## Spawn a blood smear scene at impact position and direction.
-func _spawn_blood_smear(global_pos: Vector2, away_dir: Vector2) -> void:
-	if blood_smear_scene == null:
-		return
-	var instance := blood_smear_scene.instantiate()
-	var parent := get_tree().current_scene
-	if parent:
-		parent.add_child(instance)
-		if instance.has_method("setup_impact"):
-			instance.call("setup_impact", global_pos, away_dir)
-		else:
-			instance.global_position = global_pos

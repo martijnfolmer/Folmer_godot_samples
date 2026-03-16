@@ -90,7 +90,7 @@ func _physics_process(delta: float) -> void:
 	# Recalculate path every so often
 	_repath_timer -= delta
 	if _repath_timer <= 0.0:
-		_rebuild_path_for_state()
+		_rebuild_path_for_state()				# based on state, we make a path
 		_repath_timer = _next_repath_delay()
 
 	_follow_path(delta)
@@ -124,22 +124,25 @@ func _update_behavior_state() -> void:
 		_set_state(BehaviorState.IDLE)
 		return
 
-	# Check line of sight (if we have line of sight, we update the position of the player)
+	# Check line of sight (if we have line of sight, we update the known position of the player)
 	var has_los: bool = _has_clear_line_to_player(player_body)
 	if has_los:
 		_last_known_player_pos = player_body.global_position
 
+	# Change state of the goblin
 	match _behavior_state:
-		BehaviorState.IDLE:
+		BehaviorState.IDLE:	# if we are idle and see the player, we chase
 			if has_los:
 				_set_state(BehaviorState.CHASE)
-		BehaviorState.CHASE:
+		BehaviorState.CHASE: # if we are chasing and lose the player, go to last known location
 			if !has_los:
 				_set_state(BehaviorState.SEARCH_LAST_KNOWN)
-		BehaviorState.SEARCH_LAST_KNOWN:
-			if has_los:
-				_set_state(BehaviorState.CHASE)
+		BehaviorState.SEARCH_LAST_KNOWN: 
+			if has_los:	# if we are searching last known, and see the player, we start chasing
+				_set_state(BehaviorState.CHASE) 
 				return
+			
+			# If we are close to player last known location, and don't see him, we go back to idle
 			if _body.global_position.distance_to(_last_known_player_pos) <= waypoint_reach_distance * 1.6:
 				_set_state(BehaviorState.IDLE)
 
@@ -157,17 +160,20 @@ func _set_state(next_state: BehaviorState) -> void:
 # Path build/follow
 ## Build a new path to current behavior target for the active state.
 func _rebuild_path_for_state() -> void:
-	# Resolve target position from behavior state.
+	
+	# If there is no player, we clear the path
 	var player_body := _get_player_body()
 	if player_body == null:
 		_clear_path()
 		return
 
+	# if we are idle, we clear the path and stop moving
 	if _behavior_state == BehaviorState.IDLE:
 		_clear_path()
 		return
 
-	var target_pos: Vector2 = player_body.global_position
+	
+	var target_pos: Vector2 = player_body.global_position			# player location
 	var has_los: bool = _has_clear_line_to_player(player_body)
 	if _behavior_state == BehaviorState.SEARCH_LAST_KNOWN:
 		target_pos = _last_known_player_pos
@@ -351,7 +357,7 @@ func _is_cell_in_bounds(cell: Vector2i) -> bool:
 func _set_path(points: PackedVector2Array) -> void:
 	_path_points = points
 	_path_index = 0
-	queue_redraw()
+	queue_redraw()		# for debugging : draw the path
 
 
 ## Clear active path data and request redraw when needed.
@@ -360,32 +366,12 @@ func _clear_path() -> void:
 		return
 	_path_points = PackedVector2Array()
 	_path_index = 0
-	queue_redraw()
+	queue_redraw()		# for debugging : draw the path
 
-
-# Debug draw
-## Draw current path preview from body to remaining waypoints.
-func _draw() -> void:
-	if !draw_path_enabled or _path_points.is_empty():
-		return
-
-	var next_index: int = clampi(_path_index, 0, _path_points.size() - 1)
-	if _body != null and next_index < _path_points.size():
-		var body_local: Vector2 = to_local(_body.global_position)
-		var next_local: Vector2 = to_local(_path_points[next_index])
-		draw_line(body_local, next_local, path_line_color, path_line_width, true)
-
-	if _path_points.size() - next_index < 2:
-		return
-
-	var local_points: PackedVector2Array = PackedVector2Array()
-	for i in range(next_index, _path_points.size()):
-		local_points.append(to_local(_path_points[i]))
-	draw_polyline(local_points, path_line_color, path_line_width, true)
 
 
 # Perception and smoothing
-## Return true when no pillar blocks line of sight to the player.
+## Return true when no pillar blocks line of sight to the player (line of sight)
 func _has_clear_line_to_player(player_body: CharacterBody2D) -> bool:
 	if _body == null or player_body == null:
 		return false
@@ -427,7 +413,7 @@ func _is_line_blocked_by_pillar(from_pos: Vector2, to_pos: Vector2) -> bool:
 	return _node_or_ancestor_in_group(collider, "pillar")
 
 
-## Simplify path points by removing collinear and visible intermediate nodes.
+## Simplify path points by removing collinear (points on a single line) and visible intermediate nodes
 func _smooth_path_points(points: PackedVector2Array) -> PackedVector2Array:
 	# First pass: remove mostly collinear points.
 	if points.size() <= 2:
@@ -449,7 +435,7 @@ func _smooth_path_points(points: PackedVector2Array) -> PackedVector2Array:
 	if collinear_reduced.size() <= 2:
 		return collinear_reduced
 
-	# Second pass: greedily skip points with direct pillar-free visibility.
+	# Second pass: greedily skip points with direct pillar-free visibility
 	var simplified: PackedVector2Array = PackedVector2Array()
 	simplified.append(collinear_reduced[0])
 	var anchor: int = 0
@@ -522,3 +508,26 @@ func _node_or_ancestor_in_group(node: Node, group: StringName) -> bool:
 			return true
 		current = current.get_parent()
 	return false
+	
+	
+
+
+# Debug draw
+## Draw current path preview from body to remaining waypoints.
+func _draw() -> void:
+	if !draw_path_enabled or _path_points.is_empty():
+		return
+
+	var next_index: int = clampi(_path_index, 0, _path_points.size() - 1)
+	if _body != null and next_index < _path_points.size():
+		var body_local: Vector2 = to_local(_body.global_position)
+		var next_local: Vector2 = to_local(_path_points[next_index])
+		draw_line(body_local, next_local, path_line_color, path_line_width, true)
+
+	if _path_points.size() - next_index < 2:
+		return
+
+	var local_points: PackedVector2Array = PackedVector2Array()
+	for i in range(next_index, _path_points.size()):
+		local_points.append(to_local(_path_points[i]))
+	draw_polyline(local_points, path_line_color, path_line_width, true)

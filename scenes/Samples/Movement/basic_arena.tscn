@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://c2v34hlugvkwk" path="res://scenes/Samples/Movement/pillar.tscn" id="1_bjjws"]
 [ext_resource type="PackedScene" uid="uid://dsf0xhgp0hrv" path="res://scenes/Samples/GridSquare/cell_square.tscn" id="1_vg2uj"]
-[ext_resource type="PackedScene" uid="uid://dmqrwpp2fg11w" path="res://scenes/Samples/Movement/player_movement_WASD.tscn" id="2_00l21"]
+[ext_resource type="PackedScene" uid="uid://dmqrwpp2fg11w" path="res://scenes/Samples/Movement/player.tscn" id="2_00l21"]
 [ext_resource type="PackedScene" uid="uid://cy6d05qriys22" path="res://scenes/Samples/Movement/goblin_basic.tscn" id="3_00l21"]
 [ext_resource type="Script" uid="uid://cxh2hdapjg7fa" path="res://scripts/Samples/Movement/basic_arena_cell_grid.gd" id="5_hwd22"]
 

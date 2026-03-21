@@ -18,7 +18,6 @@ script = ExtResource("1_72rnh")
 script = ExtResource("2_tbgim")
 speed = 750.0
 deccelerate = 5000.0
-texture = ExtResource("3_tbgim")
 legTexture = ExtResource("4_tbgim")
 trail_distance = 1.0
 leg_side_offset = 20.0
@@ -31,15 +30,18 @@ kick_force = 1000.0
 kick_leg_length_mult = 1.5
 kick_leg_thickness_mult = 1.1
 kick_speed_mult = 0.75
-kick_screen_shake_strength = 100.0
-kick_screen_shake_duration_sec = 5.0
+kick_screen_shake_duration_sec = 0.3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="movement_WASD" unique_id=345265054]
 shape = SubResource("RectangleShape2D_tbgim")
+
+[node name="Sprite2D" type="Sprite2D" parent="movement_WASD" unique_id=1804434444]
+texture = ExtResource("3_tbgim")
 
 [node name="CompDamage" parent="." unique_id=1256099559 instance=ExtResource("5_72rnh")]
 blood_smear_color = Color(0.68833226, 0.13494971, 0.09194548, 1)
 
 [node name="CompOnCellOverlap" parent="." unique_id=148390022 instance=ExtResource("6_j3mg2")]
 body_path = NodePath("../movement_WASD")
+sprite_path = NodePath("../movement_WASD/Sprite2D")
 cell_scene = ExtResource("7_mn7dn")

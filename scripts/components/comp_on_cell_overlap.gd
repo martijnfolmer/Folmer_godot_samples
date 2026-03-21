@@ -9,6 +9,7 @@ extends Node
 signal on_cell_state_changed(is_on_cell: bool, area: Area2D)
 
 @export var body_path: NodePath = NodePath("../CharacterBody2D") # our characterbody2d
+@export var sprite_path: NodePath = NodePath("../CharacterBody2D/Sprite2D") # the sprite
 @export var cell_scene: PackedScene
 @export var poll_in_physics: bool = true		# either poll in physics, or in normal process
 @export var debug_print_changes: bool = false
@@ -17,11 +18,13 @@ var is_on_cell: bool = false
 var current_cell_area: Area2D = null
 
 var _body: CollisionObject2D = null
+var _sprite: Sprite2D = null
 var _cell_scene_path: String = ""
 
 
 func _ready() -> void:
 	_body = get_node_or_null(body_path) as CollisionObject2D		# get our collision
+	_sprite = get_node_or_null(sprite_path) as Sprite2D
 	_cell_scene_path = cell_scene.resource_path if cell_scene != null else ""
 	_refresh_overlap_state()
 
@@ -29,12 +32,12 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	if poll_in_physics:
 		_refresh_overlap_state()
-
+		_rotate_when_not_on_cell_area()
 
 func _process(_delta: float) -> void:
 	if !poll_in_physics:
 		_refresh_overlap_state()
-
+		_rotate_when_not_on_cell_area()
 
 ## check if we are overlapping or not
 func _refresh_overlap_state() -> void:
@@ -51,6 +54,17 @@ func _refresh_overlap_state() -> void:
 
 	if debug_print_changes:
 		print(name, " on_cell=", is_on_cell, " area=", current_cell_area)
+
+
+func _rotate_when_not_on_cell_area():
+	if !is_on_cell : 
+		_sprite.rotation += 0.1
+		_sprite.scale.x = move_toward(_sprite.scale.x, 0.0, 0.01);
+		_sprite.scale.y = move_toward(_sprite.scale.y, 0.0, 0.01);
+		if _sprite.scale.x <= 0.01:
+			var damage := get_parent().get_node_or_null("CompDamage")
+			if damage != null and damage.has_method("_instance_destroy"):
+				damage._instance_destroy(false)
 
 
 func _find_overlapping_cell_area() -> Area2D:

@@ -96,21 +96,23 @@ func take_damage(amount: int) -> void:
 # Destruction of the instance
 ###############################
 ## Spawn configured blood smear and delete the owning entity hierarchy.
-func _instance_destroy() -> void:
+func _instance_destroy(_create_blood_smear = true) -> void:
 	
-	# Find out where the blood smear should be
-	if blood_smear_location == null:
-		var sibling = get_characterbody2d_sibling()
-		if sibling == null:
-			blood_smear_location = get_parent().global_position
-		else:
-			blood_smear_location = sibling.global_position
+	# create the blood smear
+	if _create_blood_smear:
+		# Find out where the blood smear should be
+		if blood_smear_location == null:
+			var sibling = get_characterbody2d_sibling()
+			if sibling == null:
+				blood_smear_location = get_parent().global_position
+			else:
+				blood_smear_location = sibling.global_position
 
-	# Spawn directional or omni smear depending on available direction
-	if blood_smear_direction == null:
-		spawn_blood_smear(blood_smear_location, blood_smear_color)
-	else:
-		spawn_blood_smear_directional(blood_smear_location, blood_smear_direction, blood_smear_color)
+		# Spawn directional or omni smear depending on available direction
+		if blood_smear_direction == null:
+			spawn_blood_smear(blood_smear_location, blood_smear_color)
+		else:
+			spawn_blood_smear_directional(blood_smear_location, blood_smear_direction, blood_smear_color)
 
 	# Free parent and children to remove this full entity instance.
 	var parent := get_parent()

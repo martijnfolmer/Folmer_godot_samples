@@ -11,8 +11,6 @@ extends CharacterBody2D
 @export var angular_speed: float = 8.0
 
 @export_group("Sprites")
-## Main body sprite texture
-@export var texture: Texture2D
 ## Texture used for both procedural leg sprites
 @export var legTexture: Texture2D
 
@@ -151,10 +149,8 @@ var _recent_pillar_contacts: Dictionary = {}
 func _ready() -> void:
 	add_to_group("player")
 
-	# Build body sprite
-	sprite = Sprite2D.new()
-	add_child(sprite)
-	sprite.texture = texture
+	# get the sprite2D
+	sprite = $Sprite2D
 
 	# Build leg sprites
 	leg_left = Sprite2D.new()

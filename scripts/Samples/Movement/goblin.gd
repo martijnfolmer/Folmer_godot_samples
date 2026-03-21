@@ -18,6 +18,8 @@ var _dazed: bool = false
 var _dazed_orbit_sprites: Array[Sprite2D] = []
 var _dazed_orbit_phase: float = 0.0
 
+var _body_sprite = null		# the body sprite of the unit, to get its scale
+
 # Lifecycle
 ## Register goblin group membership and hook kickback events.
 func _ready() -> void:
@@ -32,6 +34,8 @@ func _ready() -> void:
 
 	set_process(true)
 
+	# Get the body sprite of the unit if there are any
+	_body_sprite = _get_sprite_2D_if_any()
 
 ## Update dazed orbit positions each frame while visuals are active.
 func _process(delta: float) -> void:
@@ -99,11 +103,17 @@ func _start_dazed_orbit_visuals() -> void:
 		return
 
 	# Create and configure orbit sprites.
+	
+	# if we have a body sprite, scale the dazed sprite accordingly
+	var added_scale = 1.0
+	if _body_sprite!=null:
+		added_scale = _body_sprite.scale.x
+	
 	var count: int = max(1, dazed_orbit_count)
 	for i in range(count):
 		var sprite := Sprite2D.new()
 		sprite.texture = dazed_orbit_texture
-		sprite.scale = Vector2.ONE * max(0.01, dazed_orbit_scale)
+		sprite.scale = Vector2.ONE * max(0.01, added_scale * dazed_orbit_scale)
 		sprite.z_index = 100
 		add_child(sprite)
 		_dazed_orbit_sprites.append(sprite)
@@ -136,10 +146,17 @@ func _update_dazed_orbit_visuals(delta: float) -> void:
 		if !is_instance_valid(sprite):
 			continue
 		var angle: float = _dazed_orbit_phase + (TAU * float(i) / float(count))
-		sprite.global_position = center + Vector2(cos(angle), sin(angle)) * dazed_orbit_radius
+		
+		# if we have a body sprite, scale the dazed sprite accordingly
+		var added_scale = 1.0
+		if _body_sprite != null:
+			added_scale = _body_sprite.scale.x
+
+		sprite.global_position = center + Vector2(cos(angle), sin(angle)) * dazed_orbit_radius * added_scale
 		sprite.rotation = angle + PI * 0.5
-
-
+		sprite.scale = Vector2.ONE * max(0.01, added_scale * dazed_orbit_scale)
+		
+		
 # Helpers
 ## Return true when node or any ancestor belongs to the given group.
 func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
@@ -149,3 +166,6 @@ func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 			return true
 		current = current.get_parent()
 	return false
+
+func _get_sprite_2D_if_any() -> Sprite2D:
+	return get_node_or_null("CharacterBody2D/Sprite2D") as Sprite2D

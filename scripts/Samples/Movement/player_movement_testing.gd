@@ -1,19 +1,22 @@
 extends Node2D
 
+# TODO: TESTING: pillar test force
 @export_group("Pillar crush test")
 @export var pillar_test_force: float = 1000.0
 
 # Input
+# TODO: TESTING: pillars to you after space bar
 ## Handle debug input and trigger the pillar push test.
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_space_pressed(event):
 		_move_two_closest_pillars_towards_player()
 
+# TODO: TESTING: space bar pressed
 ## Return true when the key event is a non-repeated Space press.
 func _is_space_pressed(event: InputEvent) -> bool:
 	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
 
-# Debug action
+# TODO: TESTING: move nearest pillars to you
 ## Push the two nearest pillars toward the player using kickback impact.
 func _move_two_closest_pillars_towards_player() -> void:
 	# Resolve the player used as the attraction point.

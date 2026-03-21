@@ -63,6 +63,10 @@ extends CharacterBody2D
 
 ## Movement speed multiplier while kick attack is active
 @export var kick_speed_mult: float = 0.5
+## Screen shake strength in camera pixels when a kick hits (requires SingletonCamera autoload)
+@export var kick_screen_shake_strength: float = 10.0
+## Screen shake duration in seconds when a kick hits
+@export var kick_screen_shake_duration_sec: float = 0.2
 
 @export_group("Pillar push")
 ## Fraction of pillar velocity carried into external push
@@ -357,7 +361,14 @@ func _apply_kick_to_target(target: Node) -> void:
 	target.get_node("CompDamage").take_damage(1)
 	var ang: float = (get_global_mouse_position() - global_position).angle()
 	target.get_node("CompBodyKickback").impact(kick_force, ang)
+	_try_apply_kick_screen_shake()
 
+
+## If a node named SingletonCamera exists (autoload or nested in the scene) and exposes add_screen_shake, trigger it.
+func _try_apply_kick_screen_shake() -> void:
+	var cam := get_tree().root.find_child("SingletonCamera", true, false)
+	if cam != null and cam.has_method("add_screen_shake"):
+		cam.call("add_screen_shake", kick_screen_shake_strength, kick_screen_shake_duration_sec)
 
 ## Handle hitbox overlap events and apply kick to valid targets
 func _on_kick_hitbox_body_entered(body: Node2D) -> void:

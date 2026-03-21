@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cgbo4axgtfepr"]
+
+[ext_resource type="Script" path="res://scripts/singletons/singleton_camera.gd" id="1_cam"]
+
+[node name="SingletonCamera" type="Node2D" unique_id=-1447676240]
+script = ExtResource("1_cam")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=-1447676239]

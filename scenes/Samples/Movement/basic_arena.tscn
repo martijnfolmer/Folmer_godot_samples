@@ -5,8 +5,11 @@
 [ext_resource type="PackedScene" uid="uid://dmqrwpp2fg11w" path="res://scenes/Samples/Movement/player.tscn" id="2_00l21"]
 [ext_resource type="PackedScene" uid="uid://cy6d05qriys22" path="res://scenes/Samples/Movement/goblin_basic.tscn" id="3_00l21"]
 [ext_resource type="Script" uid="uid://cxh2hdapjg7fa" path="res://scripts/Samples/Movement/basic_arena_cell_grid.gd" id="5_hwd22"]
+[ext_resource type="PackedScene" uid="uid://bh3k2m8qx9nwpsfx" path="res://scripts/singletons/singleton_sfx.tscn" id="6_sfx"]
 
 [node name="BasicArena" type="Node2D" unique_id=667505686]
+
+[node name="SingletonSfx" parent="." unique_id=3918274650 instance=ExtResource("6_sfx")]
 
 [node name="cells" type="Node2D" parent="." unique_id=118779851]
 z_index = -100

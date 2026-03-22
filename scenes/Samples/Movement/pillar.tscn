@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="4_nu50h"]
 [ext_resource type="PackedScene" path="res://scenes/components/comp_on_cell_overlap.tscn" id="5_9v0r5"]
 [ext_resource type="Texture2D" uid="uid://bc7nelq85kvfu" path="res://png/environment/pillar.png" id="6_hsxdt"]
-[ext_resource type="PackedScene" uid="uid://dsf0xhgp0hrv" path="res://scenes/Samples/GridSquare/cell_square.tscn" id="6_jtfe1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ls6d4"]
 size = Vector2(64, 64)
@@ -21,7 +20,6 @@ body_path = NodePath("../CharacterBody2D")
 movement_shake_scale = 0.01
 
 [node name="CompOnCellOverlap" parent="." unique_id=429639440 instance=ExtResource("5_9v0r5")]
-cell_scene = ExtResource("6_jtfe1")
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1791689986]
 

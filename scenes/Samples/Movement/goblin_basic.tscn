@@ -7,7 +7,6 @@
 [ext_resource type="Script" uid="uid://cfo7hjn8if7e5" path="res://scripts/Samples/Movement/goblin_astar_chase.gd" id="2_chase"]
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="3_bawqr"]
 [ext_resource type="PackedScene" path="res://scenes/components/comp_on_cell_overlap.tscn" id="4_rsxvf"]
-[ext_resource type="PackedScene" uid="uid://dsf0xhgp0hrv" path="res://scenes/Samples/GridSquare/cell_square.tscn" id="5_906lc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lrtaf"]
 size = Vector2(40, 91)
@@ -24,7 +23,6 @@ body_path = NodePath("../CharacterBody2D")
 movement_shake_scale = 0.01
 
 [node name="CompOnCellOverlap" parent="." unique_id=1479008585 instance=ExtResource("4_rsxvf")]
-cell_scene = ExtResource("5_906lc")
 
 [node name="GoblinAStarChase" type="Node2D" parent="." unique_id=1495848707]
 script = ExtResource("2_chase")

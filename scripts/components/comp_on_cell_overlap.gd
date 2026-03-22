@@ -3,14 +3,14 @@ extends Node
 """
 	Check if we are in collision with the cells (meaning, we are standing over them)
 	
-	Uses physics collision to check.
+	Uses physics collision to check. Queries only the floor_cell physics layer (see project layer_names).
 """
 
 signal on_cell_state_changed(is_on_cell: bool, area: Area2D)
 
 @export var body_path: NodePath = NodePath("../CharacterBody2D") # our characterbody2d
 @export var sprite_path: NodePath = NodePath("../CharacterBody2D/Sprite2D") # the sprite
-@export var cell_scene: PackedScene
+@export_flags_2d_physics var floor_collision_mask: int = 2
 @export var poll_in_physics: bool = true		# either poll in physics, or in normal process
 @export var debug_print_changes: bool = false
 
@@ -19,13 +19,11 @@ var current_cell_area: Area2D = null
 
 var _body: CollisionObject2D = null
 var _sprite: Sprite2D = null
-var _cell_scene_path: String = ""
 
 
 func _ready() -> void:
 	_body = get_node_or_null(body_path) as CollisionObject2D		# get our collision
 	_sprite = get_node_or_null(sprite_path) as Sprite2D
-	_cell_scene_path = cell_scene.resource_path if cell_scene != null else ""
 	_refresh_overlap_state()
 
 
@@ -71,6 +69,9 @@ func _find_overlapping_cell_area() -> Area2D:
 	if _body == null or !is_instance_valid(_body):
 		return null
 
+	if floor_collision_mask == 0:
+		return null
+
 	var world := _body.get_world_2d()
 	if world == null:
 		return null
@@ -94,9 +95,9 @@ func _find_overlapping_cell_area() -> Area2D:
 			query.collide_with_areas = true
 			query.collide_with_bodies = false
 			query.exclude = [_body.get_rid()]
-			query.collision_mask = _body.collision_mask
+			query.collision_mask = floor_collision_mask
 
-			var hits := space_state.intersect_shape(query, 16)
+			var hits := space_state.intersect_shape(query, 1)
 			for hit in hits:
 				var collider = hit.get("collider")
 				if collider is Area2D and _is_cell_area(collider):
@@ -106,20 +107,7 @@ func _find_overlapping_cell_area() -> Area2D:
 
 
 func _is_cell_area(area: Area2D) -> bool:
-	var owning_node := _node_or_ancestor_in_group(area, "cell_floor")
-	if owning_node != null:
-		return true
-
-	if _cell_scene_path.is_empty():
-		return false
-
-	var node: Node = area
-	while node != null:
-		if node.scene_file_path == _cell_scene_path:
-			return true
-		node = node.get_parent()
-
-	return false
+	return _node_or_ancestor_in_group(area, "cell_floor") != null
 
 
 func _node_or_ancestor_in_group(node: Node, group_name: StringName) -> Node:

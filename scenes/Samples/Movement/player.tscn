@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://1w5uc3givdd" path="res://png/player/leg.png" id="4_tbgim"]
 [ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="5_72rnh"]
 [ext_resource type="PackedScene" path="res://scenes/components/comp_on_cell_overlap.tscn" id="6_j3mg2"]
-[ext_resource type="PackedScene" uid="uid://dsf0xhgp0hrv" path="res://scenes/Samples/GridSquare/cell_square.tscn" id="7_mn7dn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tbgim"]
 size = Vector2(48, 48)
@@ -44,4 +43,3 @@ blood_smear_color = Color(0.68833226, 0.13494971, 0.09194548, 1)
 [node name="CompOnCellOverlap" parent="." unique_id=148390022 instance=ExtResource("6_j3mg2")]
 body_path = NodePath("../movement_WASD")
 sprite_path = NodePath("../movement_WASD/Sprite2D")
-cell_scene = ExtResource("7_mn7dn")

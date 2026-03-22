@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://ce1lmi503xop7"]
 
+[ext_resource type="Script" uid="uid://252n6teesito" path="res://scripts/Samples/Movement/wall.gd" id="1_dxn8d"]
 [ext_resource type="Texture2D" uid="uid://cwsepdircqsej" path="res://png/environment/wall.png" id="1_wfotv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wfotv"]
 size = Vector2(100, 36)
 
 [node name="Wall" type="Node2D" unique_id=592342518]
+script = ExtResource("1_dxn8d")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1153373608]
 texture = ExtResource("1_wfotv")

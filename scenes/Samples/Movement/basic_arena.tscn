@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://cy6d05qriys22" path="res://scenes/Samples/Movement/goblin_basic.tscn" id="3_00l21"]
 [ext_resource type="Script" uid="uid://cxh2hdapjg7fa" path="res://scripts/Samples/Movement/basic_arena_cell_grid.gd" id="5_hwd22"]
 [ext_resource type="PackedScene" uid="uid://ce1lmi503xop7" path="res://scenes/Samples/Movement/wall.tscn" id="8_cxbq3"]
+[ext_resource type="PackedScene" uid="uid://bhhxd83wfxktn" path="res://scenes/Samples/Movement/glass.tscn" id="9_7ql2u"]
 
 [node name="BasicArena" type="Node2D" unique_id=667505686]
 
@@ -57,7 +58,7 @@ position = Vector2(569, 449)
 position = Vector2(339, 1104)
 
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
-position = Vector2(339, 994)
+position = Vector2(328, 981)
 
 [node name="GoblinBasic" parent="." unique_id=574766309 instance=ExtResource("3_00l21")]
 position = Vector2(1088, 992)
@@ -70,3 +71,6 @@ position = Vector2(332, 554)
 
 [node name="Wall" parent="." unique_id=592342518 instance=ExtResource("8_cxbq3")]
 position = Vector2(339, 856)
+
+[node name="Glass" parent="." unique_id=680498862 instance=ExtResource("9_7ql2u")]
+position = Vector2(639, 862)

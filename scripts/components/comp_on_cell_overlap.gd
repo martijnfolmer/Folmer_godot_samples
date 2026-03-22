@@ -3,7 +3,7 @@ extends Node
 """
 	Check if we are in collision with the cells (meaning, we are standing over them)
 	
-	Uses physics collision to check. Queries only the floor_cell physics layer (see project layer_names).
+	Uses physics collision to check. Queries only the floor_cell physics layer
 """
 
 signal on_cell_state_changed(is_on_cell: bool, area: Area2D)
@@ -64,7 +64,7 @@ func _rotate_when_not_on_cell_area():
 			if damage != null and damage.has_method("_instance_destroy"):
 				damage._instance_destroy(false)
 
-
+## Check if we are hitting the 
 func _find_overlapping_cell_area() -> Area2D:
 	if _body == null or !is_instance_valid(_body):
 		return null

@@ -29,8 +29,8 @@ signal body_slammed(collision: KinematicCollision2D, speed: float)
 var _impact_active: bool = false		# true if we are being moved after being kicked or moving wall
 var _body_sprite: Sprite2D
 
-# key = id of the thing we are colliding with, val = the time until we can transfer push again
-# this is to prevent the push transfer happening multiple times.
+# key = id of the thing we are colliding with, val = wall time (sec) until we can transfer again
+# Expired entries are pruned each physics frame so freed instance IDs do not accumulate.
 var _recent_transfer_until: Dictionary = {}	
 
 
@@ -75,7 +75,8 @@ func is_impact_active() -> bool:
 # Physics
 ## Simulate friction, collisions, and push transfer while impact is active.
 func _physics_process(delta: float) -> void:
-	
+	_prune_expired_transfer_cooldowns(Time.get_ticks_msec() * 0.001)
+
 	# Exit early when no kickback movement is in progress.
 	if !_impact_active:
 		return
@@ -193,6 +194,18 @@ func _try_transfer_push(collision: KinematicCollision2D, velocity_before_slide: 
 #################
 # Helpers
 #################
+
+## Clean up cooldowns
+func _prune_expired_transfer_cooldowns(now_sec: float) -> void:
+	if _recent_transfer_until.is_empty():
+		return
+	var expired: Array = []
+	for target_id in _recent_transfer_until:
+		if now_sec >= float(_recent_transfer_until[target_id]):
+			expired.append(target_id)
+	for target_id in expired:
+		_recent_transfer_until.erase(target_id)
+
 
 ## Walk up collider ancestry and return first node in configured transfer groups.
 func _resolve_transfer_target(collider: Object) -> Node:

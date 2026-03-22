@@ -24,10 +24,6 @@ config/icon="res://icon.svg"
 GlobalGrid="*uid://d10w3ljhide4c"
 GlPlayerInput="*uid://c2e8xve880a8h"
 
-[layer_names]
-
-2d_physics/layer_2="floor_cell"
-
 [display]
 
 window/size/viewport_width=2200
@@ -36,3 +32,7 @@ window/size/viewport_height=1300
 [dotnet]
 
 project/assembly_name="Godot_Template"
+
+[layer_names]
+
+2d_physics/layer_2="floor_cell"

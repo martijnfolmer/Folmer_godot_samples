@@ -77,12 +77,17 @@ func is_impact_active() -> bool:
 func _physics_process(delta: float) -> void:
 	_prune_expired_transfer_cooldowns(Time.get_ticks_msec() * 0.001)
 
+	# Check if we are a pillar, or something else (like a goblin)
+	var source_is_pillar: bool = get_parent() != null and get_parent().is_in_group("pillar")
+
 	# Exit early when no kickback movement is in progress.
 	if !_impact_active:
 		return
 
 	# Apply frame-based friction to impact velocity.
 	parentBody.velocity *= max(0.0, 1.0 - friction * delta)
+	if source_is_pillar and parentBody.velocity.length() <= 500:
+		parentBody.velocity *= max(0.0, 1.0 - friction * delta)
 
 	# Stop fully once under threshold and reset visual shake offset.
 	if parentBody.velocity.length_squared() <= stop_speed * stop_speed:
@@ -99,7 +104,6 @@ func _physics_process(delta: float) -> void:
 	parentBody.move_and_slide()
 	
 	# Check if we are a pillar that is moving (different transferrence rules)
-	var source_is_pillar: bool = get_parent() != null and get_parent().is_in_group("pillar")
 	var collided_any_pillar: bool = false
 
 	# for each collisions

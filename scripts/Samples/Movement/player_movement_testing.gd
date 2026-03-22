@@ -1,16 +1,40 @@
 extends Node2D
 
+
 # TODO: TESTING: pillar test force
 @export_group("Pillar crush test")
 @export var pillar_test_force: float = 1000.0
+
+#TODO: TESTING: write and read to json
+func write_and_read_json() -> void:
+	#var path := "user://save_data.json"	# the example says this, but I could not tell you where this ended up
+	var path := "res://json/save_data.json"
+
+	var save_data := {
+		"player_name": "Martijn",
+		"level": 3,
+		"hp": 87,
+		"items": ["key", "potion"]
+	}
+
+	var ok := JsonFileUtils.write_json_file(path, save_data)
+	if ok:
+		print("Saved JSON to ", path)
+
+	var loaded = JsonFileUtils.read_json_file(path)
+	if loaded != null:
+		print("Loaded JSON: ", loaded)
+
+
 
 # Input
 # TODO: TESTING: pillars to you after space bar
 ## Handle debug input and trigger the pillar push test.
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_space_pressed(event):
-		_move_two_closest_pillars_towards_player()
-
+		#_move_two_closest_pillars_towards_player()
+		write_and_read_json()
+		
 # TODO: TESTING: space bar pressed
 ## Return true when the key event is a non-repeated Space press.
 func _is_space_pressed(event: InputEvent) -> bool:

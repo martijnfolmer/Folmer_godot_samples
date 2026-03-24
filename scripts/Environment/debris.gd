@@ -15,8 +15,11 @@ extends Node2D
 @export_group("visual")
 ## the initial scale of the debris
 @export var ini_scale : float = 1.0
+
+@export_group("movement")
 ## The friction with which it stops moving
 @export var friction : float = 0.9
+
 
 '''
 todo:
@@ -42,6 +45,8 @@ var texture_1 : Texture2D
 var texture_2 : Texture2D
 var texture_3 : Texture2D
 
+var velocity : Vector2 = Vector2.ZERO
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	add_to_group("debris")
@@ -49,6 +54,14 @@ func _ready() -> void:
 	_create_debris_sprite()		# create the sprite for the debris from options
 	_set_scale(ini_scale)	# the initial scale of the debris
 	rotation = randf() * 2 * PI	#random initial roation
+	
+	velocity.x += (randf() * 2 - 1) * 1000
+	velocity.y += (randf() * 2 - 1) * 1000
+	
+
+func add_velocity(vel : Vector2) -> void:
+	velocity.x += vel.x
+	velocity.y += vel.y 
 	
 
 func _create_debris_sprite() -> void:
@@ -97,9 +110,20 @@ func _set_scale(_scale) -> void:
 	sprite.scale.y = _scale
 
 
-	
-
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
+	_process_velocity(delta)				# slow down the velocity
+	
+
+func _process_velocity(delta: float) -> void:
+	# friction
+	velocity.x -= velocity.x * friction * delta
+	velocity.y -= velocity.y * friction * delta
+
+	# zero if we are too slow
+	if velocity.length_squared()<=0.001:
+		velocity = Vector2.ZERO
+	
+	# movement
+	position.x += velocity.x * delta
+	position.y += velocity.y * delta

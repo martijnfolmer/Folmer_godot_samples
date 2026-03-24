@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://c418ojxhqq7xg"]
+
+[ext_resource type="Script" uid="uid://dyjpp3xsm7rtu" path="res://scripts/Environment/debris.gd" id="1_qofd3"]
+[ext_resource type="Texture2D" uid="uid://bti5vuh5ox0xg" path="res://png/debris/wall/wall_debris_1.png" id="2_lq34i"]
+[ext_resource type="Texture2D" uid="uid://djrc84nuu458s" path="res://png/debris/wall/wall_debris_2.png" id="3_lq34i"]
+[ext_resource type="Texture2D" uid="uid://cu5qvd0aptx66" path="res://png/debris/wall/wall_debris_3.png" id="4_gipwa"]
+[ext_resource type="Texture2D" uid="uid://bhqe4wt0abrdf" path="res://png/debris/glass/glass_debris_1.png" id="5_b5srs"]
+[ext_resource type="Texture2D" uid="uid://bxapoqyojxqif" path="res://png/debris/glass/glass_debris_2.png" id="6_wyxjy"]
+[ext_resource type="Texture2D" uid="uid://cglx4psnu6mk6" path="res://png/debris/glass/glass_debris_3.png" id="7_hkhii"]
+
+[node name="Debris" type="Node2D" unique_id=972933422]
+position = Vector2(950, 548)
+script = ExtResource("1_qofd3")
+sprite_wall_1 = ExtResource("2_lq34i")
+sprite_wall_2 = ExtResource("3_lq34i")
+sprite_wall_3 = ExtResource("4_gipwa")
+sprite_glass_1 = ExtResource("5_b5srs")
+sprite_glass_2 = ExtResource("6_wyxjy")
+sprite_glass_3 = ExtResource("7_hkhii")
+ini_scale = 0.05
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2107299773]
+texture = ExtResource("2_lq34i")

@@ -64,7 +64,7 @@ func _rotate_when_not_on_cell_area():
 			if damage != null and damage.has_method("_instance_destroy"):
 				damage._instance_destroy(false)
 
-## Check if we are hitting the 
+## Check if we are hitting the cell floor
 func _find_overlapping_cell_area() -> Area2D:
 	if _body == null or !is_instance_valid(_body):
 		return null

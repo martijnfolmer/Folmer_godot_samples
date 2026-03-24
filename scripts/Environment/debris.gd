@@ -20,6 +20,9 @@ extends Node2D
 ## The friction with which it stops moving
 @export var friction : float = 0.9
 
+@export_group("cell overlap")
+@export_flags_2d_physics var floor_collision_mask: int = 2
+
 
 '''
 todo:
@@ -27,10 +30,11 @@ todo:
 	- glass and wall textures (done)
 	- add to debris group (done)
 	- initial rotation (done)
+	- collision with cell floor (done)
+	- update movement as well (done)
 	
 	- fall of the edge (non collision perhaps)
 	- give impulse (velocity added to current velocity, and a bit of rotation)
-	- update movement as well
 	- rotation update when we are moving
 
 	- initialization of the glass and wall
@@ -46,6 +50,7 @@ var texture_2 : Texture2D
 var texture_3 : Texture2D
 
 var velocity : Vector2 = Vector2.ZERO
+var is_on_cell: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -112,6 +117,12 @@ func _set_scale(_scale) -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	
+	# Check if we are on the cell
+	is_on_cell = _is_colliding_with_cell_square()
+	print(is_on_cell)
+	
+	# process velocity in normal ffunction
 	_process_velocity(delta)				# slow down the velocity
 	
 
@@ -127,3 +138,40 @@ func _process_velocity(delta: float) -> void:
 	# movement
 	position.x += velocity.x * delta
 	position.y += velocity.y * delta
+
+
+## Return true when this debris overlaps a cell_square area.
+func _is_colliding_with_cell_square() -> bool:
+	if floor_collision_mask == 0:
+		return false
+
+	var world := get_world_2d()
+	if world == null:
+		return false
+
+	var query := PhysicsPointQueryParameters2D.new()
+	query.position = global_position
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	query.collision_mask = floor_collision_mask
+
+	var hits := world.direct_space_state.intersect_point(query, 8)
+	for hit in hits:
+		var collider = hit.get("collider")
+		if collider is Area2D and _is_cell_area(collider):
+			return true
+
+	return false
+
+
+func _is_cell_area(area: Area2D) -> bool:
+	return _node_or_ancestor_in_group(area, "cell_floor") != null
+
+
+func _node_or_ancestor_in_group(node: Node, group_name: StringName) -> Node:
+	var current: Node = node
+	while current != null:
+		if current.is_in_group(group_name):
+			return current
+		current = current.get_parent()
+	return null

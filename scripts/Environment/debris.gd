@@ -32,6 +32,7 @@ todo:
 	- initial rotation (done)
 	- collision with cell floor (done)
 	- update movement as well (done)
+	- only check if we are on the floor if we are moving (done)
 	
 	- fall of the edge (non collision perhaps)
 	- give impulse (velocity added to current velocity, and a bit of rotation)
@@ -52,6 +53,9 @@ var texture_3 : Texture2D
 var velocity : Vector2 = Vector2.ZERO
 var is_on_cell: bool = false
 
+enum state {NORMAL, FALLING}
+var _state : state = state.NORMAL
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	add_to_group("debris")
@@ -60,8 +64,8 @@ func _ready() -> void:
 	_set_scale(ini_scale)	# the initial scale of the debris
 	rotation = randf() * 2 * PI	#random initial roation
 	
-	velocity.x += (randf() * 2 - 1) * 1000
-	velocity.y += (randf() * 2 - 1) * 1000
+	velocity.x += (randf() * 2 - 1) * 100
+	velocity.y += (randf() * 2 - 1) * 100
 	
 
 func add_velocity(vel : Vector2) -> void:
@@ -119,18 +123,38 @@ func _set_scale(_scale) -> void:
 func _process(delta: float) -> void:
 	
 	# Check if we are on the cell (if we are moving)
-	if velocity!=Vector2.ZERO:
+	if velocity!=Vector2.ZERO and _state == state.NORMAL:
 		is_on_cell = _is_colliding_with_cell_square()
-	
+		if !is_on_cell:
+			_state = state.FALLING
 
-	# process velocity in normal ffunction
-	_process_velocity(delta)				# slow down the velocity
+	# process velocity in normal function
+	_process_velocity(delta)
+	
+	# process falling
+	_process_falling(delta)
+	
+func _process_falling(delta:float) -> void:
+	
+	# Don't process if we are not falling
+	if _state == state.NORMAL:
+		return
+	
+	rotation += 5 * delta
+	scale.x -= 0.5 * delta
+	scale.y -= 0.5 * delta
+	
+	# delete if we are falling
+	if scale.x <= 0.01:
+		queue_free()
 	
 
 func _process_velocity(delta: float) -> void:
-	# friction
-	velocity.x -= velocity.x * friction * delta
-	velocity.y -= velocity.y * friction * delta
+	
+	# friction if we are on the normal state
+	if _state == state.NORMAL:
+		velocity.x -= velocity.x * friction * delta
+		velocity.y -= velocity.y * friction * delta
 
 	# zero if we are too slow
 	if velocity.length_squared()<=0.001:

@@ -41,7 +41,7 @@ func _process(_delta: float) -> void:
 func _refresh_overlap_state() -> void:
 	
 	# only check if we are moving
-	if _body.velocity == Vector2.ZERO:
+	if _body==null or _body.velocity == Vector2.ZERO:
 		return
 	
 	var overlap_area := _find_overlapping_cell_area()

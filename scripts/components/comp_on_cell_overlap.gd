@@ -14,7 +14,7 @@ signal on_cell_state_changed(is_on_cell: bool, area: Area2D)
 @export var poll_in_physics: bool = true		# either poll in physics, or in normal process
 @export var debug_print_changes: bool = false
 
-var is_on_cell: bool = false
+var is_on_cell: bool = true
 var current_cell_area: Area2D = null
 
 var _body: CollisionObject2D = null
@@ -39,6 +39,11 @@ func _process(_delta: float) -> void:
 
 ## check if we are overlapping or not
 func _refresh_overlap_state() -> void:
+	
+	# only check if we are moving
+	if _body.velocity == Vector2.ZERO:
+		return
+	
 	var overlap_area := _find_overlapping_cell_area()
 	var next_is_on_cell: bool = overlap_area != null
 	var changed: bool = next_is_on_cell != is_on_cell or overlap_area != current_cell_area

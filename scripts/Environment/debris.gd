@@ -118,10 +118,11 @@ func _set_scale(_scale) -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	
-	# Check if we are on the cell
-	is_on_cell = _is_colliding_with_cell_square()
-	print(is_on_cell)
+	# Check if we are on the cell (if we are moving)
+	if velocity!=Vector2.ZERO:
+		is_on_cell = _is_colliding_with_cell_square()
 	
+
 	# process velocity in normal ffunction
 	_process_velocity(delta)				# slow down the velocity
 	

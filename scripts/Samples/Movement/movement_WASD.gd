@@ -381,7 +381,8 @@ func _apply_kick_to_static(target: Node) -> void:
 	print("Kick connected with static object: ", target.name)
 	
 	# actually destroy
-	target._instance_destroy()
+	var ang: float = (get_global_mouse_position() - global_position).angle()
+	target._instance_destroy(ang)
 	
 	_try_apply_kick_screen_shake()
 

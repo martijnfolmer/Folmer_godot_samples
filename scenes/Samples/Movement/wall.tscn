@@ -9,10 +9,10 @@ size = Vector2(100, 36)
 [node name="Wall" type="Node2D" unique_id=592342518]
 script = ExtResource("1_dxn8d")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1153373608]
-texture = ExtResource("1_wfotv")
-
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1646489819]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=403392518]
 shape = SubResource("RectangleShape2D_wfotv")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1153373608]
+texture = ExtResource("1_wfotv")

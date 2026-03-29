@@ -93,6 +93,8 @@ extends CharacterBody2D
 var sprite: Sprite2D
 ## Overlap area used to detect kick hits at leg tip
 var kick_hitbox: Area2D
+## Collision shape reused for direct space-state kick queries
+var kick_shape: CircleShape2D
 ## Left leg sprite created in _ready()
 var leg_left: Sprite2D
 ## Right leg sprite created in _ready()
@@ -181,7 +183,7 @@ func _ready() -> void:
 	kick_hitbox.collision_layer = 0
 	kick_hitbox.collision_mask = 1
 	add_child(kick_hitbox)
-	var kick_shape := CircleShape2D.new()
+	kick_shape = CircleShape2D.new()
 	kick_shape.radius = 32.0
 	var kick_col := CollisionShape2D.new()
 	kick_col.shape = kick_shape
@@ -202,10 +204,21 @@ func _physics_process(delta: float) -> void:
 
 	## While attacking, apply hits to any overlapping valid targets
 	if _attack_active:
-		for body in kick_hitbox.get_overlapping_bodies():
+		var space_state := get_world_2d().direct_space_state
+		var query := PhysicsShapeQueryParameters2D.new()
+		query.shape = kick_shape
+		query.transform = Transform2D(0, kick_hitbox.global_position)
+		query.collision_mask = 1
+		query.exclude = [get_rid()]
+		for result in space_state.intersect_shape(query):
+			var body: Node = result["collider"]
 			var target: Node = body.get_parent()
-			if (target.is_in_group("pillar") or target.is_in_group("goblin")) and target not in _kick_hit_bodies:
+			if target in _kick_hit_bodies:
+				continue
+			if target.is_in_group("pillar") or target.is_in_group("goblin"):
 				_apply_kick_to_target(target)
+			elif target.is_in_group("glass") or target.is_in_group("wall"):
+				_apply_kick_to_static(target)
 
 	# Read WASD axis input and normalize direction
 	var input_dir: Vector2 = Vector2(
@@ -254,8 +267,11 @@ func _physics_process(delta: float) -> void:
 				continue
 
 			var collNode: Node = body.get_parent()
-			if (collNode.is_in_group("pillar") or collNode.is_in_group("goblin")) and collNode not in _kick_hit_bodies:
-				_apply_kick_to_target(collNode)
+			if collNode not in _kick_hit_bodies:
+				if collNode.is_in_group("pillar") or collNode.is_in_group("goblin"):
+					_apply_kick_to_target(collNode)
+				elif collNode.is_in_group("glass") or collNode.is_in_group("wall"):
+					_apply_kick_to_static(collNode)
 
 		_attack_active = false
 
@@ -356,6 +372,13 @@ func _apply_kick_to_target(target: Node) -> void:
 	target.get_node("CompDamage").take_damage(1)
 	var ang: float = (get_global_mouse_position() - global_position).angle()
 	target.get_node("CompBodyKickback").impact(kick_force, ang)
+	_try_apply_kick_screen_shake()
+
+
+## Handle kick hit on a static destructible (glass/wall) that lacks kickback components
+func _apply_kick_to_static(target: Node) -> void:
+	_kick_hit_bodies.append(target)
+	print("Kick connected with static object: ", target.name)
 	_try_apply_kick_screen_shake()
 
 

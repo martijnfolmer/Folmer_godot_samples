@@ -9,10 +9,10 @@ size = Vector2(100, 24)
 [node name="Glass" type="Node2D" unique_id=680498862]
 script = ExtResource("1_fxgtv")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1733229588]
-texture = ExtResource("1_4sll0")
-
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=329130932]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=2049624096]
 shape = SubResource("RectangleShape2D_fxgtv")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1733229588]
+texture = ExtResource("1_4sll0")

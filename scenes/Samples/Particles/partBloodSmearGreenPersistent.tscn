@@ -1,9 +1,17 @@
 [gd_scene format=3 uid="uid://cqf6eoofrp6j5"]
 
 [ext_resource type="Texture2D" uid="uid://b531o11daaxir" path="res://png/particles/partWhiteCircle64x64.png" id="1_tex"]
-[ext_resource type="Script" uid="uid://cjcfqd10x3j52" path="res://scripts/Samples/Particles/part_blood_smear_green_persistent.gd" id="2_script"]
+[ext_resource type="Script" uid="uid://blyjxt6w0rllp" path="res://scripts/Samples/Particles/part_blood_smear_green_persistent.gd" id="2_script"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ajduu"]
+
+[sub_resource type="Gradient" id="Gradient_n6irp"]
+offsets = PackedFloat32Array(0, 0.72240806, 1)
+colors = PackedColorArray(1, 1, 1, 0.78431374, 1, 1, 1, 0.78431374, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_mbc6c"]
+gradient = SubResource("Gradient_n6irp")
+width = 500
 
 [sub_resource type="Curve" id="Curve_damping"]
 _limits = [0.0, 100.0, 0.0, 1.0]
@@ -33,6 +41,7 @@ damping_curve = SubResource("CurveTexture_damping")
 scale_min = 0.099999994
 scale_max = 0.39999998
 scale_curve = SubResource("CurveTexture_scale")
+color_ramp = SubResource("GradientTexture1D_mbc6c")
 
 [node name="PartBloodSmearGreenPersistent" type="GPUParticles2D" unique_id=1181000995]
 z_index = -10

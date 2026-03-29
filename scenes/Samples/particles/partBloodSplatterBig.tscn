@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dt6nsya0v3o8a"]
+[gd_scene format=3 uid="uid://dt6nsya0v3o8a"]
 
 [ext_resource type="Texture2D" uid="uid://b531o11daaxir" path="res://png/particles/partWhiteCircle64x64.png" id="1_8i46c"]
 
@@ -40,7 +40,7 @@ scale_max = 0.79999995
 scale_curve = SubResource("CurveTexture_j68it")
 color_ramp = SubResource("GradientTexture1D_cr4nk")
 
-[node name="PartBloodSplatterBig" type="GPUParticles2D"]
+[node name="PartBloodSplatterBig" type="GPUParticles2D" unique_id=349768071]
 material = SubResource("CanvasItemMaterial_ajduu")
 amount = 40
 texture = ExtResource("1_8i46c")

@@ -186,7 +186,6 @@ func _ready() -> void:
 	var kick_col := CollisionShape2D.new()
 	kick_col.shape = kick_shape
 	kick_hitbox.add_child(kick_col)
-	kick_hitbox.body_entered.connect(_on_kick_hitbox_body_entered)
 
 # Main loop
 ## Process movement, combat, leg animation, and external push each frame
@@ -201,7 +200,7 @@ func _physics_process(delta: float) -> void:
 		_attack_time_left = max(0.01, kick_duration_sec)
 		_kick_hit_bodies.clear()
 
-	# While attacking, apply hits to any overlapping valid targets
+	## While attacking, apply hits to any overlapping valid targets
 	if _attack_active:
 		for body in kick_hitbox.get_overlapping_bodies():
 			var target: Node = body.get_parent()
@@ -365,17 +364,6 @@ func _try_apply_kick_screen_shake() -> void:
 	var cam := get_tree().root.find_child("SingletonCamera", true, false)
 	if cam != null and cam.has_method("add_screen_shake"):
 		cam.call("add_screen_shake", kick_screen_shake_strength, kick_screen_shake_duration_sec)
-
-## Handle hitbox overlap events and apply kick to valid targets
-func _on_kick_hitbox_body_entered(body: Node2D) -> void:
-	if !_attack_active:
-		return
-	var target: Node = body.get_parent()
-	if !target.is_in_group("pillar") and !target.is_in_group("goblin"):
-		return
-	if target in _kick_hit_bodies:
-		return
-	_apply_kick_to_target(target)
 
 
 # Squash and destroy

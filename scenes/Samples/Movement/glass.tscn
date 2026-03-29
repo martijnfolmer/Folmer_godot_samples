@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://bhhxd83wfxktn"]
 
 [ext_resource type="Texture2D" uid="uid://c6kxcojg6xr5k" path="res://png/environment/glass.png" id="1_4sll0"]
+[ext_resource type="Script" uid="uid://cwoeoofeo28gm" path="res://scripts/Samples/Movement/glass.gd" id="1_fxgtv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fxgtv"]
 size = Vector2(100, 24)
 
 [node name="Glass" type="Node2D" unique_id=680498862]
+script = ExtResource("1_fxgtv")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1733229588]
 texture = ExtResource("1_4sll0")

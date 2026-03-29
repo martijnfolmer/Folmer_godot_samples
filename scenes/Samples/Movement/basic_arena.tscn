@@ -55,7 +55,7 @@ position = Vector2(688, 560)
 position = Vector2(569, 449)
 
 [node name="Pillar11" parent="." unique_id=1751347978 instance=ExtResource("1_bjjws")]
-position = Vector2(339, 1104)
+position = Vector2(1023, 740)
 
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
 position = Vector2(328, 981)
@@ -70,7 +70,22 @@ position = Vector2(800, 544)
 position = Vector2(332, 554)
 
 [node name="Wall" parent="." unique_id=592342518 instance=ExtResource("8_cxbq3")]
-position = Vector2(339, 856)
+position = Vector2(289, 855)
+
+[node name="Wall2" parent="." unique_id=1092318142 instance=ExtResource("8_cxbq3")]
+position = Vector2(390, 855)
+
+[node name="Wall3" parent="." unique_id=860934339 instance=ExtResource("8_cxbq3")]
+position = Vector2(491, 855)
 
 [node name="Glass" parent="." unique_id=680498862 instance=ExtResource("9_7ql2u")]
-position = Vector2(639, 862)
+position = Vector2(562, 989)
+rotation = 1.5707964
+
+[node name="Glass2" parent="." unique_id=1970894080 instance=ExtResource("9_7ql2u")]
+position = Vector2(562, 1086)
+rotation = 1.5707964
+
+[node name="Glass3" parent="." unique_id=1725767937 instance=ExtResource("9_7ql2u")]
+position = Vector2(562, 1186)
+rotation = 1.5707964

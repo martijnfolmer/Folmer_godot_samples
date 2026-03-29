@@ -1,6 +1,6 @@
 extends GPUParticles2D
 """
-	Particle effect that spawns glass shards when the wall is destroyed.
+	Particle effect that spawns wall shards when the wall is destroyed.
 """
 
 # How far to push the particle emitter away from the wall surface,

@@ -1,9 +1,9 @@
-[gd_scene format=3 uid="uid://bkjj06e6suteq"]
+[gd_scene format=3 uid="uid://crt7drd43cbtc"]
 
-[ext_resource type="Script" uid="uid://cadaww3fqseu3" path="res://scripts/Samples/Particles/part_glass_shards.gd" id="2_58xys"]
-[ext_resource type="Texture2D" uid="uid://bhqe4wt0abrdf" path="res://png/debris/glass/glass_debris_1.png" id="3_wc57y"]
-[ext_resource type="Texture2D" uid="uid://bxapoqyojxqif" path="res://png/debris/glass/glass_debris_2.png" id="4_suduf"]
-[ext_resource type="Texture2D" uid="uid://cglx4psnu6mk6" path="res://png/debris/glass/glass_debris_3.png" id="5_y3ra3"]
+[ext_resource type="Texture2D" uid="uid://bti5vuh5ox0xg" path="res://png/debris/wall/wall_debris_1.png" id="1_1va7c"]
+[ext_resource type="Script" uid="uid://dnhws4lxwea8l" path="res://scripts/Samples/Particles/part_wall_shards.gd" id="2_i7u8c"]
+[ext_resource type="Texture2D" uid="uid://djrc84nuu458s" path="res://png/debris/wall/wall_debris_2.png" id="3_ypjfa"]
+[ext_resource type="Texture2D" uid="uid://cu5qvd0aptx66" path="res://png/debris/wall/wall_debris_3.png" id="4_uqq8p"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ajduu"]
 
@@ -46,18 +46,18 @@ scale_max = 0.07
 scale_curve = SubResource("CurveTexture_scale")
 color_ramp = SubResource("GradientTexture1D_mbc6c")
 
-[node name="PartGlassShards" type="GPUParticles2D" unique_id=1181000995]
+[node name="PartWallShards" type="GPUParticles2D" unique_id=1181000995]
 z_index = -10
 z_as_relative = false
 material = SubResource("CanvasItemMaterial_ajduu")
 emitting = false
-amount = 56
-texture = ExtResource("3_wc57y")
+amount = 10
+texture = ExtResource("1_1va7c")
 lifetime = 600.0
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_kjwgw")
-script = ExtResource("2_58xys")
-tex1 = ExtResource("3_wc57y")
-tex2 = ExtResource("4_suduf")
-tex3 = ExtResource("5_y3ra3")
+script = ExtResource("2_i7u8c")
+tex1 = ExtResource("1_1va7c")
+tex2 = ExtResource("3_ypjfa")
+tex3 = ExtResource("4_uqq8p")

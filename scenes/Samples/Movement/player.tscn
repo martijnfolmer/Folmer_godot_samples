@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://b4okd2oo0o2j" path="res://png/player/simple_torso.png" id="3_tbgim"]
 [ext_resource type="Texture2D" uid="uid://1w5uc3givdd" path="res://png/player/leg.png" id="4_tbgim"]
 [ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="5_72rnh"]
-[ext_resource type="PackedScene" path="res://scenes/components/comp_on_cell_overlap.tscn" id="6_j3mg2"]
+[ext_resource type="PackedScene" uid="uid://g1n38uj15vxs" path="res://scenes/components/comp_on_cell_overlap.tscn" id="6_j3mg2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tbgim"]
 size = Vector2(48, 48)

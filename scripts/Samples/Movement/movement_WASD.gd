@@ -379,6 +379,10 @@ func _apply_kick_to_target(target: Node) -> void:
 func _apply_kick_to_static(target: Node) -> void:
 	_kick_hit_bodies.append(target)
 	print("Kick connected with static object: ", target.name)
+	
+	# actually destroy
+	target._instance_destroy()
+	
 	_try_apply_kick_screen_shake()
 
 

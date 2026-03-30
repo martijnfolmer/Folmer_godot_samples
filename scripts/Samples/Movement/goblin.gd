@@ -62,8 +62,16 @@ func _on_impact_ended() -> void:
 
 
 # Wall slam
-## Convert a dazed wall slam above threshold speed into destruction.
+## Get slammed into an object like wall, pillar, glass
 func _on_body_slammed(collision: KinematicCollision2D, speed: float) -> void:
+	
+	# Check whether it is a glass wall we are being yeeted through
+	if _is_glass(collision):
+		# Give damage to the glass
+		
+		
+		return
+	
 	# Ignore non-dazed, low-speed, or non-wall impacts.
 	if !_dazed or speed < wall_slam_speed_min or !_is_wall(collision):
 		return
@@ -74,6 +82,13 @@ func _on_body_slammed(collision: KinematicCollision2D, speed: float) -> void:
 	$CompDamage.blood_smear_location = collision.get_position()
 	$CompDamage._instance_destroy()
 
+func _is_glass(collision: KinematicCollision2D) -> bool:
+	var collider := collision.get_collider()
+	if collider == null:
+		return false
+	if _node_or_ancestor_in_group(collider, "glass"):
+		return true
+	return false
 
 ## Return true when collision should count as a wall impact.
 func _is_wall(collision: KinematicCollision2D) -> bool:
@@ -88,6 +103,9 @@ func _is_wall(collision: KinematicCollision2D) -> bool:
 	if wall_collision_group.is_empty():
 		return false
 	return _node_or_ancestor_in_group(collider, wall_collision_group)
+
+
+
 
 ## Public helper used by other scripts to check goblin dazed state.
 func is_dazed() -> bool:

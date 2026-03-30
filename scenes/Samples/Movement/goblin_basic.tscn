@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cqf6eoofrp6j5" path="res://scenes/Samples/Particles/partBloodSmearGreenPersistent.tscn" id="2_bawqr"]
 [ext_resource type="Script" uid="uid://cfo7hjn8if7e5" path="res://scripts/Samples/Movement/goblin_astar_chase.gd" id="2_chase"]
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="3_bawqr"]
-[ext_resource type="PackedScene" path="res://scenes/components/comp_on_cell_overlap.tscn" id="4_rsxvf"]
+[ext_resource type="PackedScene" uid="uid://g1n38uj15vxs" path="res://scenes/components/comp_on_cell_overlap.tscn" id="4_rsxvf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lrtaf"]
 size = Vector2(40, 91)

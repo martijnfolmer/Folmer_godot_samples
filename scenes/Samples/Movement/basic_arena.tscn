@@ -25,7 +25,7 @@ H = 12
 cell_scene = ExtResource("1_vg2uj")
 
 [node name="Pillar" parent="." unique_id=1493386293 instance=ExtResource("1_bjjws")]
-position = Vector2(132, 513)
+position = Vector2(480, 826)
 
 [node name="Pillar2" parent="." unique_id=139601998 instance=ExtResource("1_bjjws")]
 position = Vector2(1306, 482)
@@ -34,7 +34,7 @@ position = Vector2(1306, 482)
 position = Vector2(974, 994)
 
 [node name="Pillar4" parent="." unique_id=1840937098 instance=ExtResource("1_bjjws")]
-position = Vector2(330, 723)
+position = Vector2(682, 1038)
 
 [node name="Pillar5" parent="." unique_id=468483794 instance=ExtResource("1_bjjws")]
 position = Vector2(672, 160)
@@ -58,34 +58,34 @@ position = Vector2(569, 449)
 position = Vector2(1023, 740)
 
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
-position = Vector2(328, 981)
+position = Vector2(512, 1041)
 
 [node name="GoblinBasic" parent="." unique_id=574766309 instance=ExtResource("3_00l21")]
-position = Vector2(1088, 992)
+position = Vector2(579, 827)
 
 [node name="GoblinBasic2" parent="." unique_id=2052670920 instance=ExtResource("3_00l21")]
 position = Vector2(800, 544)
 
 [node name="GoblinBasic3" parent="." unique_id=503990667 instance=ExtResource("3_00l21")]
-position = Vector2(461, 989)
+position = Vector2(689, 856)
 
 [node name="Wall" parent="." unique_id=592342518 instance=ExtResource("8_cxbq3")]
-position = Vector2(289, 855)
+position = Vector2(503, 722)
 
 [node name="Wall2" parent="." unique_id=1092318142 instance=ExtResource("8_cxbq3")]
-position = Vector2(390, 855)
+position = Vector2(604, 722)
 
 [node name="Wall3" parent="." unique_id=860934339 instance=ExtResource("8_cxbq3")]
-position = Vector2(491, 855)
+position = Vector2(705, 722)
 
 [node name="Glass" parent="." unique_id=680498862 instance=ExtResource("9_7ql2u")]
-position = Vector2(562, 989)
+position = Vector2(794, 830)
 rotation = 1.5707964
 
 [node name="Glass2" parent="." unique_id=1970894080 instance=ExtResource("9_7ql2u")]
-position = Vector2(562, 1086)
+position = Vector2(794, 927)
 rotation = 1.5707964
 
 [node name="Glass3" parent="." unique_id=1725767937 instance=ExtResource("9_7ql2u")]
-position = Vector2(562, 1186)
+position = Vector2(794, 1027)
 rotation = 1.5707964

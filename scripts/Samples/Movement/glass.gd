@@ -10,8 +10,11 @@ func _ready() -> void:
 func _instance_destroy(_dir : float) ->void:
 	
 	# create glass shards
-	var direction = Vector2(cos(_dir), sin(_dir))
-	direction = direction.normalized()
+	var direction := Vector2(cos(_dir), sin(_dir))
+	if !direction.is_finite() or direction.length_squared() < 1e-12:
+		direction = Vector2.RIGHT
+	else:
+		direction = direction.normalized()
 	spawn_glass_shards(global_position, direction)
 	
 	 #Free children

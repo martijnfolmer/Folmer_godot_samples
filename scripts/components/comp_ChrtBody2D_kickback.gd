@@ -9,7 +9,7 @@ extends Node
 # Signals are something other nodes can subscribe to. .emit will create a signal
 signal impact_started()
 signal impact_ended()
-signal body_slammed(collision: KinematicCollision2D, speed: float)
+signal body_slammed(collision: KinematicCollision2D, speed: float, velocity_before_slide: Vector2)
 
 @export var weight:float = 1.0
 @export var friction: float = 1.25
@@ -24,6 +24,7 @@ signal body_slammed(collision: KinematicCollision2D, speed: float)
 @export var transfer_force_max: float = 140.0
 @export var transfer_cooldown_sec: float = 0.08
 @export var pillar_hit_slowdown_mult: float = 0.2
+@export var pillar_glass_break_speed_min: float = 150.0
 
 @onready var parentBody := get_node(body_path) as CharacterBody2D
 var _impact_active: bool = false		# true if we are being moved after being kicked or moving wall
@@ -72,6 +73,13 @@ func is_impact_active() -> bool:
 	return _impact_active
 
 
+## Restore velocity after a pass-through collision (e.g. goblin breaking glass). Call from body_slammed handlers.
+func restore_impact_velocity(v: Vector2) -> void:
+	parentBody.velocity = v
+	if v.length_squared() > stop_speed * stop_speed:
+		_impact_active = true
+
+
 # Physics
 ## Simulate friction, collisions, and push transfer while impact is active.
 func _physics_process(delta: float) -> void:
@@ -105,25 +113,44 @@ func _physics_process(delta: float) -> void:
 	
 	# Check if we are a pillar that is moving (different transferrence rules)
 	var collided_any_pillar: bool = false
+	var collided_blocking_wall: bool = false
+	var collided_unbroken_glass: bool = false
 
 	# for each collisions
 	for i in parentBody.get_slide_collision_count():
 		var collision: KinematicCollision2D = parentBody.get_slide_collision(i)
+		var collider: Object = collision.get_collider()
+
+		if source_is_pillar:
+			if _node_or_ancestor_in_group(collider, "wall"):
+				collided_blocking_wall = true
+			elif _node_or_ancestor_in_group(collider, "glass"):
+				if speed_before_slide >= pillar_glass_break_speed_min:
+					var destroy_node := _find_node_with_method(collider as Node, "_instance_destroy")
+					if destroy_node:
+						var shard_dir := velocity_before_slide
+						if shard_dir.length_squared() < 0.01:
+							shard_dir = -collision.get_normal()
+						destroy_node._instance_destroy(shard_dir.angle())
+					else:
+						collided_unbroken_glass = true
+				else:
+					collided_unbroken_glass = true
 		
 		# if we are a pillar and the thing we are colliding with is a pillar
-		if source_is_pillar and _node_or_ancestor_in_group(collision.get_collider(), "pillar"):
+		if source_is_pillar and _node_or_ancestor_in_group(collider, "pillar"):
 			collided_any_pillar = true
 		
 		# emit body slammed, because we slammed into something (either a pillar or something else)
-		body_slammed.emit(collision, speed_before_slide)
+		body_slammed.emit(collision, speed_before_slide, velocity_before_slide)
 		
 		# Try to transfer our speed to whatever we are colliding with
 		_try_transfer_push(collision, velocity_before_slide, speed_before_slide, source_is_pillar)
 
-	# Keep pillar momentum unless pillar-to-pillar collision occurred.
-	if source_is_pillar and !collided_any_pillar:			# keep moving
+	# Keep pillar momentum unless pillar-to-pillar, wall, or intact glass blocked this frame.
+	if source_is_pillar and !collided_any_pillar and !collided_blocking_wall and !collided_unbroken_glass:
 		parentBody.velocity = velocity_before_slide
-	elif source_is_pillar and collided_any_pillar:		# slow down rapidly, becuase we are a pillar hitting pillar
+	elif source_is_pillar and collided_any_pillar:
 		parentBody.velocity *= clamp(pillar_hit_slowdown_mult, 0.0, 1.0)
 
 	# Apply sprite jitter proportional to remaining speed.
@@ -249,3 +276,12 @@ func _node_or_ancestor_in_group(collider: Object, group: StringName) -> bool:
 			return true
 		current = current.get_parent()
 	return false
+
+
+func _find_node_with_method(node: Node, method_name: String) -> Node:
+	var current := node
+	while current != null:
+		if current.has_method(method_name):
+			return current
+		current = current.get_parent()
+	return null

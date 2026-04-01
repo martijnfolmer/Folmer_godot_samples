@@ -63,23 +63,26 @@ func _on_impact_ended() -> void:
 
 # Wall slam
 ## Get slammed into an object like wall, pillar, glass
-func _on_body_slammed(collision: KinematicCollision2D, speed: float) -> void:
+func _on_body_slammed(collision: KinematicCollision2D, speed: float, velocity_before_slide: Vector2) -> void:
 	
 	if !_dazed or speed < wall_slam_speed_min:
 		return	
 	
 	# Check whether it is a glass wall we are being yeeted through
 	if _is_glass(collision):
-		
-		# TODO: make it so the goblin doesn't slow down
-		# TODO: give velocity to the instance_destroy
-		
-		# Give damage to the glass 
+		var shard_dir := velocity_before_slide
+		if shard_dir.length_squared() < 0.01:
+			shard_dir = -collision.get_normal()
+
 		var collider = collision.get_collider()
 		var destroy_node := _find_node_with_method(collider, "_instance_destroy")
 		if destroy_node:
-			destroy_node._instance_destroy(0)
-		
+			destroy_node._instance_destroy(shard_dir.angle())
+
+		var kickback := get_node_or_null("CompBodyKickback")
+		if kickback and kickback.has_method("restore_impact_velocity"):
+			kickback.restore_impact_velocity(velocity_before_slide)
+
 		return
 	
 	# Ignore non-dazed, low-speed, or non-wall impacts.

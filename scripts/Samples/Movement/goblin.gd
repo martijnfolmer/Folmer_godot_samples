@@ -65,10 +65,20 @@ func _on_impact_ended() -> void:
 ## Get slammed into an object like wall, pillar, glass
 func _on_body_slammed(collision: KinematicCollision2D, speed: float) -> void:
 	
+	if !_dazed or speed < wall_slam_speed_min:
+		return	
+	
 	# Check whether it is a glass wall we are being yeeted through
 	if _is_glass(collision):
-		# Give damage to the glass
 		
+		# TODO: make it so the goblin doesn't slow down
+		# TODO: give velocity to the instance_destroy
+		
+		# Give damage to the glass 
+		var collider = collision.get_collider()
+		var destroy_node := _find_node_with_method(collider, "_instance_destroy")
+		if destroy_node:
+			destroy_node._instance_destroy(0)
 		
 		return
 	
@@ -187,3 +197,11 @@ func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 
 func _get_sprite_2D_if_any() -> Sprite2D:
 	return get_node_or_null("CharacterBody2D/Sprite2D") as Sprite2D
+
+func _find_node_with_method(node: Node, method_name: String) -> Node:
+	var current := node
+	while current != null:
+		if current.has_method(method_name):
+			return current
+		current = current.get_parent()
+	return null

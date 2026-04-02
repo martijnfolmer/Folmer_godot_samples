@@ -217,8 +217,10 @@ func _physics_process(delta: float) -> void:
 				continue
 			if target.is_in_group("pillar") or target.is_in_group("goblin"):
 				_apply_kick_to_target(target)
+				break
 			elif target.is_in_group("glass") or target.is_in_group("wall"):
 				_apply_kick_to_static(target)
+				break
 
 	# Read WASD axis input and normalize direction
 	var input_dir: Vector2 = Vector2(
@@ -242,7 +244,7 @@ func _physics_process(delta: float) -> void:
 		if _attack_time_left <= 0.0:
 			_attack_active = false
 
-	# Run movement, carry pillar push, and resolve overlap nudges
+	# Run movement, get pushed by pillars, and resolve overlap nudges
 	move_and_slide()
 	_update_external_push_from_pillars(delta)
 	_resolve_pillar_overlap()
@@ -270,9 +272,10 @@ func _physics_process(delta: float) -> void:
 			if collNode not in _kick_hit_bodies:
 				if collNode.is_in_group("pillar") or collNode.is_in_group("goblin"):
 					_apply_kick_to_target(collNode)
+					break	# only kick the first thing
 				elif collNode.is_in_group("glass") or collNode.is_in_group("wall"):
 					_apply_kick_to_static(collNode)
-
+					break	# only kick the first thing
 		_attack_active = false
 
 	# Compute movement direction used by body/legs visual logic

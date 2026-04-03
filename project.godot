@@ -26,8 +26,12 @@ GlPlayerInput="*uid://c2e8xve880a8h"
 
 [display]
 
-window/size/viewport_width=2200
-window/size/viewport_height=1300
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
 
 [dotnet]
 

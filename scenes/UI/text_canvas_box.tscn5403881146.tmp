@@ -14,20 +14,18 @@ offset_top = 500.0
 offset_right = 1230.0
 offset_bottom = 700.0
 script = ExtResource("1_script")
-display_texts = Array[String](["[p1]I'm talking first, so my left portrait should scale up first", "[p2]I will talk second, so now we switch it up", "[p2][big]And I'm still talking, but loudly!", "[p1][small]And now I'm saying something softly"])
+display_texts = Array[String](["[p1]I'm talking first, so my left portrait should scale up first", "[p2]I will talk second, so now we switch it up", "[p2]And I'm still talking, so here we are"])
 update_interval = 0.05
 diff_y = 900.0
-scale_start = 0.5
-scale_end = 0.6
-font_small_size = 30
+scale_start = 0.9
 
 [node name="P2" type="Sprite2D" parent="." unique_id=114830202]
-position = Vector2(863, -173)
+position = Vector2(860, -190)
 scale = Vector2(-0.582, 0.582)
 texture = ExtResource("2_h0pem")
 
 [node name="P1" type="Sprite2D" parent="." unique_id=1665155125]
-position = Vector2(236, -178.00003)
+position = Vector2(227, -183.00003)
 scale = Vector2(0.6576087, 0.6576087)
 texture = ExtResource("3_tiivl")
 

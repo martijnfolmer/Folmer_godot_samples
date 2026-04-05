@@ -1,5 +1,7 @@
 extends Node2D
 
+# TODO: TESTING: create the text canvas box
+const TEXT_CANVAS_BOX_SCENE := preload("res://scenes/UI/text_canvas_box.tscn")
 
 # TODO: TESTING: pillar test force
 @export_group("Pillar crush test")
@@ -31,14 +33,21 @@ func write_and_read_json() -> void:
 # TODO: TESTING: pillars to you after space bar
 ## Handle debug input and trigger the pillar push test.
 func _unhandled_input(event: InputEvent) -> void:
-	if _is_space_pressed(event):
+	#if _is_space_pressed(event):
 		#_move_two_closest_pillars_towards_player()
-		write_and_read_json()
+		#write_and_read_json()
+	if _is_K_pressed(event):
 		
+		var txtBox := TEXT_CANVAS_BOX_SCENE.instantiate()
+		add_child(txtBox)
+	
 # TODO: TESTING: space bar pressed
 ## Return true when the key event is a non-repeated Space press.
 func _is_space_pressed(event: InputEvent) -> bool:
 	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
+
+func _is_K_pressed(event: InputEvent) -> bool:
+	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_K
 
 # TODO: TESTING: move nearest pillars to you
 ## Push the two nearest pillars toward the player using kickback impact.

@@ -5,8 +5,7 @@ class_name TextCanvasBox
 
 enum txtState {MOVE_IN, MOVE_OUT, IDLE, SCROLLING, COMPLETE, NEXTLINE}
 enum scaleState {SCALE_UP, SCALE_DOWN}
-
-var PROCESS_TEXT: bool = false
+var PROCESS_TEXT: bool = false				# check the text for changing font scales and usch
 
 ## Full texts to show, revealed one character at a time
 @export var display_texts: Array[String] = ["Sample text"]:
@@ -16,20 +15,49 @@ var PROCESS_TEXT: bool = false
 		_current_char_index = 0
 		_apply_text()
 
+## How fast to cycle through the next character
 @export var update_interval: float = 0.1
+## How far to move off screen (x coordinate)
 @export var diff_x: float = 0.0
+## how far to move off screen (y coordinate)
 @export var diff_y: float = 160.0
 
+@export_group("Scaling and Value change when talking")
+## scale for the portrait when it is not the one talking
 @export var scale_start: float = 0.8
+## scale for the portrait when it is the one talking
 @export var scale_end: float = 1.0
 ## how fast the scale changes
 @export var scale_time: float = 0.1
 ## how much to darken the portrait when not talking
 @export var modulate_value: float = 0.7
 
+@export_group("Shaking the portrait when [shake] tag is used")
+## How long to shake if the [shake] tag is used in txt
+@export var shake_timer : float = 3.0
+## Maximum shake
+@export var shake_tot : float = 50
+
+@export_group("Rotating the portrait when [rotate] tag is used")
+## How long to rotate if the [rotate] tag is used in txt
+@export var rotate_timer : float = 1.0
+## Maximum amplitude (degrees)
+@export var rotate_amplitude : float = 30
+## How fast to move a single sinus cycle
+@export var rotate_time_per_cycle : float = 0.5
+
+
+
+@export_group("Font sizes for [big] and [small] tags")
+# Font size when we yell
 @export var font_big_size : int = 50
+# Font size when we whisper
 @export var font_small_size : int = 20
+# Font size for normal conversation
 @export var font_normal_size : int = 40
+
+
+
 
 
 var _label: Label
@@ -50,6 +78,7 @@ var move_out_y2: float
 var move_out_x1: float
 var move_out_x2: float
 
+# scaling when talking or not
 var p1_scale: float = scale_start
 var p2_scale: float = scale_start
 var p1_scale_t : float = 0.0
@@ -57,22 +86,27 @@ var p2_scale_t : float = 0.0
 var p1_scale_state : scaleState = scaleState.SCALE_DOWN
 var p2_scale_state : scaleState = scaleState.SCALE_DOWN
 
+# turning brighter and darker when talking or not
 var p1_modulate_v: float = modulate_value
 var p2_modulate_v: float = modulate_value
 
-#todo:
-'''
-	after move out, we destroy
-	after text is over, we start the move out (done)
-	Create a set_output, where we set the output based on current position and diff
-	2 portraits (scaling)
-'''
+# Shaking a portrait if the [shake] tag is used
+var p1_shake_timer: float = 0.0
+var p2_shake_timer: float = 0.0
+
+# rotating the portrait if the [rotate] tag is used
+var p1_rotate_timer: float = 0.0
+var p2_rotate_timer: float = 0.0
 
 
-# The current state of the 
+# The current state of the textbox
 var _state: txtState = txtState.IDLE
 
+
+
 func _ready() -> void:
+	
+	# Get the label child node
 	_label = %Label
 	_label.add_theme_font_size_override("font_size", font_normal_size)
 	
@@ -109,7 +143,7 @@ func _ready() -> void:
 	
 	$P1.modulate = Color(modulate_value, modulate_value, modulate_value, 1.0)
 	$P2.modulate = Color(modulate_value, modulate_value, modulate_value, 1.0)
-	
+
 func _process(delta) -> void:
 	
 	# Move the text box in and out of view
@@ -118,7 +152,13 @@ func _process(delta) -> void:
 	# scale the portraits based on who is talking, along with darkening/lightening
 	_process_portrait_scale(delta)
 
+	# Shaking if [shake] tag was passed on
+	_process_shaking(delta)
+	
+	# rotating if [rotate] tag was passed on
+	_process_rotate(delta)
 
+## Moving the textbox out of the screen
 func _process_move_in_out(delta : float) -> void:
 	# Moving in and out of the view
 	if _state == txtState.MOVE_IN:
@@ -134,7 +174,11 @@ func _process_move_in_out(delta : float) -> void:
 		position.y = Easing.linear_lerp(move_out_t1, move_out_t2, move_out_y1, move_out_y2)
 		if move_out_t1 >= move_out_t2:
 			_state = txtState.IDLE
+			
+			# destroy the text box
+			_instance_destroy()
 
+## Scaling the portrait and changing the brightness
 func _process_portrait_scale(delta : float) -> void:
 	
 	# scale to the minimum
@@ -159,16 +203,63 @@ func _process_portrait_scale(delta : float) -> void:
 	p2_modulate_v = Easing.linear_lerp(p2_scale_t, scale_time, modulate_value, 1.0);
 	$P2.scale = Vector2(-p2_scale, p2_scale)
 	$P2.modulate = Color(p2_modulate_v, p2_modulate_v, p2_modulate_v, 1.0)
+
+## Update the active shake effect and decay amplitude over time.
+func _process_shaking(delta: float) -> void:
+
+	if p1_shake_timer > 0:
+		p1_shake_timer = max(p1_shake_timer - delta, 0)
+		if p1_shake_timer <=0.0:
+			$P1.offset = Vector2(0.0, 0.0)
+		else:
+			## Compute decayed random offset and apply to parent.
+			var decay: float = p1_shake_timer / shake_timer
+			var amplitude: float = shake_tot * decay
+			$P1.offset = Vector2(
+				randf_range(-amplitude, amplitude),
+				randf_range(-amplitude, amplitude)
+			)
 	
+	if p2_shake_timer > 0:
+		p2_shake_timer = max(p2_shake_timer - delta, 0)
+		if p2_shake_timer <=0.0:
+			$P2.offset = Vector2(0.0, 0.0)
+		else:
+			## Compute decayed random offset and apply to parent.
+			var decay: float = p2_shake_timer / shake_timer
+			var amplitude: float = shake_tot * decay
+			$P2.offset = Vector2(
+				randf_range(-amplitude, amplitude),
+				randf_range(-amplitude, amplitude)
+			)
+
+## rotate the portrait when the [rotate] tag is used
+func _process_rotate(delta: float) -> void:
+	
+	if p1_rotate_timer > 0:
+		p1_rotate_timer = max(p1_rotate_timer - delta, 0)
+		if p1_rotate_timer <=0.0:
+			$P1.rotation_degrees = 0
+		else:
+			$P1.rotation_degrees = p1_rotate_timer/rotate_timer * rotate_amplitude * sin(2*PI / rotate_time_per_cycle * (1 - p1_rotate_timer/rotate_timer))
+	
+	if p2_rotate_timer > 0:
+		p2_rotate_timer = max(p2_rotate_timer - delta, 0)
+		if p2_rotate_timer <=0.0:
+			$P2.rotation_degrees = 0
+		else:
+			$P2.rotation_degrees = p2_rotate_timer/rotate_timer * rotate_amplitude * sin(2*PI / rotate_time_per_cycle * (1 - p2_rotate_timer/rotate_timer))
 
 
+###################################
+## Text related
+###################################
 
 func set_box_texts(texts: Array[String]) -> void:
 	display_texts = texts
 	_current_text_index = 0
 	_current_char_index = 0
 	_apply_text()
-
 
 func _on_timer_timeout() -> void:
 	if display_texts.is_empty():
@@ -187,7 +278,6 @@ func _on_timer_timeout() -> void:
 		_timer.stop()
 
 	_apply_text()
-
 
 func _apply_text() -> void:
 	
@@ -222,9 +312,20 @@ func _process_txt(txt: String) -> void:
 	if txt.contains("[p2]"):
 		p1_scale_state = scaleState.SCALE_DOWN
 		p2_scale_state = scaleState.SCALE_UP
+		
+		if txt.contains("[shake]"):
+			p2_shake_timer = shake_timer
+		if txt.contains("[rotate]"):
+			p2_rotate_timer = rotate_timer
+		
 	elif txt.contains("[p1]"):
 		p1_scale_state = scaleState.SCALE_UP
 		p2_scale_state = scaleState.SCALE_DOWN
+		
+		if txt.contains("[shake]"):
+			p1_shake_timer = shake_timer
+		if txt.contains("[rotate]"):
+			p1_rotate_timer = rotate_timer
 
 	if txt.contains("[big]"):
 		_label.add_theme_font_size_override("font_size", font_big_size)
@@ -233,7 +334,23 @@ func _process_txt(txt: String) -> void:
 	else:
 		_label.add_theme_font_size_override("font_size", font_normal_size)
 
-# Primary keypress somewhere
+## Clear out the instructions
+func _clean_txt(txt: String) -> String:
+	txt = txt.replace("[p1]", "")
+	txt = txt.replace("[p2]", "")
+	txt = txt.replace("[big]", "")
+	txt = txt.replace("[small]", "")
+	txt = txt.replace("[shake]", "")
+	txt = txt.replace("[rotate]", "")
+	
+	return txt
+
+
+
+
+
+
+# Check for keypressed
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_space_pressed(event):
 		# if we are idle, start it (we haven't started the text yet)
@@ -258,11 +375,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func _is_space_pressed(event: InputEvent) -> bool:
 	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
 
-
-func _clean_txt(txt: String) -> String:
-	txt = txt.replace("[p1]", "")
-	txt = txt.replace("[p2]", "")
-	txt = txt.replace("[big]", "")
-	txt = txt.replace("[small]", "")
-	
-	return txt
+## Destroy this text box and all of its children
+func _instance_destroy():
+	queue_free()

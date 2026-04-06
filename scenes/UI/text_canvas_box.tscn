@@ -14,11 +14,14 @@ offset_top = 500.0
 offset_right = 1230.0
 offset_bottom = 700.0
 script = ExtResource("1_script")
-display_texts = Array[String](["[p1]I'm talking first, so my left portrait should scale up first", "[p2]I will talk second, so now we switch it up", "[p2][big]And I'm still talking, but loudly!", "[p1][small]And now I'm saying something softly"])
+display_texts = Array[String](["[p1]I'm talking first, so my left portrait should scale up first", "[p2]I will talk second, so now we switch it up", "[p2][big]And I'm still talking, but loudly!", "[p1][small]And now I'm saying something softly", "[p1][shake]I should be shaking now!", "[p2][rotate]Is my portrait shaking? I think so", "[p1][big][shake][rotate] I have all effects!"])
 update_interval = 0.05
 diff_y = 900.0
 scale_start = 0.5
 scale_end = 0.6
+shake_timer = 1.0
+shake_tot = 20.0
+rotate_amplitude = 10.0
 font_small_size = 30
 
 [node name="P2" type="Sprite2D" parent="." unique_id=114830202]

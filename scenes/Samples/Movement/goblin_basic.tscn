@@ -1,15 +1,16 @@
 [gd_scene format=3 uid="uid://cy6d05qriys22"]
 
-[ext_resource type="Texture2D" uid="uid://f8cg7pwfmvyk" path="res://png/goblin/goblin_base.png" id="1_7xiet"]
 [ext_resource type="Script" uid="uid://oyt3wxf0cj4i" path="res://scripts/Samples/Movement/goblin.gd" id="1_goblin"]
 [ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="2_5palr"]
 [ext_resource type="PackedScene" uid="uid://cqf6eoofrp6j5" path="res://scenes/Samples/Particles/partBloodSmearGreenPersistent.tscn" id="2_bawqr"]
 [ext_resource type="Script" uid="uid://cfo7hjn8if7e5" path="res://scripts/Samples/Movement/goblin_astar_chase.gd" id="2_chase"]
+[ext_resource type="Texture2D" uid="uid://ej2b4un6xg5e" path="res://png/goblin/goblin_arm.png" id="3_armtex"]
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="3_bawqr"]
+[ext_resource type="Texture2D" uid="uid://bid0jpsnxmuip" path="res://png/goblin/goblin_chest.png" id="4_chstex"]
 [ext_resource type="PackedScene" uid="uid://g1n38uj15vxs" path="res://scenes/components/comp_on_cell_overlap.tscn" id="4_rsxvf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lrtaf"]
-size = Vector2(40, 91)
+size = Vector2(53, 112)
 
 [node name="GoblinBasic" type="Node2D" unique_id=574766309]
 script = ExtResource("1_goblin")
@@ -23,6 +24,7 @@ body_path = NodePath("../CharacterBody2D")
 movement_shake_scale = 0.01
 
 [node name="CompOnCellOverlap" parent="." unique_id=1479008585 instance=ExtResource("4_rsxvf")]
+sprite_path = NodePath("../CharacterBody2D/SpriteChest")
 
 [node name="GoblinAStarChase" type="Node2D" parent="." unique_id=1495848707]
 script = ExtResource("2_chase")
@@ -31,9 +33,30 @@ cell_size = 64
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=2036670946]
 
-[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225520]
-texture = ExtResource("1_7xiet")
+[node name="SpriteChest" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225521]
+texture = ExtResource("4_chstex")
+
+[node name="SpriteArmLeft" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225522]
+z_index = 1
+position = Vector2(1, -41)
+scale = Vector2(0.59375, 0.59375)
+texture = ExtResource("3_armtex")
+
+[node name="SpriteArmRight" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225523]
+z_index = 1
+position = Vector2(-2, 43)
+scale = Vector2(0.71875, 0.6875)
+texture = ExtResource("3_armtex")
+flip_h = true
+
+[node name="SpriteHead" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225524]
+z_index = 2
+position = Vector2(20.000004, 4.999999)
+scale = Vector2(0.35, 0.6052632)
+texture = ExtResource("3_armtex")
+region_enabled = true
+region_rect = Rect2(20, 6, 60, 38)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=296132105]
-position = Vector2(0, -0.5)
+position = Vector2(5, 2)
 shape = SubResource("RectangleShape2D_lrtaf")

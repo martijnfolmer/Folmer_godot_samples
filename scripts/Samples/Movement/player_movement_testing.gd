@@ -37,9 +37,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		#_move_two_closest_pillars_towards_player()
 		#write_and_read_json()
 	if _is_K_pressed(event):
-		
 		var txtBox := TEXT_CANVAS_BOX_SCENE.instantiate()
-		add_child(txtBox)
+		var singleton_cam := get_parent().get_node_or_null("SingletonCamera") as Node
+		var hud := singleton_cam.get_node_or_null("HudLayer") if singleton_cam else null
+		if hud:
+			hud.add_child(txtBox)
+		else:
+			add_child(txtBox)
 	
 # TODO: TESTING: space bar pressed
 ## Return true when the key event is a non-repeated Space press.

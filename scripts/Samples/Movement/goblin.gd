@@ -14,11 +14,37 @@ extends Node2D
 @export var dazed_orbit_speed: float = 4.5
 @export var dazed_orbit_scale: float = 0.2
 
+@export_group("Idle part scale pulse")
+@export var part_pulse_enabled: bool = true
+@export var arms_pulse_period: float = 3.0
+@export var chest_pulse_period: float = 2.2
+@export var head_pulse_period: float = 2.7
+@export var arms_pulse_amplitude: float = 0.05
+@export var chest_pulse_amplitude: float = 0.05
+@export var head_pulse_amplitude: float = 0.05
+@export var arms_pulse_phase: float = 0.0
+@export var chest_pulse_phase: float = 0.0
+@export var head_pulse_phase: float = 0.0
+@export var sprite_arm_left_path: NodePath = ^"CharacterBody2D/SpriteArmLeft"
+@export var sprite_arm_right_path: NodePath = ^"CharacterBody2D/SpriteArmRight"
+@export var sprite_chest_path: NodePath = ^"CharacterBody2D/SpriteChest"
+@export var sprite_head_path: NodePath = ^"CharacterBody2D/SpriteHead"
+
 var _dazed: bool = false
 var _dazed_orbit_sprites: Array[Sprite2D] = []
 var _dazed_orbit_phase: float = 0.0
 
 var _body_sprite = null		# the body sprite of the unit, to get its scale
+
+var _part_pulse_time: float = 0.0
+var _sprite_arm_l: Sprite2D
+var _sprite_arm_r: Sprite2D
+var _sprite_chest: Sprite2D
+var _sprite_head: Sprite2D
+var _base_scale_arm_l: Vector2 = Vector2.ONE
+var _base_scale_arm_r: Vector2 = Vector2.ONE
+var _base_scale_chest: Vector2 = Vector2.ONE
+var _base_scale_head: Vector2 = Vector2.ONE
 
 # Lifecycle
 ## Register goblin group membership and hook kickback events.
@@ -36,9 +62,11 @@ func _ready() -> void:
 
 	# Get the body sprite of the unit if there are any
 	_body_sprite = _get_sprite_2D_if_any()
+	_capture_part_pulse_baselines()
 
 ## Update dazed orbit positions each frame while visuals are active.
 func _process(delta: float) -> void:
+	_update_part_scale_pulse(delta)
 	if !_dazed or _dazed_orbit_sprites.is_empty():
 		return
 	_update_dazed_orbit_visuals(delta)
@@ -186,8 +214,54 @@ func _update_dazed_orbit_visuals(delta: float) -> void:
 		sprite.global_position = center + Vector2(cos(angle), sin(angle)) * dazed_orbit_radius * added_scale
 		sprite.rotation = angle + PI * 0.5
 		sprite.scale = Vector2.ONE * max(0.01, added_scale * dazed_orbit_scale)
-		
-		
+
+
+# --- Idle part scale pulse (GoblinBasic layered sprites) ---
+func _capture_part_pulse_baselines() -> void:
+	_sprite_arm_l = get_node_or_null(sprite_arm_left_path) as Sprite2D
+	_sprite_arm_r = get_node_or_null(sprite_arm_right_path) as Sprite2D
+	_sprite_chest = get_node_or_null(sprite_chest_path) as Sprite2D
+	_sprite_head = get_node_or_null(sprite_head_path) as Sprite2D
+	if _sprite_arm_l:
+		_base_scale_arm_l = _sprite_arm_l.scale
+	if _sprite_arm_r:
+		_base_scale_arm_r = _sprite_arm_r.scale
+	if _sprite_chest:
+		_base_scale_chest = _sprite_chest.scale
+	if _sprite_head:
+		_base_scale_head = _sprite_head.scale
+
+
+func _update_part_scale_pulse(delta: float) -> void:
+	if !part_pulse_enabled:
+		return
+	if _sprite_arm_l == null and _sprite_arm_r == null and _sprite_chest == null and _sprite_head == null:
+		return
+
+	_part_pulse_time += delta
+
+	var arms_p: float = maxf(0.001, arms_pulse_period)
+	var chest_p: float = maxf(0.001, chest_pulse_period)
+	var head_p: float = maxf(0.001, head_pulse_period)
+
+	var arms_s: float = sin(TAU * _part_pulse_time / arms_p + arms_pulse_phase)
+	var chest_s: float = sin(TAU * _part_pulse_time / chest_p + chest_pulse_phase)
+	var head_s: float = sin(TAU * _part_pulse_time / head_p + head_pulse_phase)
+
+	var arms_f: float = 1.0 + arms_pulse_amplitude * arms_s
+	var chest_f: float = 1.0 + chest_pulse_amplitude * chest_s
+	var head_f: float = 1.0 + head_pulse_amplitude * head_s
+
+	if _sprite_arm_l:
+		_sprite_arm_l.scale = _base_scale_arm_l * arms_f
+	if _sprite_arm_r:
+		_sprite_arm_r.scale = _base_scale_arm_r * arms_f
+	if _sprite_chest:
+		_sprite_chest.scale = _base_scale_chest * chest_f
+	if _sprite_head:
+		_sprite_head.scale = _base_scale_head * head_f
+
+
 # Helpers
 ## Return true when node or any ancestor belongs to the given group.
 func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
@@ -199,7 +273,7 @@ func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 	return false
 
 func _get_sprite_2D_if_any() -> Sprite2D:
-	return get_node_or_null("CharacterBody2D/Sprite2D") as Sprite2D
+	return get_node_or_null("CharacterBody2D/SpriteChest") as Sprite2D
 
 func _find_node_with_method(node: Node, method_name: String) -> Node:
 	var current := node

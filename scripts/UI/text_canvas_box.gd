@@ -56,8 +56,10 @@ var PROCESS_TEXT: bool = false				# check the text for changing font scales and 
 # Font size for normal conversation
 @export var font_normal_size : int = 40
 
-
-
+@export_group("HUD layout (when parent is CanvasLayer)")
+@export var hud_margin_x: float = 30.0
+@export var hud_margin_bottom: float = 20.0
+@export var hud_bar_height: float = 200.0
 
 
 var _label: Label
@@ -103,13 +105,44 @@ var p2_rotate_timer: float = 0.0
 var _state: txtState = txtState.IDLE
 
 
+func _is_hud_canvas() -> bool:
+	return get_parent() is CanvasLayer
+
+
+func _layout_hud_in_viewport() -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var inner_width: float = maxf(0.0, vp.x - hud_margin_x * 2.0)
+	size = Vector2(inner_width, hud_bar_height)
+	position = Vector2(hud_margin_x, vp.y - hud_bar_height - hud_margin_bottom)
+
+
+func _refresh_move_keyframes() -> void:
+	move_in_x1 = position.x + diff_x
+	move_in_y1 = position.y + diff_y
+	move_in_x2 = position.x
+	move_in_y2 = position.y
+
+	move_out_x1 = position.x
+	move_out_y1 = position.y
+	move_out_x2 = position.x + diff_x
+	move_out_y2 = position.y + diff_y
+
+
+func _on_viewport_size_changed() -> void:
+	if not _is_hud_canvas():
+		return
+	_layout_hud_in_viewport()
+	_refresh_move_keyframes()
+	if _state == txtState.IDLE or _state == txtState.SCROLLING or _state == txtState.COMPLETE:
+		position.x = move_in_x2
+		position.y = move_in_y2
+
 
 func _ready() -> void:
-	
 	# Get the label child node
 	_label = %Label
 	_label.add_theme_font_size_override("font_size", font_normal_size)
-	
+
 	# Timer which governs how fast text
 	_timer = Timer.new()
 	_timer.wait_time = update_interval
@@ -118,18 +151,14 @@ func _ready() -> void:
 	_timer.timeout.connect(_on_timer_timeout)
 	add_child(_timer)
 	_apply_text()
-	
-	# Moving in and out
-	move_in_x1 = position.x + diff_x
-	move_in_y1 = position.y + diff_y
-	move_in_x2 = position.x
-	move_in_y2 = position.y 
-	
-	move_out_x1 = position.x
-	move_out_y1 = position.y
-	move_out_x2 = position.x + diff_x
-	move_out_y2 = position.y + diff_y
-	
+
+	if _is_hud_canvas():
+		set_anchors_preset(Control.LayoutPreset.PRESET_TOP_LEFT)
+		_layout_hud_in_viewport()
+		get_viewport().size_changed.connect(_on_viewport_size_changed)
+
+	_refresh_move_keyframes()
+
 	position.x = move_in_x1
 	position.y = move_in_y1
 	_state = txtState.MOVE_IN

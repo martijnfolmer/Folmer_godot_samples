@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="3_bawqr"]
 [ext_resource type="Texture2D" uid="uid://bid0jpsnxmuip" path="res://png/goblin/goblin_chest.png" id="4_chstex"]
 [ext_resource type="PackedScene" uid="uid://g1n38uj15vxs" path="res://scenes/components/comp_on_cell_overlap.tscn" id="4_rsxvf"]
+[ext_resource type="Texture2D" uid="uid://dlr4g80qmc2b8" path="res://png/goblin/goblin_arm_outline.png" id="8_fofqr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lrtaf"]
 size = Vector2(53, 112)
@@ -28,10 +29,29 @@ sprite_path = NodePath("../CharacterBody2D/SpriteChest")
 
 [node name="GoblinAStarChase" type="Node2D" parent="." unique_id=1495848707]
 script = ExtResource("2_chase")
-movement_enabled = false
 cell_size = 64
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=2036670946]
+
+[node name="SpriteHead_outline" type="Sprite2D" parent="CharacterBody2D" unique_id=139606106]
+position = Vector2(21, 6)
+scale = Vector2(0.84375, 0.84375)
+texture = ExtResource("8_fofqr")
+
+[node name="SpriteChest_outline" type="Sprite2D" parent="CharacterBody2D" unique_id=664307596]
+position = Vector2(-2.4999983, -1)
+scale = Vector2(1.1406251, 1.6601561)
+texture = ExtResource("8_fofqr")
+
+[node name="SpriteArmLeft_outline" type="Sprite2D" parent="CharacterBody2D" unique_id=405629231]
+position = Vector2(0.99999976, -39.999985)
+scale = Vector2(0.640625, 0.640625)
+texture = ExtResource("8_fofqr")
+
+[node name="SpriteArmRight_outline" type="Sprite2D" parent="CharacterBody2D" unique_id=124191567]
+position = Vector2(-1, 44.000004)
+scale = Vector2(0.71874994, 0.74218756)
+texture = ExtResource("8_fofqr")
 
 [node name="SpriteChest" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225521]
 texture = ExtResource("4_chstex")

@@ -1,2 +1,95 @@
 K = knight
 A = alchemist
+
+
+A: "Blessings of humanity on you Knight"
+K : ...
+A : ...
+K : ...
+A : ... you are supposed to respond...
+K : why are you here, Alchemist?
+A : Ah, to support you on your mission to cleanse the tower
+K : there is no need, this isn't...
+A : Nonsense, the edicts state clearly that the order shall support any and all..
+K : Do NOT lecture me on the edicts greenling, I had served years before you ever considered taking the vows.
+A : Apologies knight, I spoke in arrogance. Please accept my apologies and take the elixir. 
+K: ... apology accepted. Humanities blessings on you, Alchemist.
+A: ... and on you, knight.
+
+A: blessings of humanity on you knight.
+K : on you as well, Alchemist.
+K : i wish to ask you a question about the nature of your defect.
+A: ...what makes you claim I have one, knight?
+K : we are both here.
+A : ... the elders felt i required more field experience because of my ... affliction. I shrink away when things get... loud. "Cowardice must be stamped out like iron", said the elder.
+K : I hope your affliction does not hinder you further
+A : ...likewise, Knight
+
+
+A: blessings of humanity on you knight.
+K : on you as well, Alchemist.
+K : when you spoke of your affliction earlier, a thought occurred
+A : don't worry, in my medical experience, thoughts are perfectly normal.
+K: ...
+A: sorry, please continue
+K: why not apply to a position in the university, or the travelling medicae? Should be soft enough for you
+A : i appreciate the thought. But spots are rare, and only the most shining examples of the alchemist get in. Someone like me is not a right fit.
+K : Untrue, the edicts clearly state that "the order shall provide purpose to all those that take the vow".
+A: and how has adherence to the edicts worked out for you, Knight!?
+K: ...
+A: that was unkind of me, please accept my apologies knight
+K .... i will take my leave
+
+
+
+A : blessings of humanity on you
+K : on you as well
+A: may i ask something about your... situation knight? Please?
+K: ... ask
+A: the loss of your arms, your wounds, they seem not to diminish your ability to clear this tower. 
+A : so why accept this assignment, this judgement?
+K : ...it may seem i am not diminished in your eyes, but the loss of my sword and shield...
+K : it is difficult to describe, but a fully equipped knight could destroy this tower within minutes
+K : but I take a lot longer
+A : is that so bad, when you can still complete your task
+K : a dead knight galvanizes, an alive knight inspires. 
+K : a wounded knight is just a reminder of failure
+A : you do yourself to little credit knight, but i appreciate you answering me
+A : go with my blessings
+K : appreciated
+
+
+Knight and alchemist discussion : 
+-- K : why did you join the alchemists?
+-- A : Cool outfit, mask makes it easier to look people in the eyes, pretty sick architecture on the schools
+-- K : ...
+-- A : .. I wanted something to be good at, so I followed my aptitudes and just sort of fell into this
+-- K : We have that in common
+-- A : :-)
+
+
+
+- Before last battle:
+-- A : The council has ordered me to give you a worthy end. Your deeds have been recorded, your sacrifice will never be forgotten. 
+-- K : ...
+-- A : ... This is crap.
+-- K : Do you feel hardened yet?
+-- A : I feel sick
+-- K : Perhaps you need an alchemist.
+-- A : ... I don't
+-- K : Its oke. We all perform our tasks, and you have acted your role admirably. You have the chance to be great, I can see it.
+-- A : No role can compel me to watch you fall. Perhaps they ordered you to take the councils mercy, but take mine as well (drop red potion as well). Live, and find new purpose. Or don't find new purpose, just be, it is enough!
+
+
+- 
+- I lost my arms, my chance of revenge, given a squires job
+- after the alchemist gives the black potion, it is clear what they meant about "hardening"
+-- the alchemist is unhappy with this, and offers the antidote as well. The knight has an option to do both.
+-- if you take the black potion, you will fade to black slowly, as your heart stops. Text appears 'And so a flame has disappeared, never to be seen again. The world is less warm'
+-- if you take the antidote, you can leave through the door 'To a new adventure, a new purpose, a new knight. A flame may flicker, but its warmth sustains us still'
+
+
+From the mentor
+- Let duty lighten your load, but add weight to your steps
+- Let honor guide you, and stay your sword when needed
+- Keep going!

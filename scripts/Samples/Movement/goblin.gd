@@ -29,6 +29,11 @@ extends Node2D
 @export var sprite_arm_right_path: NodePath = ^"CharacterBody2D/SpriteArmRight"
 @export var sprite_chest_path: NodePath = ^"CharacterBody2D/SpriteChest"
 @export var sprite_head_path: NodePath = ^"CharacterBody2D/SpriteHead"
+@export var sprite_arm_left_outline_path: NodePath = ^"CharacterBody2D/SpriteArmLeft_outline"
+@export var sprite_arm_right_outline_path: NodePath = ^"CharacterBody2D/SpriteArmRight_outline"
+@export var sprite_chest_outline_path: NodePath = ^"CharacterBody2D/SpriteChest_outline"
+@export var sprite_head_outline_path: NodePath = ^"CharacterBody2D/SpriteHead_outline"
+
 
 var _dazed: bool = false
 var _dazed_orbit_sprites: Array[Sprite2D] = []
@@ -41,10 +46,18 @@ var _sprite_arm_l: Sprite2D
 var _sprite_arm_r: Sprite2D
 var _sprite_chest: Sprite2D
 var _sprite_head: Sprite2D
+var _sprite_arm_l_outline: Sprite2D
+var _sprite_arm_r_outline: Sprite2D
+var _sprite_chest_outline: Sprite2D
+var _sprite_head_outline: Sprite2D
 var _base_scale_arm_l: Vector2 = Vector2.ONE
 var _base_scale_arm_r: Vector2 = Vector2.ONE
 var _base_scale_chest: Vector2 = Vector2.ONE
 var _base_scale_head: Vector2 = Vector2.ONE
+var _base_scale_arm_l_outline: Vector2 = Vector2.ONE
+var _base_scale_arm_r_outline: Vector2 = Vector2.ONE
+var _base_scale_chest_outline: Vector2 = Vector2.ONE
+var _base_scale_head_outline: Vector2 = Vector2.ONE
 
 # Lifecycle
 ## Register goblin group membership and hook kickback events.
@@ -222,6 +235,12 @@ func _capture_part_pulse_baselines() -> void:
 	_sprite_arm_r = get_node_or_null(sprite_arm_right_path) as Sprite2D
 	_sprite_chest = get_node_or_null(sprite_chest_path) as Sprite2D
 	_sprite_head = get_node_or_null(sprite_head_path) as Sprite2D
+	_sprite_arm_l_outline = get_node_or_null(sprite_arm_left_outline_path) as Sprite2D
+	_sprite_arm_r_outline = get_node_or_null(sprite_arm_right_outline_path) as Sprite2D
+	_sprite_chest_outline = get_node_or_null(sprite_chest_outline_path) as Sprite2D
+	_sprite_head_outline = get_node_or_null(sprite_head_outline_path) as Sprite2D
+	
+	
 	if _sprite_arm_l:
 		_base_scale_arm_l = _sprite_arm_l.scale
 	if _sprite_arm_r:
@@ -230,7 +249,14 @@ func _capture_part_pulse_baselines() -> void:
 		_base_scale_chest = _sprite_chest.scale
 	if _sprite_head:
 		_base_scale_head = _sprite_head.scale
-
+	if _sprite_arm_l_outline:
+		_base_scale_arm_l_outline = _sprite_arm_l_outline.scale
+	if _sprite_arm_r_outline:
+		_base_scale_arm_r_outline = _sprite_arm_r_outline.scale
+	if _sprite_chest_outline:
+		_base_scale_chest_outline = _sprite_chest_outline.scale
+	if _sprite_head_outline:
+		_base_scale_head_outline = _sprite_head_outline.scale
 
 func _update_part_scale_pulse(delta: float) -> void:
 	if !part_pulse_enabled:
@@ -252,12 +278,20 @@ func _update_part_scale_pulse(delta: float) -> void:
 	var chest_f: float = 1.0 + chest_pulse_amplitude * chest_s
 	var head_f: float = 1.0 + head_pulse_amplitude * head_s
 
+	if _sprite_arm_l_outline:
+		_sprite_arm_l_outline.scale = _base_scale_arm_l_outline * arms_f
 	if _sprite_arm_l:
 		_sprite_arm_l.scale = _base_scale_arm_l * arms_f
+	if _sprite_arm_r_outline:
+		_sprite_arm_r_outline.scale = _base_scale_arm_r_outline * arms_f
 	if _sprite_arm_r:
 		_sprite_arm_r.scale = _base_scale_arm_r * arms_f
+	if _sprite_chest_outline:
+		_sprite_chest_outline.scale = _base_scale_chest_outline * chest_f
 	if _sprite_chest:
 		_sprite_chest.scale = _base_scale_chest * chest_f
+	if _sprite_head_outline:
+		_sprite_head_outline.scale = _base_scale_head_outline * head_f
 	if _sprite_head:
 		_sprite_head.scale = _base_scale_head * head_f
 
@@ -273,7 +307,7 @@ func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 	return false
 
 func _get_sprite_2D_if_any() -> Sprite2D:
-	return get_node_or_null("CharacterBody2D/SpriteChest") as Sprite2D
+	return get_node_or_null(sprite_chest_path) as Sprite2D
 
 func _find_node_with_method(node: Node, method_name: String) -> Node:
 	var current := node

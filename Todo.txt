@@ -1,0 +1,56 @@
+Todo:
+	Goblin all:
+		- blood splatter matches goblin type
+		- when falling, the dazed should scale with chest
+		- when falling, the arms should rotate the same way as the chest
+	Goblin basic
+		- arms go back and forth when walking
+		- attacking state : when getting close to the player, wind up arm (and flash)
+		- attacking state : release, and check collision with player
+		- knockback player a bit. Don't make them explode unless their health is too low
+		- auto aim goblin into other goblins and pillars
+	Ranged goblin:
+		- gets in range, wind up (flashing), fire an arrow
+		- arrow is a sepparate thing, and can be kicked at the right time
+		- hold a colored bow in front of them
+	Shield goblin:
+		- gets in range, but must be kicked again when dazed
+		- has a similiar attack to goblin basic
+	Kick goblin:
+		- big kickback to the player
+		- getting dazed
+		- if kick connects with kick, it blows other things away
+	spear goblin:
+		- throws a spear that keeps you in place, and you can kick the spear away
+	final boss:
+		- heart of the dungeon, must kick enough goblins into it.
+		- floating off the platform, you must kick goblins onto it
+		- it messes with the platform, changing the arena to previous lvls
+	
+	Screen
+		- make it fullscreen, the smallish screen is bothering me
+	
+	Knight and alchemist:
+		- replace text box with character portraits (WIP)
+		- put an alchemist character there we can interact with, initializing the text box 
+		- put some dialogue in a csv, then to a json, and read that json from here
+		
+	
+	What happens when you hurt the alchemist?
+	-- they dissapear, no more healing potions
+	-- so you don't heal inbetween chambers
+	
+	- global pause
+	-- pause player and goblins and debris when global pause is active (can be an enum and auto load)
+	
+	
+	Options menu
+		- different resolutions
+		- global screen shake
+		- sfx slider
+		- music slider
+		- colorblind mode
+		- deathless mode
+		- rebindable keys
+		
+		

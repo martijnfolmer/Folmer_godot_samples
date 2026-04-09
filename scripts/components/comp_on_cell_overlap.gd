@@ -7,6 +7,7 @@ extends Node
 """
 
 signal on_cell_state_changed(is_on_cell: bool, area: Area2D)
+signal left_cell
 
 @export var body_path: NodePath = NodePath("../CharacterBody2D") # our characterbody2d
 @export var sprite_path: NodePath = NodePath("../CharacterBody2D/Sprite2D") # the sprite
@@ -50,6 +51,10 @@ func _refresh_overlap_state() -> void:
 
 	if !changed:
 		return
+
+	var was_on_cell: bool = is_on_cell
+	if was_on_cell and !next_is_on_cell:
+		left_cell.emit()
 
 	is_on_cell = next_is_on_cell
 	current_cell_area = overlap_area

@@ -34,7 +34,12 @@ extends Node2D
 @export var sprite_chest_outline_path: NodePath = ^"CharacterBody2D/SpriteChest_outline"
 @export var sprite_head_outline_path: NodePath = ^"CharacterBody2D/SpriteHead_outline"
 
+enum GroundState {
+	ON_CELL,			# on top o the cell
+	FALLING,			# falling of the edge
+}
 
+var _ground_state: GroundState = GroundState.ON_CELL
 var _dazed: bool = false
 var _dazed_orbit_sprites: Array[Sprite2D] = []
 var _dazed_orbit_phase: float = 0.0
@@ -71,6 +76,12 @@ func _ready() -> void:
 		kickback.impact_ended.connect(_on_impact_ended)		# reads the signal impact_ended
 		kickback.body_slammed.connect(_on_body_slammed)		# reads the signal on_body_slammed
 
+	# Bind cell overlap signals from CompOnCellOverlap for checking if we are falling or not
+	var cell_overlap := get_node_or_null("CompOnCellOverlap")
+	if cell_overlap:
+		cell_overlap.left_cell.connect(_on_left_cell)
+		cell_overlap.on_cell_state_changed.connect(_on_cell_overlap_state_changed)
+
 	set_process(true)
 
 	# Get the body sprite of the unit if there are any
@@ -100,6 +111,15 @@ func _on_impact_ended() -> void:
 	if is_instance_valid(self):
 		_dazed = false
 		_stop_dazed_orbit_visuals()
+
+
+func _on_left_cell() -> void:
+	_ground_state = GroundState.FALLING
+
+
+func _on_cell_overlap_state_changed(is_on_cell: bool, _area: Area2D) -> void:
+	if is_on_cell:
+		_ground_state = GroundState.ON_CELL
 
 
 # Wall slam
@@ -260,6 +280,8 @@ func _capture_part_pulse_baselines() -> void:
 
 func _update_part_scale_pulse(delta: float) -> void:
 	if !part_pulse_enabled:
+		return
+	if _ground_state == GroundState.FALLING:
 		return
 	if _sprite_arm_l == null and _sprite_arm_r == null and _sprite_chest == null and _sprite_head == null:
 		return

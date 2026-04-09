@@ -7,6 +7,7 @@ extends Node2D
 @export_group("Node paths")
 @export var body_path: NodePath = ^"../CharacterBody2D"
 @export var kickback_path: NodePath = ^"../CompBodyKickback"
+@export var cell_overlap_path: NodePath = ^"../CompOnCellOverlap"
 
 @export_group("Movement")
 @export var move_speed: float = 220.0
@@ -47,14 +48,27 @@ var _path_index: int = 0
 var _repath_timer: float = 0.0
 var _behavior_state: BehaviorState = BehaviorState.IDLE
 var _last_known_player_pos: Vector2 = Vector2.ZERO
+var _on_cell_floor: bool = true
 
 
 func _ready() -> void:
 	_body = get_node_or_null(body_path) as CharacterBody2D
 	_kickback = get_node_or_null(kickback_path)
 	_goblin_root = get_parent()
+	var cell_overlap := get_node_or_null(cell_overlap_path)
+	if cell_overlap:
+		cell_overlap.left_cell.connect(_on_overlap_left_cell)
+		cell_overlap.on_cell_state_changed.connect(_on_overlap_cell_state_changed)
 	randomize()
 	_repath_timer = randf_range(0.0, max(initial_stagger_max_sec, 0.0))
+
+
+func _on_overlap_left_cell() -> void:
+	_on_cell_floor = false
+
+
+func _on_overlap_cell_state_changed(is_on_cell: bool, _area: Area2D) -> void:
+	_on_cell_floor = is_on_cell
 
 
 # Main update loop
@@ -79,6 +93,13 @@ func _physics_process(delta: float) -> void:
 
 	# The path stops when the goblin is dazed
 	if pause_when_dazed and _is_goblin_dazed():
+		_clear_path()
+		_body.velocity = Vector2.ZERO
+		_body.move_and_slide()
+		return
+
+	if !_on_cell_floor:
+		_set_state(BehaviorState.IDLE)
 		_clear_path()
 		_body.velocity = Vector2.ZERO
 		_body.move_and_slide()

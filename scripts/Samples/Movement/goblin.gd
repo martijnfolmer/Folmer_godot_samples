@@ -279,21 +279,21 @@ func _update_part_scale_pulse(delta: float) -> void:
 	var head_f: float = 1.0 + head_pulse_amplitude * head_s
 
 	if _sprite_arm_l_outline:
-		_sprite_arm_l_outline.scale = _base_scale_arm_l_outline * arms_f
+		_sprite_arm_l_outline.scale = _base_scale_arm_l_outline * (arms_f - chest_f -1)
 	if _sprite_arm_l:
-		_sprite_arm_l.scale = _base_scale_arm_l * arms_f
+		_sprite_arm_l.scale = _base_scale_arm_l * (arms_f - chest_f -1)
 	if _sprite_arm_r_outline:
-		_sprite_arm_r_outline.scale = _base_scale_arm_r_outline * arms_f
+		_sprite_arm_r_outline.scale = _base_scale_arm_r_outline * (arms_f - chest_f -1)
 	if _sprite_arm_r:
-		_sprite_arm_r.scale = _base_scale_arm_r * arms_f
+		_sprite_arm_r.scale = _base_scale_arm_r * (arms_f- chest_f -1)
 	if _sprite_chest_outline:
 		_sprite_chest_outline.scale = _base_scale_chest_outline * chest_f
 	if _sprite_chest:
 		_sprite_chest.scale = _base_scale_chest * chest_f
 	if _sprite_head_outline:
-		_sprite_head_outline.scale = _base_scale_head_outline * head_f
+		_sprite_head_outline.scale = _base_scale_head_outline * (head_f - chest_f -1)
 	if _sprite_head:
-		_sprite_head.scale = _base_scale_head * head_f
+		_sprite_head.scale = _base_scale_head * (head_f - chest_f -1)
 
 
 # Helpers

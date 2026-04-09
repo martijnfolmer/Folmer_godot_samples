@@ -17,8 +17,16 @@ size = Vector2(53, 112)
 script = ExtResource("1_goblin")
 wall_slam_speed_min = 10.0
 blood_smear_scene = ExtResource("2_bawqr")
+sprite_arm_left_path = NodePath("CharacterBody2D/SpriteChest/SpriteArmLeft")
+sprite_arm_right_path = NodePath("CharacterBody2D/SpriteChest/SpriteArmRight")
+sprite_head_path = NodePath("CharacterBody2D/SpriteChest/SpriteHead")
+sprite_arm_left_outline_path = NodePath("CharacterBody2D/SpriteChest/SpriteArmLeft_outline")
+sprite_arm_right_outline_path = NodePath("CharacterBody2D/SpriteChest/SpriteArmRight_outline")
+sprite_chest_outline_path = NodePath("CharacterBody2D/SpriteChest/SpriteChest_outline")
+sprite_head_outline_path = NodePath("CharacterBody2D/SpriteChest/SpriteHead_outline")
 
 [node name="CompDamage" parent="." unique_id=1256099559 instance=ExtResource("2_5palr")]
+blood_smear_color = Color(0, 0.4016261, 0.6899639, 1)
 
 [node name="CompBodyKickback" parent="." unique_id=876922541 instance=ExtResource("3_bawqr")]
 body_path = NodePath("../CharacterBody2D")
@@ -29,53 +37,60 @@ sprite_path = NodePath("../CharacterBody2D/SpriteChest")
 
 [node name="GoblinAStarChase" type="Node2D" parent="." unique_id=1495848707]
 script = ExtResource("2_chase")
+movement_enabled = false
 cell_size = 64
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=2036670946]
 
-[node name="SpriteHead_outline" type="Sprite2D" parent="CharacterBody2D" unique_id=139606106]
-position = Vector2(21, 6)
-scale = Vector2(0.84375, 0.84375)
-texture = ExtResource("8_fofqr")
-
-[node name="SpriteChest_outline" type="Sprite2D" parent="CharacterBody2D" unique_id=664307596]
-position = Vector2(-2.4999983, -1)
-scale = Vector2(1.1406251, 1.6601561)
-texture = ExtResource("8_fofqr")
-
-[node name="SpriteArmLeft_outline" type="Sprite2D" parent="CharacterBody2D" unique_id=405629231]
-position = Vector2(0.99999976, -39.999985)
-scale = Vector2(0.640625, 0.640625)
-texture = ExtResource("8_fofqr")
-
-[node name="SpriteArmRight_outline" type="Sprite2D" parent="CharacterBody2D" unique_id=124191567]
-position = Vector2(-1, 44.000004)
-scale = Vector2(0.71874994, 0.74218756)
-texture = ExtResource("8_fofqr")
-
 [node name="SpriteChest" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225521]
+position = Vector2(1.9073486e-06, 0)
+scale = Vector2(0.99999994, 1)
 texture = ExtResource("4_chstex")
 
-[node name="SpriteArmLeft" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225522]
+[node name="SpriteArmLeft" type="Sprite2D" parent="CharacterBody2D/SpriteChest" unique_id=1318225522]
 z_index = 1
-position = Vector2(1, -41)
-scale = Vector2(0.59375, 0.59375)
+position = Vector2(1.0000001, -41)
+scale = Vector2(0.59375006, 0.59375)
 texture = ExtResource("3_armtex")
 
-[node name="SpriteArmRight" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225523]
+[node name="SpriteArmRight" type="Sprite2D" parent="CharacterBody2D/SpriteChest" unique_id=1318225523]
 z_index = 1
-position = Vector2(-2, 43)
-scale = Vector2(0.71875, 0.6875)
+position = Vector2(-2.0000021, 43)
+scale = Vector2(0.71875006, 0.6875)
 texture = ExtResource("3_armtex")
 flip_h = true
 
-[node name="SpriteHead" type="Sprite2D" parent="CharacterBody2D" unique_id=1318225524]
+[node name="SpriteHead" type="Sprite2D" parent="CharacterBody2D/SpriteChest" unique_id=1318225524]
 z_index = 2
 position = Vector2(20.000004, 4.999999)
-scale = Vector2(0.35, 0.6052632)
+scale = Vector2(0.35000002, 0.6052632)
 texture = ExtResource("3_armtex")
 region_enabled = true
 region_rect = Rect2(20, 6, 60, 38)
+
+[node name="SpriteHead_outline" type="Sprite2D" parent="CharacterBody2D/SpriteChest" unique_id=139606106]
+z_index = -1
+position = Vector2(21, 6)
+scale = Vector2(0.84375024, 0.84375)
+texture = ExtResource("8_fofqr")
+
+[node name="SpriteChest_outline" type="Sprite2D" parent="CharacterBody2D/SpriteChest" unique_id=664307596]
+z_index = -1
+position = Vector2(-2.5000005, -1)
+scale = Vector2(1.1406252, 1.6601561)
+texture = ExtResource("8_fofqr")
+
+[node name="SpriteArmLeft_outline" type="Sprite2D" parent="CharacterBody2D/SpriteChest" unique_id=405629231]
+z_index = -1
+position = Vector2(0.999998, -39.999985)
+scale = Vector2(0.64062506, 0.640625)
+texture = ExtResource("8_fofqr")
+
+[node name="SpriteArmRight_outline" type="Sprite2D" parent="CharacterBody2D/SpriteChest" unique_id=124191567]
+z_index = -1
+position = Vector2(-1.000002, 44.000004)
+scale = Vector2(0.71875, 0.74218756)
+texture = ExtResource("8_fofqr")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=296132105]
 position = Vector2(5, 2)

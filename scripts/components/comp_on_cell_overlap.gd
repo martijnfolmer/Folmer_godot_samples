@@ -22,7 +22,7 @@ var _sprite: Sprite2D = null
 
 
 func _ready() -> void:
-	_body = get_node_or_null(body_path) as CollisionObject2D		# get our collision
+	_body = get_node_or_null(body_path) as CollisionObject2D # get our collision
 	_sprite = get_node_or_null(sprite_path) as Sprite2D
 	_refresh_overlap_state()
 

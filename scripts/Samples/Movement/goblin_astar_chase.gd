@@ -1,8 +1,8 @@
 extends Node2D
 
 @export_group("Enable")
-@export var movement_enabled: bool = true		# for debugging, if set to false, we don't update movement
-@export var pause_when_dazed: bool = true
+@export var movement_enabled: bool = true# for debugging, if set to false, we don't update movement
+@export var pause_when_dazed: bool = true# if the goblin is dazed (like kicked, we don't update movement
 
 @export_group("Node paths")
 @export var body_path: NodePath = ^"../CharacterBody2D"

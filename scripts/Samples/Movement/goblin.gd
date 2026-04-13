@@ -39,6 +39,14 @@ enum GroundState {
 	FALLING,			# falling of the edge
 }
 
+enum AttackState {
+	CHASE,
+	WINDING_UP,
+	ATTACKING,
+	RELOAD,
+}
+
+
 var _ground_state: GroundState = GroundState.ON_CELL
 var _dazed: bool = false
 var _dazed_orbit_sprites: Array[Sprite2D] = []

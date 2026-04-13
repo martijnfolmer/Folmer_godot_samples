@@ -27,6 +27,13 @@ Todo:
 		- floating off the platform, you must kick goblins onto it
 		- it messes with the platform, changing the arena to previous lvls
 	
+	General:
+		- function to create txt box and pass list
+		- cleanup text box.gd code
+		- create 2 lvls
+		- sounds for txt ticks, different for alchemist or other one
+		- talk to npc in screen, spawn stuff
+
 	Screen
 		- make it fullscreen, the smallish screen is bothering me
 	

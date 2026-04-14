@@ -34,20 +34,24 @@ extends Node2D
 @export var sprite_chest_outline_path: NodePath = ^"CharacterBody2D/SpriteChest_outline"
 @export var sprite_head_outline_path: NodePath = ^"CharacterBody2D/SpriteHead_outline"
 
+# Checking whether the goblin is on the cell or falling off (works with comp_on_cell_overlap)
 enum GroundState {
 	ON_CELL,			# on top o the cell
 	FALLING,			# falling of the edge
 }
 
+# checking what the attacking status is of the goblin (works with comp_chase_melee)
 enum AttackState {
-	CHASE,
-	WINDING_UP,
-	ATTACKING,
-	RELOAD,
+	CHASE,			# we are either idle or chasing
+	WINDING_UP,		# we are winding up the attack
+	ATTACKING,		# we are doing the attack
+	RELOAD,			# small idle window when slowing down
 }
 
-
+# states
 var _ground_state: GroundState = GroundState.ON_CELL
+var _attack_state: AttackState = AttackState.CHASE
+
 var _dazed: bool = false
 var _dazed_orbit_sprites: Array[Sprite2D] = []
 var _dazed_orbit_phase: float = 0.0
@@ -346,3 +350,11 @@ func _find_node_with_method(node: Node, method_name: String) -> Node:
 			return current
 		current = current.get_parent()
 	return null
+
+
+## return attack state
+func _get_attack_state() -> AttackState:
+	return _attack_state
+
+func _get_ground_state() -> GroundState:
+	return _ground_state

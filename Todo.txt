@@ -1,4 +1,6 @@
 Todo:
+	General:
+		- all enums in a global script that we can all access?
 	Goblin all:
 		- if mostly off off edge, move a little more towards the edge.
 		- auto aim at pillars or other goblins when kicked.

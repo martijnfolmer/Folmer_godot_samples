@@ -11,6 +11,8 @@ extends Node
 
 """
 
+@export var distance_to_player_for_attack : float = 100
+
 # From goblin state
 # Checking whether the goblin is on the cell or falling off (works with comp_on_cell_overlap)
 enum GroundState {
@@ -29,11 +31,12 @@ enum AttackState {
 
 
 var _goblin_root: Node
+var _goblin_body: Node
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_goblin_root = get_parent()
-	
+	_goblin_body = _goblin_root.get_node_or_null("CharacterBody2D") 
 	
 
 
@@ -49,7 +52,7 @@ func _process(delta: float) -> void:
 	var player = _get_player_body()
 	
 	# Goblin state machine
-	
+
 	# if player no longer exists, do nothing
 	if player == null:
 		return
@@ -57,6 +60,15 @@ func _process(delta: float) -> void:
 	# if goblin is dazed or falling, do nothing
 	if goblin_dazed or goblin_grounded_status == GroundState.FALLING:
 		return
+	
+	
+	if goblin_attack_status == AttackState.CHASE:
+		
+		var dist_player = _distance_to_player(player)
+		
+		#if dist_player <= distance_to_player_for_attack:
+			# set attack state for goblin function
+			# do it here
 	
 	# If chase, we do the A star
 	# if we are close to the player (find player (export size))
@@ -107,6 +119,11 @@ func _goblin_attack_status() -> AttackState:
 	return AttackState.CHASE
 	
 
+## Get distance to player
+func _distance_to_player(_player : CharacterBody2D) -> float:
+	
+	var dist = _player.global_position.distance_to(_goblin_body.global_position)
+	return dist
 
 	
 	

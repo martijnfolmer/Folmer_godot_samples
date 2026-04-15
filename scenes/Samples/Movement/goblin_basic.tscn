@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="3_bawqr"]
 [ext_resource type="Texture2D" uid="uid://bid0jpsnxmuip" path="res://png/goblin/goblin_chest.png" id="4_chstex"]
 [ext_resource type="PackedScene" uid="uid://g1n38uj15vxs" path="res://scenes/components/comp_on_cell_overlap.tscn" id="4_rsxvf"]
+[ext_resource type="PackedScene" uid="uid://hdpa5sph2ccr" path="res://scenes/components/comp_chase_and_melee.tscn" id="6_fofqr"]
+[ext_resource type="Script" uid="uid://ulnv3k3d3q81" path="res://scripts/components/comp_chase_and_melee.gd" id="7_35bxk"]
 [ext_resource type="Texture2D" uid="uid://dlr4g80qmc2b8" path="res://png/goblin/goblin_arm_outline.png" id="8_fofqr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lrtaf"]
@@ -34,6 +36,9 @@ movement_shake_scale = 0.01
 
 [node name="CompOnCellOverlap" parent="." unique_id=1479008585 instance=ExtResource("4_rsxvf")]
 sprite_path = NodePath("../CharacterBody2D/SpriteChest")
+
+[node name="CompChaseAndMelee" parent="." unique_id=832466147 instance=ExtResource("6_fofqr")]
+script = ExtResource("7_35bxk")
 
 [node name="GoblinAStarChase" type="Node2D" parent="." unique_id=1495848707]
 script = ExtResource("2_chase")

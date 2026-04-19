@@ -36,19 +36,20 @@ extends Node2D
 
 # Checking whether the goblin is on the cell or falling off (works with comp_on_cell_overlap)
 enum GroundState {
-	ON_CELL,			# on top o the cell
-	FALLING,			# falling of the edge
+	ON_CELL,   # on top of the cell
+	FALLING,   # falling off the edge
 }
 
-# checking what the attacking status is of the goblin (works with comp_chase_melee)
+# Checking what the attacking status is of the goblin (works with comp_chase_melee)
 enum AttackState {
-	CHASE,			# we are either idle or chasing
-	WINDING_UP,		# we are winding up the attack
-	ATTACKING,		# we are doing the attack
-	RELOAD,			# small idle window when slowing down
+	IDLE,        # We are idle (patrolling)
+	CHASE,       # we are either chasing
+	WINDING_UP,  # we are winding up the attack
+	ATTACKING,   # we are doing the attack
+	RELOAD,      # small idle window when slowing down
 }
 
-# states
+# States
 var _ground_state: GroundState = GroundState.ON_CELL
 var _attack_state: AttackState = AttackState.CHASE
 
@@ -56,7 +57,7 @@ var _dazed: bool = false
 var _dazed_orbit_sprites: Array[Sprite2D] = []
 var _dazed_orbit_phase: float = 0.0
 
-var _body_sprite = null		# the body sprite of the unit, to get its scale
+var _body_sprite = null  # the body sprite of the unit, to get its scale
 
 var _part_pulse_time: float = 0.0
 var _sprite_arm_l: Sprite2D
@@ -76,7 +77,11 @@ var _base_scale_arm_r_outline: Vector2 = Vector2.ONE
 var _base_scale_chest_outline: Vector2 = Vector2.ONE
 var _base_scale_head_outline: Vector2 = Vector2.ONE
 
-# Lifecycle
+
+# =========================================================
+# LIFECYCLE
+# =========================================================
+
 ## Register goblin group membership and hook kickback events.
 func _ready() -> void:
 	add_to_group("goblin")
@@ -84,11 +89,11 @@ func _ready() -> void:
 	# Bind kickback signals from CompBodyKickBack used for dazed state and slam death.
 	var kickback := get_node_or_null("CompBodyKickback")
 	if kickback:
-		kickback.impact_started.connect(_on_impact_started)	# reads the signal impact_started
-		kickback.impact_ended.connect(_on_impact_ended)		# reads the signal impact_ended
-		kickback.body_slammed.connect(_on_body_slammed)		# reads the signal on_body_slammed
+		kickback.impact_started.connect(_on_impact_started)
+		kickback.impact_ended.connect(_on_impact_ended)
+		kickback.body_slammed.connect(_on_body_slammed)
 
-	# Bind cell overlap signals from CompOnCellOverlap for checking if we are falling or not
+	# Bind cell overlap signals from CompOnCellOverlap for checking if we are falling or not.
 	var cell_overlap := get_node_or_null("CompOnCellOverlap")
 	if cell_overlap:
 		cell_overlap.left_cell.connect(_on_left_cell)
@@ -96,20 +101,24 @@ func _ready() -> void:
 
 	set_process(true)
 
-	# Get the body sprite of the unit if there are any
+	# Get the body sprite of the unit if there is one.
 	_body_sprite = _get_sprite_2D_if_any()
 	_capture_part_pulse_baselines()
 
-## Update dazed orbit positions each frame while visuals are active.
+
+## Update visuals each frame while active.
 func _process(delta: float) -> void:
 	_update_part_scale_pulse(delta)
-	if !_dazed or _dazed_orbit_sprites.is_empty():
+
+	if not _dazed or _dazed_orbit_sprites.is_empty():
 		return
+
 	_update_dazed_orbit_visuals(delta)
 
 
-
-
+# =========================================================
+# FUNCTIONAL / GAMEPLAY
+# =========================================================
 
 # Kickback handlers
 ## Enter dazed state and start orbit visuals when kickback begins.
@@ -124,7 +133,7 @@ func _on_impact_ended() -> void:
 		_dazed = false
 		_stop_dazed_orbit_visuals()
 
-
+## if no longer on a cell, set to falling
 func _on_left_cell() -> void:
 	_ground_state = GroundState.FALLING
 
@@ -134,14 +143,12 @@ func _on_cell_overlap_state_changed(is_on_cell: bool, _area: Area2D) -> void:
 		_ground_state = GroundState.ON_CELL
 
 
-# Wall slam
-## Get slammed into an object like wall, pillar, glass
+## Get slammed into an object like wall, pillar, glass.
 func _on_body_slammed(collision: KinematicCollision2D, speed: float, velocity_before_slide: Vector2) -> void:
-	
-	if !_dazed or speed < wall_slam_speed_min:
-		return	
-	
-	# Check whether it is a glass wall we are being yeeted through
+	if not _dazed or speed < wall_slam_speed_min:
+		return
+
+	# Check whether it is a glass wall we are being yeeted through.
 	if _is_glass(collision):
 		var shard_dir := velocity_before_slide
 		if shard_dir.length_squared() < 0.01:
@@ -157,9 +164,9 @@ func _on_body_slammed(collision: KinematicCollision2D, speed: float, velocity_be
 			kickback.restore_impact_velocity(velocity_before_slide)
 
 		return
-	
-	# Ignore non-dazed, low-speed, or non-wall impacts.
-	if !_dazed or speed < wall_slam_speed_min or !_is_wall(collision):
+
+	# Ignore non-wall impacts.
+	if not _is_wall(collision):
 		return
 
 	# Pass impact direction/position to damage component, then destroy.
@@ -168,17 +175,9 @@ func _on_body_slammed(collision: KinematicCollision2D, speed: float, velocity_be
 	$CompDamage.blood_smear_location = collision.get_position()
 	$CompDamage._instance_destroy()
 
-func _is_glass(collision: KinematicCollision2D) -> bool:
-	var collider := collision.get_collider()
-	if collider == null:
-		return false
-	if _node_or_ancestor_in_group(collider, "glass"):
-		return true
-	return false
 
 ## Return true when collision should count as a wall impact.
 func _is_wall(collision: KinematicCollision2D) -> bool:
-	# Resolve collider and filter out goblin-on-goblin impacts.
 	var collider := collision.get_collider()
 	if collider == null:
 		return false
@@ -190,29 +189,31 @@ func _is_wall(collision: KinematicCollision2D) -> bool:
 		return false
 	return _node_or_ancestor_in_group(collider, wall_collision_group)
 
+## check if the thing we are colliding with is glass
+func _is_glass(collision: KinematicCollision2D) -> bool:
+	var collider := collision.get_collider()
+	if collider == null:
+		return false
+	return _node_or_ancestor_in_group(collider, "glass")
 
 
-
-## Public helper used by other scripts to check goblin dazed state.
-func is_dazed() -> bool:
-	return _dazed
-
+# =========================================================
+# VISUALS
+# =========================================================
 
 # Dazed orbit visuals
 ## Spawn orbit sprites around the goblin body for dazed feedback.
 func _start_dazed_orbit_visuals() -> void:
-	if !dazed_orbit_enabled or dazed_orbit_texture == null:
+	if not dazed_orbit_enabled or dazed_orbit_texture == null:
 		return
-	if !_dazed_orbit_sprites.is_empty():
+	if not _dazed_orbit_sprites.is_empty():
 		return
 
-	# Create and configure orbit sprites.
-	
-	# if we have a body sprite, scale the dazed sprite accordingly
-	var added_scale = 1.0
-	if _body_sprite!=null:
+	# If we have a body sprite, scale the dazed sprite accordingly.
+	var added_scale := 1.0
+	if _body_sprite != null:
 		added_scale = _body_sprite.scale.x
-	
+
 	var count: int = max(1, dazed_orbit_count)
 	for i in range(count):
 		var sprite := Sprite2D.new()
@@ -247,12 +248,13 @@ func _update_dazed_orbit_visuals(delta: float) -> void:
 	_dazed_orbit_phase += delta * dazed_orbit_speed
 	for i in range(count):
 		var sprite: Sprite2D = _dazed_orbit_sprites[i]
-		if !is_instance_valid(sprite):
+		if not is_instance_valid(sprite):
 			continue
+
 		var angle: float = _dazed_orbit_phase + (TAU * float(i) / float(count))
-		
-		# if we have a body sprite, scale the dazed sprite accordingly
-		var added_scale = 1.0
+
+		# If we have a body sprite, scale the dazed sprite accordingly.
+		var added_scale := 1.0
 		if _body_sprite != null:
 			added_scale = _body_sprite.scale.x
 
@@ -261,7 +263,7 @@ func _update_dazed_orbit_visuals(delta: float) -> void:
 		sprite.scale = Vector2.ONE * max(0.01, added_scale * dazed_orbit_scale)
 
 
-# --- Idle part scale pulse (GoblinBasic layered sprites) ---
+## Check the scale of the sprite at the start
 func _capture_part_pulse_baselines() -> void:
 	_sprite_arm_l = get_node_or_null(sprite_arm_left_path) as Sprite2D
 	_sprite_arm_r = get_node_or_null(sprite_arm_right_path) as Sprite2D
@@ -271,8 +273,7 @@ func _capture_part_pulse_baselines() -> void:
 	_sprite_arm_r_outline = get_node_or_null(sprite_arm_right_outline_path) as Sprite2D
 	_sprite_chest_outline = get_node_or_null(sprite_chest_outline_path) as Sprite2D
 	_sprite_head_outline = get_node_or_null(sprite_head_outline_path) as Sprite2D
-	
-	
+
 	if _sprite_arm_l:
 		_base_scale_arm_l = _sprite_arm_l.scale
 	if _sprite_arm_r:
@@ -290,8 +291,9 @@ func _capture_part_pulse_baselines() -> void:
 	if _sprite_head_outline:
 		_base_scale_head_outline = _sprite_head_outline.scale
 
+
 func _update_part_scale_pulse(delta: float) -> void:
-	if !part_pulse_enabled:
+	if not part_pulse_enabled:
 		return
 	if _ground_state == GroundState.FALLING:
 		return
@@ -313,24 +315,61 @@ func _update_part_scale_pulse(delta: float) -> void:
 	var head_f: float = 1.0 + head_pulse_amplitude * head_s
 
 	if _sprite_arm_l_outline:
-		_sprite_arm_l_outline.scale = _base_scale_arm_l_outline * (arms_f - chest_f -1)
+		_sprite_arm_l_outline.scale = _base_scale_arm_l_outline * (arms_f - chest_f - 1)
 	if _sprite_arm_l:
-		_sprite_arm_l.scale = _base_scale_arm_l * (arms_f - chest_f -1)
+		_sprite_arm_l.scale = _base_scale_arm_l * (arms_f - chest_f - 1)
 	if _sprite_arm_r_outline:
-		_sprite_arm_r_outline.scale = _base_scale_arm_r_outline * (arms_f - chest_f -1)
+		_sprite_arm_r_outline.scale = _base_scale_arm_r_outline * (arms_f - chest_f - 1)
 	if _sprite_arm_r:
-		_sprite_arm_r.scale = _base_scale_arm_r * (arms_f- chest_f -1)
+		_sprite_arm_r.scale = _base_scale_arm_r * (arms_f - chest_f - 1)
 	if _sprite_chest_outline:
 		_sprite_chest_outline.scale = _base_scale_chest_outline * chest_f
 	if _sprite_chest:
 		_sprite_chest.scale = _base_scale_chest * chest_f
 	if _sprite_head_outline:
-		_sprite_head_outline.scale = _base_scale_head_outline * (head_f - chest_f -1)
+		_sprite_head_outline.scale = _base_scale_head_outline * (head_f - chest_f - 1)
 	if _sprite_head:
-		_sprite_head.scale = _base_scale_head * (head_f - chest_f -1)
+		_sprite_head.scale = _base_scale_head * (head_f - chest_f - 1)
 
 
-# Helpers
+# =========================================================
+# GETTERS / SETTERS
+# =========================================================
+
+## Checking if the goblin has the 'dazed' status.
+func get_dazed() -> bool:
+	return _dazed
+
+
+## Return attack state.
+func get_attack_state() -> AttackState:
+	return _attack_state
+
+## return true if we are in the chasing state
+func get_chase_state() -> bool:
+	if _attack_state == AttackState.CHASE:
+		return true
+	return false
+
+## Set attack state.
+func set_attack_state(attack_state: AttackState) -> void:
+	_attack_state = attack_state
+
+
+## Return ground state.
+func get_ground_state() -> GroundState:
+	return _ground_state
+
+
+## Set ground state.
+func set_ground_state(ground_state: GroundState) -> void:
+	_ground_state = ground_state
+
+
+# =========================================================
+# HELPERS
+# =========================================================
+
 ## Return true when node or any ancestor belongs to the given group.
 func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 	var current: Node = node
@@ -340,9 +379,11 @@ func _node_or_ancestor_in_group(node: Node, group: String) -> bool:
 		current = current.get_parent()
 	return false
 
+## get the sprite2D if it exists
 func _get_sprite_2D_if_any() -> Sprite2D:
 	return get_node_or_null(sprite_chest_path) as Sprite2D
 
+## Get a node which includes a method (only finds the first one) or a null
 func _find_node_with_method(node: Node, method_name: String) -> Node:
 	var current := node
 	while current != null:
@@ -350,11 +391,3 @@ func _find_node_with_method(node: Node, method_name: String) -> Node:
 			return current
 		current = current.get_parent()
 	return null
-
-
-## return attack state
-func _get_attack_state() -> AttackState:
-	return _attack_state
-
-func _get_ground_state() -> GroundState:
-	return _ground_state

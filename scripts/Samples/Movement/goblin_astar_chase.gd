@@ -105,6 +105,12 @@ func _physics_process(delta: float) -> void:
 		_body.move_and_slide()
 		return
 
+	if !_is_goblin_chasing():
+		_clear_path()
+		_body.velocity = Vector2.ZERO
+		_body.move_and_slide()
+		return
+
 	# Update behavior state and rebuild path on timer.
 	_update_behavior_state()
 
@@ -478,8 +484,13 @@ func _smooth_path_points(points: PackedVector2Array) -> PackedVector2Array:
 func _is_goblin_dazed() -> bool:
 	if _goblin_root == null:
 		return false
-	return _goblin_root.has_method("is_dazed") and _goblin_root.call("is_dazed")
+	return _goblin_root.has_method("get_dazed") and _goblin_root.call("get_dazed")
 
+## get true if we are using the chasing state of the attacking
+func _is_goblin_chasing() -> bool:
+	if _goblin_root == null:
+		return false		
+	return _goblin_root.has_method("get_chase_state") and _goblin_root.call("get_chase_state")
 
 ## Rotate body smoothly toward movement direction.
 func _rotate_body_toward(move_dir: Vector2, delta: float) -> void:

@@ -31,7 +31,7 @@ position = Vector2(374, 826)
 position = Vector2(1306, 482)
 
 [node name="Pillar3" parent="." unique_id=411479620 instance=ExtResource("1_bjjws")]
-position = Vector2(1227, 936)
+position = Vector2(1374, 1063)
 
 [node name="Pillar4" parent="." unique_id=1840937098 instance=ExtResource("1_bjjws")]
 position = Vector2(717, 1137)
@@ -46,28 +46,28 @@ position = Vector2(1378, 774)
 position = Vector2(928, 160)
 
 [node name="Pillar8" parent="." unique_id=953461983 instance=ExtResource("1_bjjws")]
-position = Vector2(937, 579)
+position = Vector2(1073, 388)
 
 [node name="Pillar9" parent="." unique_id=1156426203 instance=ExtResource("1_bjjws")]
 position = Vector2(688, 560)
 
 [node name="Pillar10" parent="." unique_id=1224326118 instance=ExtResource("1_bjjws")]
-position = Vector2(569, 449)
+position = Vector2(366, 318)
 
 [node name="Pillar11" parent="." unique_id=1751347978 instance=ExtResource("1_bjjws")]
 position = Vector2(1023, 740)
 
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
-position = Vector2(512, 1041)
+position = Vector2(441, 1089)
 
 [node name="GoblinBasic" parent="." unique_id=574766309 instance=ExtResource("3_00l21")]
-position = Vector2(607, 839)
+position = Vector2(1419, 220)
 
 [node name="GoblinBasic2" parent="." unique_id=2052670920 instance=ExtResource("3_00l21")]
 position = Vector2(800, 544)
 
 [node name="GoblinBasic3" parent="." unique_id=503990667 instance=ExtResource("3_00l21")]
-position = Vector2(740, 918)
+position = Vector2(1147, 1104)
 
 [node name="Wall" parent="." unique_id=592342518 instance=ExtResource("8_cxbq3")]
 position = Vector2(390, 720)

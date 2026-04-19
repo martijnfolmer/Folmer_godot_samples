@@ -1,14 +1,18 @@
+Concrete steps:
+	- move arm of goblin back when we are recharging after attack
+	- create a debris.tscn, with a movement, and slowdown, and collision, and falling down
+	- all enums in a global script (start with goblin enums)
+	- player gets a knockback component, gets hit with goblin attack
+	- goblin a star, make a list export of groups that block, add glass
+	
+	
 Todo:
 	General:
-		- all enums in a global script that we can all access?
 	Goblin all:
 		- if mostly off off edge, move a little more towards the edge.
 		- auto aim at pillars or other goblins when kicked.
 	Goblin basic
 		- arms go back and forth when walking
-		- attacking state : when getting close to the player, wind up arm (and flash)
-		- attacking state : release, and check collision with player
-		- knockback player a bit. Don't make them explode unless their health is too low
 		- auto aim goblin into other goblins and pillars
 		- on componcelloverlap, add a list of sprites instead of just one, and rotate them all
 	Ranged goblin:
@@ -18,6 +22,10 @@ Todo:
 	Shield goblin:
 		- gets in range, but must be kicked again when dazed
 		- has a similiar attack to goblin basic
+	goblin brute:
+		- can move through walls and glass
+	goblin flier:
+		- can fly over pits, and you need to kick something into them
 	Kick goblin:
 		- big kickback to the player
 		- getting dazed
@@ -37,7 +45,6 @@ Todo:
 		- talk to npc in screen, spawn stuff
 
 	Screen
-		- make it fullscreen, the smallish screen is bothering me
 	
 	Knight and alchemist:
 		- replace text box with character portraits (WIP)
@@ -61,5 +68,6 @@ Todo:
 		- colorblind mode
 		- deathless mode
 		- rebindable keys
+		- fullscreen and windowed
 		
 		

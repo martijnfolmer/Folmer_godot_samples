@@ -8,5 +8,5 @@ script = ExtResource("1_cam")
 [node name="Camera2D" type="Camera2D" parent="." unique_id=-1447676239]
 zoom = Vector2(0.6, 0.6)
 
-[node name="HudLayer" type="CanvasLayer" parent="."]
+[node name="HudLayer" type="CanvasLayer" parent="." unique_id=2121820185]
 layer = 10

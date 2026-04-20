@@ -187,7 +187,7 @@ func _set_state(next_state: BehaviorState) -> void:
 # Path build/follow
 ## Build a new path to current behavior target for the active state.
 func _rebuild_path_for_state() -> void:
-	
+
 	# If there is no player, we clear the path
 	var player_body := _get_player_body()
 	if player_body == null:
@@ -199,18 +199,20 @@ func _rebuild_path_for_state() -> void:
 		_clear_path()
 		return
 
-	
-	var target_pos: Vector2 = player_body.global_position			# player location
+	var target_pos: Vector2 = player_body.global_position         # player location
 	var has_los: bool = _has_clear_line_to_player(player_body)
 	if _behavior_state == BehaviorState.SEARCH_LAST_KNOWN:
 		target_pos = _last_known_player_pos
 
+	# TODO: We got here, LOS doesn't work, we have to rebuild grid
+	
 	if _behavior_state == BehaviorState.CHASE and has_los:
 		_set_path(PackedVector2Array([_body.global_position, player_body.global_position]))
 		return
-
+	
 	# Build A* grid and compute ID path fallbacks.
 	var graph_ok: bool = _build_grid(target_pos)
+
 	if !graph_ok:
 		_set_path(PackedVector2Array([target_pos]))
 		return
@@ -318,6 +320,7 @@ func _build_grid(target_pos: Vector2) -> bool:
 
 	# Mark pillar occupancy as blocked cells.
 	_mark_pillar_blocked_cells(step)
+	_mark_wall_blocked_cells(step)
 	return true
 
 
@@ -329,6 +332,25 @@ func _mark_pillar_blocked_cells(step: int) -> void:
 
 		var pillar_node: Node2D = node as Node2D
 		var block_radius_px: float = _pillar_block_radius_for(pillar_node)
+		var center_id: Vector2i = _world_to_cell(pillar_node.global_position)
+		var block_radius_cells: int = max(1, int(ceil(block_radius_px / float(step))))
+		for y in range(-block_radius_cells, block_radius_cells + 1):
+			for x in range(-block_radius_cells, block_radius_cells + 1):
+				var sample_world: Vector2 = _cell_to_world(center_id + Vector2i(x, y))
+				if sample_world.distance_to(pillar_node.global_position) > block_radius_px:
+					continue
+				var test_id := center_id + Vector2i(x, y)
+				if _is_cell_in_bounds(test_id):
+					_astar.set_point_solid(test_id, true)
+
+func _mark_wall_blocked_cells(step: int) -> void:
+	for node in get_tree().get_nodes_in_group("wall"):
+		if !(node is Node2D):
+			continue
+
+		var pillar_node: Node2D = node as Node2D
+		var block_radius_px: float = _pillar_block_radius_for(pillar_node)
+		print(block_radius_px)
 		var center_id: Vector2i = _world_to_cell(pillar_node.global_position)
 		var block_radius_cells: int = max(1, int(ceil(block_radius_px / float(step))))
 		for y in range(-block_radius_cells, block_radius_cells + 1):

@@ -67,6 +67,9 @@ var _timer: Timer
 var _current_text_index: int = 0
 var _current_char_index: int = 0
 
+var _sfx: Node
+var _tick_sound: String = "hit1"	 # the sound that each letter makes
+
 var move_in_t1: float = 0.00
 var move_in_t2: float = 0.5
 var move_in_y1: float
@@ -99,7 +102,6 @@ var p2_shake_timer: float = 0.0
 # rotating the portrait if the [rotate] tag is used
 var p1_rotate_timer: float = 0.0
 var p2_rotate_timer: float = 0.0
-
 
 # The current state of the textbox
 var _state: txtState = txtState.IDLE
@@ -142,6 +144,9 @@ func _ready() -> void:
 	# Get the label child node
 	_label = %Label
 	_label.add_theme_font_size_override("font_size", font_normal_size)
+
+	# Get the sfx singleton
+	_sfx = _get_sfx_singleton()
 
 	# Timer which governs how fast text
 	_timer = Timer.new()
@@ -302,6 +307,10 @@ func _on_timer_timeout() -> void:
 
 	if _current_char_index < current_text.length():
 		_current_char_index += 1
+		
+		# play the tikking sound
+		if _sfx!=null and _sfx.has_method("play_sfx_rand_pitch"):
+			_sfx.play_sfx_rand_pitch(_tick_sound)
 	else:
 		_state = txtState.COMPLETE
 		_timer.stop()
@@ -375,11 +384,22 @@ func _clean_txt(txt: String) -> String:
 	return txt
 
 
+## Destroy this text box and all of its children
+func _instance_destroy():
+	queue_free()
 
 
+func _get_sfx_singleton() -> Node:
+	for node in get_tree().root.get_children():
+		for childNode in node.get_children():
+			if childNode.name == "SingletonSfx":
+				return childNode
+	return null
 
 
-# Check for keypressed
+######################
+## Check for keypressed
+######################
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_space_pressed(event):
 		# if we are idle, start it (we haven't started the text yet)
@@ -403,7 +423,3 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Return true when the key event is a non-repeated Space press.
 func _is_space_pressed(event: InputEvent) -> bool:
 	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
-
-## Destroy this text box and all of its children
-func _instance_destroy():
-	queue_free()

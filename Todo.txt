@@ -2,16 +2,26 @@ Concrete steps (20 - 26 april):
 	
 	- move arm of goblin back when we are recharging after attack
 	- create a debris.tscn, with a movement, and slowdown, and collision, and falling down
-	
 	- player gets a knockback component, gets hit with goblin attack
-	- goblin a star, make a list export of groups that block, add glass
 	- function to create txt box and pass list
 	- cleanup text box.gd code
 	
+	- goblin a star, make a list export of groups that block, add glass
+		- has_los doesn't work
+		- pillars are not blocking
+		- neither are glass and wall
+	
+	- text_box sfx every thing (done)
 	- all enums in a global script (start with goblin enums)	(done)
 	- different pitch in the sfx singleton (done)
 	
 Todo:
+	SFX :
+		- pass on volume
+		- maximum number of same single sfx
+	Textbox :
+		- loud and soft text should have loud and soft sfx sound
+	
 	General:
 	Goblin all:
 		- if mostly off off edge, move a little more towards the edge.

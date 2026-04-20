@@ -4,7 +4,7 @@ Concrete steps:
 	- all enums in a global script (start with goblin enums)
 	- player gets a knockback component, gets hit with goblin attack
 	- goblin a star, make a list export of groups that block, add glass
-	
+	- different pitch in the sfx singleton (done)
 	
 Todo:
 	General:

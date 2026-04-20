@@ -1,9 +1,14 @@
-Concrete steps:
+Concrete steps (20 - 26 april):
+	
 	- move arm of goblin back when we are recharging after attack
 	- create a debris.tscn, with a movement, and slowdown, and collision, and falling down
-	- all enums in a global script (start with goblin enums)
+	
 	- player gets a knockback component, gets hit with goblin attack
 	- goblin a star, make a list export of groups that block, add glass
+	- function to create txt box and pass list
+	- cleanup text box.gd code
+	
+	- all enums in a global script (start with goblin enums)	(done)
 	- different pitch in the sfx singleton (done)
 	
 Todo:
@@ -38,8 +43,7 @@ Todo:
 		- it messes with the platform, changing the arena to previous lvls
 	
 	General:
-		- function to create txt box and pass list
-		- cleanup text box.gd code
+		
 		- create 2 lvls
 		- sounds for txt ticks, different for alchemist or other one
 		- talk to npc in screen, spawn stuff

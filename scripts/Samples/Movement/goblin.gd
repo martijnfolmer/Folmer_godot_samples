@@ -34,24 +34,10 @@ extends Node2D
 @export var sprite_chest_outline_path: NodePath = ^"CharacterBody2D/SpriteChest_outline"
 @export var sprite_head_outline_path: NodePath = ^"CharacterBody2D/SpriteHead_outline"
 
-# Checking whether the goblin is on the cell or falling off (works with comp_on_cell_overlap)
-enum GroundState {
-	ON_CELL,   # on top of the cell
-	FALLING,   # falling off the edge
-}
-
-# Checking what the attacking status is of the goblin (works with comp_chase_melee)
-enum AttackState {
-	IDLE,        # We are idle (patrolling)
-	CHASE,       # we are either chasing
-	WINDING_UP,  # we are winding up the attack
-	ATTACKING,   # we are doing the attack
-	RELOAD,      # small idle window when slowing down
-}
 
 # States
-var _ground_state: GroundState = GroundState.ON_CELL
-var _attack_state: AttackState = AttackState.CHASE
+var _ground_state: Enums.GroundState = Enums.GroundState.ON_CELL
+var _attack_state: Enums.AttackState = Enums.AttackState.CHASE
 
 var _dazed: bool = false
 var _dazed_orbit_sprites: Array[Sprite2D] = []
@@ -135,12 +121,12 @@ func _on_impact_ended() -> void:
 
 ## if no longer on a cell, set to falling
 func _on_left_cell() -> void:
-	_ground_state = GroundState.FALLING
+	_ground_state = Enums.GroundState.FALLING
 
 
 func _on_cell_overlap_state_changed(is_on_cell: bool, _area: Area2D) -> void:
 	if is_on_cell:
-		_ground_state = GroundState.ON_CELL
+		_ground_state = Enums.GroundState.ON_CELL
 
 
 ## Get slammed into an object like wall, pillar, glass.
@@ -295,7 +281,7 @@ func _capture_part_pulse_baselines() -> void:
 func _update_part_scale_pulse(delta: float) -> void:
 	if not part_pulse_enabled:
 		return
-	if _ground_state == GroundState.FALLING:
+	if _ground_state == Enums.GroundState.FALLING:
 		return
 	if _sprite_arm_l == null and _sprite_arm_r == null and _sprite_chest == null and _sprite_head == null:
 		return
@@ -342,27 +328,27 @@ func get_dazed() -> bool:
 
 
 ## Return attack state.
-func get_attack_state() -> AttackState:
+func get_attack_state() -> Enums.AttackState:
 	return _attack_state
 
 ## return true if we are in the chasing state
 func get_chase_state() -> bool:
-	if _attack_state == AttackState.CHASE:
+	if _attack_state == Enums.AttackState.CHASE:
 		return true
 	return false
 
 ## Set attack state.
-func set_attack_state(attack_state: AttackState) -> void:
+func set_attack_state(attack_state: Enums.AttackState) -> void:
 	_attack_state = attack_state
 
 
 ## Return ground state.
-func get_ground_state() -> GroundState:
+func get_ground_state() -> Enums.GroundState:
 	return _ground_state
 
 
 ## Set ground state.
-func set_ground_state(ground_state: GroundState) -> void:
+func set_ground_state(ground_state: Enums.GroundState) -> void:
 	_ground_state = ground_state
 
 

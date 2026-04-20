@@ -1,15 +1,6 @@
 extends Node
 
-"""
-	For the enemy that needs to chase a player, get into melee range, and attack
-	
-		- If we are not dazed
-			- check if player exists
-			- if player near us, go to windup up attacking (stop Astar)
-			- flash enemy color
-			- 
 
-"""
 
 @export_group("Melee range")
 ## Maximum distance from the goblin body to the player at which CHASE transitions into WINDING_UP.
@@ -38,23 +29,6 @@ extends Node
 @export_group("Windup flash")
 ## Target tint blended with each sprite’s normal modulate during windup (pulses with a sine wave).
 @export var windup_flash_color: Color = Color(0.0, 0.559, 0.812, 1.0)
-
-# From goblin state
-# Checking whether the goblin is on the cell or falling off (works with comp_on_cell_overlap)
-enum GroundState {
-	ON_CELL,			# on top o the cell
-	FALLING,			# falling of the edge
-}
-
-# From goblin state
-# checking what the attacking status is of the goblin (works with comp_chase_melee)
-enum AttackState {
-	IDLE,        # We are idle (patrolling)
-	CHASE,       # we are either chasing
-	WINDING_UP,  # we are winding up the attack
-	ATTACKING,   # we are doing the attack
-	RELOAD,      # small idle window when slowing down
-}
 
 
 var _goblin_root: Node
@@ -100,16 +74,16 @@ func _process(delta: float) -> void:
 		return
 
 	# if goblin is dazed or falling, do nothing
-	if goblin_dazed or goblin_grounded_status == GroundState.FALLING:
+	if goblin_dazed or goblin_grounded_status == Enums.GroundState.FALLING:
 		return
 
-	if goblin_attack_status == AttackState.CHASE:
+	if goblin_attack_status == Enums.AttackState.CHASE:
 		var dist_player := _distance_to_player(player)
 		if dist_player <= distance_to_player_for_attack:
 			_reset_melee_phase_state()
-			_set_goblin_attack_status(AttackState.WINDING_UP)
+			_set_goblin_attack_status(Enums.AttackState.WINDING_UP)
 
-	elif goblin_attack_status == AttackState.WINDING_UP:
+	elif goblin_attack_status == Enums.AttackState.WINDING_UP:
 		# if winding up, flash color of all spriteChest in a blink
 		if !_windup_cache_built:
 			_build_windup_sprite_modulate_cache()
@@ -122,9 +96,9 @@ func _process(delta: float) -> void:
 			_phase_time = 0.0
 			_hit_applied_this_attack = false
 			_attack_arm_baselines_captured = false
-			_set_goblin_attack_status(AttackState.ATTACKING)
+			_set_goblin_attack_status(Enums.AttackState.ATTACKING)
 
-	elif goblin_attack_status == AttackState.ATTACKING:
+	elif goblin_attack_status == Enums.AttackState.ATTACKING:
 		# move the right arm towards the player like a punch
 		# check if we collide with the player once, give a kickback to the player and damage it
 		var chest := _get_sprite_chest()
@@ -133,7 +107,7 @@ func _process(delta: float) -> void:
 		if chest == null or arm_r == null:
 			_restore_arm_positions(arm_r, arm_r_outline)
 			_phase_time = 0.0
-			_set_goblin_attack_status(AttackState.RELOAD)
+			_set_goblin_attack_status(Enums.AttackState.RELOAD)
 		else:
 			if !_attack_arm_baselines_captured:
 				_capture_arm_baselines(arm_r, arm_r_outline)
@@ -160,16 +134,16 @@ func _process(delta: float) -> void:
 			if _phase_time >= attack_duration_sec:
 				_restore_arm_positions(arm_r, arm_r_outline)
 				_phase_time = 0.0
-				_set_goblin_attack_status(AttackState.RELOAD)
+				_set_goblin_attack_status(Enums.AttackState.RELOAD)
 
-	elif goblin_attack_status == AttackState.RELOAD:
+	elif goblin_attack_status == Enums.AttackState.RELOAD:
 		# wait for a certain amount of time
 		_phase_time += delta
 		if _phase_time >= reload_duration_sec:
 			_phase_time = 0.0
 			_hit_applied_this_attack = false
 			_attack_arm_baselines_captured = false
-			_set_goblin_attack_status(AttackState.CHASE)
+			_set_goblin_attack_status(Enums.AttackState.CHASE)
 
 
 ## Local position of SpriteArmRight at the start of the current strike (restored after ATTACKING).
@@ -301,18 +275,18 @@ func _get_player_body() -> CharacterBody2D:
 
 
 ## Read ON_CELL vs FALLING from the parent goblin when it exposes get_ground_state.
-func _get_goblin_grounded_status() -> GroundState:
+func _get_goblin_grounded_status() -> Enums.GroundState:
 	if _goblin_root == null:
-		return GroundState.ON_CELL
+		return Enums.GroundState.ON_CELL
 
 	if _goblin_root.has_method("get_ground_state"):
 		return _goblin_root.call("get_ground_state")
 
-	return GroundState.ON_CELL
+	return Enums.GroundState.ON_CELL
 
 
 ## Forward ground state to the parent goblin if set_ground_state exists; return whether the call was made.
-func _set_goblin_grounded_status(_groundState: GroundState) -> bool:
+func _set_goblin_grounded_status(_groundState: Enums.GroundState) -> bool:
 	if _goblin_root == null:
 		return false
 
@@ -324,18 +298,18 @@ func _set_goblin_grounded_status(_groundState: GroundState) -> bool:
 
 
 ## Read the parent goblin’s attack phase (IDLE, CHASE, WINDING_UP, ATTACKING, RELOAD) via get_attack_state.
-func _get_goblin_attack_status() -> AttackState:
+func _get_goblin_attack_status() -> Enums.AttackState:
 	if _goblin_root == null:
-		return AttackState.CHASE
+		return Enums.AttackState.CHASE
 
 	if _goblin_root.has_method("get_attack_state"):
 		return _goblin_root.call("get_attack_state")
 
-	return AttackState.CHASE
+	return Enums.AttackState.CHASE
 
 
 ## Set the parent goblin’s attack state when set_attack_state exists; return whether the call was made.
-func _set_goblin_attack_status(_attackState: AttackState) -> bool:
+func _set_goblin_attack_status(_attackState: Enums.AttackState) -> bool:
 	if _goblin_root == null:
 		return false
 

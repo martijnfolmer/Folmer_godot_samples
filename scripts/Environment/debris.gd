@@ -53,8 +53,8 @@ var texture_3 : Texture2D
 var velocity : Vector2 = Vector2.ZERO
 var is_on_cell: bool = false
 
-enum state {NORMAL, FALLING}
-var _state : state = state.NORMAL
+
+var _state : Enums.GroundState = Enums.GroundState.ON_CELL
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -123,10 +123,10 @@ func _set_scale(_scale) -> void:
 func _process(delta: float) -> void:
 	
 	# Check if we are on the cell (if we are moving)
-	if velocity!=Vector2.ZERO and _state == state.NORMAL:
+	if velocity!=Vector2.ZERO and _state == Enums.GroundState.ON_CELL:
 		is_on_cell = _is_colliding_with_cell_square()
 		if !is_on_cell:
-			_state = state.FALLING
+			_state = Enums.GroundState.FALLING
 
 	# process velocity in normal function
 	_process_velocity(delta)
@@ -137,7 +137,7 @@ func _process(delta: float) -> void:
 func _process_falling(delta:float) -> void:
 	
 	# Don't process if we are not falling
-	if _state == state.NORMAL:
+	if _state == Enums.GroundState.ON_CELL:
 		return
 	
 	rotation += 5 * delta
@@ -152,7 +152,7 @@ func _process_falling(delta:float) -> void:
 func _process_velocity(delta: float) -> void:
 	
 	# friction if we are on the normal state
-	if _state == state.NORMAL:
+	if _state == Enums.GroundState.ON_CELL:
 		velocity.x -= velocity.x * friction * delta
 		velocity.y -= velocity.y * friction * delta
 

@@ -139,6 +139,13 @@ func _on_viewport_size_changed() -> void:
 		position.x = move_in_x2
 		position.y = move_in_y2
 
+## Pass on the conversation, [p1],[p2],[small],[large],[rotate],[shake]
+func set_list(texts: Array[String]) -> void:
+	display_texts = texts
+	_current_text_index = 0
+	_current_char_index = 0
+	_apply_text()
+
 
 func _ready() -> void:
 	# Get the label child node

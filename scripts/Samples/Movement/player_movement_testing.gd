@@ -28,6 +28,27 @@ func write_and_read_json() -> void:
 		print("Loaded JSON: ", loaded)
 
 
+func _create_textBox() -> void:
+	var txtBox := TEXT_CANVAS_BOX_SCENE.instantiate()
+	var lines: Array[String] = [
+			"[p1]I'm talking first, and we passed on",
+			"[p2]I'm talking second, it has been passed",
+			"[p1][big]And I'm talking loudly",
+			"[p1][small]Same guy, talking softly",
+			"[p2][shake]Shaking a lot",
+			"[p1][rotate]rotating my portrait",
+			"[p2][big][shake][rotate] All effects!",
+		]
+	
+	var singleton_cam := get_parent().get_node_or_null("SingletonCamera") as Node
+	var hud := singleton_cam.get_node_or_null("HudLayer") if singleton_cam else null
+	if hud:
+		hud.add_child(txtBox)
+		txtBox.set_list(lines)
+	else:
+		add_child(txtBox)
+		txtBox.set_list(lines)
+
 
 # Input
 # TODO: TESTING: pillars to you after space bar
@@ -37,13 +58,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		#_move_two_closest_pillars_towards_player()
 		#write_and_read_json()
 	if _is_K_pressed(event):
-		var txtBox := TEXT_CANVAS_BOX_SCENE.instantiate()
-		var singleton_cam := get_parent().get_node_or_null("SingletonCamera") as Node
-		var hud := singleton_cam.get_node_or_null("HudLayer") if singleton_cam else null
-		if hud:
-			hud.add_child(txtBox)
-		else:
-			add_child(txtBox)
+		_create_textBox()
+		
 	
 # TODO: TESTING: space bar pressed
 ## Return true when the key event is a non-repeated Space press.

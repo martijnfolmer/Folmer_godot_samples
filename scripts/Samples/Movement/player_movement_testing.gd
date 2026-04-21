@@ -44,10 +44,10 @@ func _create_textBox() -> void:
 	var hud := singleton_cam.get_node_or_null("HudLayer") if singleton_cam else null
 	if hud:
 		hud.add_child(txtBox)
-		txtBox.set_list(lines)
+		txtBox.set_box_texts(lines)
 	else:
 		add_child(txtBox)
-		txtBox.set_list(lines)
+		txtBox.set_box_texts(lines)
 
 
 # Input

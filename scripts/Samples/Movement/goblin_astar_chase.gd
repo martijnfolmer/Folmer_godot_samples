@@ -1,56 +1,89 @@
 extends Node2D
 
+#region Exported configuration
 @export_group("Enable")
-@export var movement_enabled: bool = true# for debugging, if set to false, we don't update movement
-@export var pause_when_dazed: bool = true# if the goblin is dazed (like kicked, we don't update movement
+## When false, movement and path updates are skipped (useful for debugging).
+@export var movement_enabled: bool = true
+## When true, clears the path and zeroes velocity while the goblin is dazed (e.g. after a kick).
+@export var pause_when_dazed: bool = true
 
 @export_group("Node paths")
+## CharacterBody2D driven by this chase logic (velocity, move_and_slide).
 @export var body_path: NodePath = ^"../CharacterBody2D"
+## Optional kickback component; when it reports active impact, pathing is cleared until impact ends.
 @export var kickback_path: NodePath = ^"../CompBodyKickback"
+## Optional overlap component; connects to cell floor signals so the goblin only paths when on a cell.
 @export var cell_overlap_path: NodePath = ^"../CompOnCellOverlap"
 
+@export_group("blocking_elements")
+## Physics groups whose colliders block line-of-sight raycasts to the player.
+@export var blocking_elements_groups_los: Array[String] = ["pillar", "wall"]
+## Physics groups treated as solid for A* grid marking and path-smoothing obstacle checks.
+@export var blocking_elements_groups_astar: Array[String] = ["pillar", "wall", "glass"]
+
 @export_group("Movement")
+## Target speed along the path toward the current waypoint (pixels per second).
 @export var move_speed: float = 220.0
+## Distance from a waypoint at which the goblin advances to the next point.
 @export var waypoint_reach_distance: float = 10.0
+## When true, rotates the body toward the current movement direction each frame.
 @export var rotate_to_velocity_enabled: bool = true
+## How quickly the body rotation lerps toward the movement direction (higher = snappier).
 @export var rotation_speed: float = 10.0
 
 @export_group("Path update")
+## Base seconds between full path rebuilds while chasing.
 @export var repath_interval_sec: float = 1.0
+## Random jitter added to each repath delay so many goblins do not repath on the same frame.
 @export var repath_jitter_sec: float = 0.2
+## Maximum random delay (seconds) before the first repath after ready, to stagger startup.
 @export var initial_stagger_max_sec: float = 1.0
 
 @export_group("A* Grid")
+## Grid cell size in pixels (also used for world/cell conversions, minimum 8 enforced in code).
 @export var cell_size: int = 32
+## Extra padding around tracked actors and the goal when computing the A* region bounds.
 @export var grid_margin_px: float = 220.0
+## Default blocker radius in pixels when no collision shape can be read from a pillar node.
 @export var pillar_block_radius_px: float = 54.0
+## Extra padding added to computed blocker radii so nearby cells stay walkable-safe.
 @export var pillar_block_buffer_px: float = 12.0
+## When true, allows diagonal edges on the A* grid; when false, only cardinal moves.
 @export var allow_diagonal_movement: bool = true
 
 @export_group("Path Debug")
+## When true, draws the active path from the body to waypoints in the editor/game view.
 @export var draw_path_enabled: bool = true
+## Color used for path debug lines.
 @export var path_line_color: Color = Color(0.2, 1.0, 0.2, 0.95)
+## Width of path debug lines.
 @export var path_line_width: float = 2.0
+#endregion
 
+#region Types and state
 enum BehaviorState {
-	IDLE,				# we just stand there
-	CHASE,				# moving towards the last known location of the player
-	SEARCH_LAST_KNOWN	# search stuff
+	IDLE, # we just stand there
+	CHASE, # moving towards the last known location of the player
+	SEARCH_LAST_KNOWN # search stuff
 }
 
 var _body: CharacterBody2D
 var _kickback: Node
 var _goblin_root: Node
+
 var _astar: AStarGrid2D
 var _grid_origin: Vector2 = Vector2.ZERO
+
 var _path_points: PackedVector2Array = PackedVector2Array()
 var _path_index: int = 0
 var _repath_timer: float = 0.0
+
 var _behavior_state: BehaviorState = BehaviorState.IDLE
 var _last_known_player_pos: Vector2 = Vector2.ZERO
 var _on_cell_floor: bool = true
+#endregion
 
-
+#region Lifecycle and signals
 func _ready() -> void:
 	_body = get_node_or_null(body_path) as CharacterBody2D
 	_kickback = get_node_or_null(kickback_path)
@@ -69,9 +102,9 @@ func _on_overlap_left_cell() -> void:
 
 func _on_overlap_cell_state_changed(is_on_cell: bool, _area: Area2D) -> void:
 	_on_cell_floor = is_on_cell
+#endregion
 
-
-# Main update loop
+#region Main loop
 ## Update chase behavior, repath timing, and path following each physics frame.
 func _physics_process(delta: float) -> void:
 	# Abort when required body is missing.
@@ -117,13 +150,13 @@ func _physics_process(delta: float) -> void:
 	# Recalculate path every so often
 	_repath_timer -= delta
 	if _repath_timer <= 0.0:
-		_rebuild_path_for_state()				# based on state, we make a path
+		_rebuild_path_for_state() # based on state, we make a path
 		_repath_timer = _next_repath_delay()
 
 	_follow_path(delta)
+#endregion
 
-
-# Movement guards
+#region Movement guards
 ## Return whether this behavior component is enabled. for debugging purposes, we set movement_enabled to false
 func _is_movement_active() -> bool:
 	return movement_enabled
@@ -139,12 +172,12 @@ func _next_repath_delay() -> float:
 	var base: float = max(0.05, repath_interval_sec)
 	var jitter: float = max(0.0, repath_jitter_sec)
 	return max(0.05, base + randf_range(-jitter, jitter))
+#endregion
 
-
-# State machine
+#region State machine
 ## Update behavior state using line-of-sight and last-known player position.
 func _update_behavior_state() -> void:
-	
+
 	# Fall back to idle if no player body is found (if the player is dead for example)
 	var player_body := _get_player_body()
 	if player_body == null:
@@ -158,17 +191,17 @@ func _update_behavior_state() -> void:
 
 	# Change state of the goblin
 	match _behavior_state:
-		BehaviorState.IDLE:	# if we are idle and see the player, we chase
+		BehaviorState.IDLE: # if we are idle and see the player, we chase
 			if has_los:
 				_set_state(BehaviorState.CHASE)
 		BehaviorState.CHASE: # if we are chasing and lose the player, go to last known location
 			if !has_los:
 				_set_state(BehaviorState.SEARCH_LAST_KNOWN)
-		BehaviorState.SEARCH_LAST_KNOWN: 
-			if has_los:	# if we are searching last known, and see the player, we start chasing
-				_set_state(BehaviorState.CHASE) 
+		BehaviorState.SEARCH_LAST_KNOWN:
+			if has_los: # if we are searching last known, and see the player, we start chasing
+				_set_state(BehaviorState.CHASE)
 				return
-			
+
 			# If we are close to player last known location, and don't see him, we go back to idle
 			if _body.global_position.distance_to(_last_known_player_pos) <= waypoint_reach_distance * 1.6:
 				_set_state(BehaviorState.IDLE)
@@ -182,9 +215,9 @@ func _set_state(next_state: BehaviorState) -> void:
 	if _behavior_state == BehaviorState.IDLE:
 		_clear_path()
 	_repath_timer = 0.0
+#endregion
 
-
-# Path build/follow
+#region Path build and follow
 ## Build a new path to current behavior target for the active state.
 func _rebuild_path_for_state() -> void:
 
@@ -199,17 +232,11 @@ func _rebuild_path_for_state() -> void:
 		_clear_path()
 		return
 
-	var target_pos: Vector2 = player_body.global_position         # player location
-	var has_los: bool = _has_clear_line_to_player(player_body)
+	var target_pos: Vector2 = player_body.global_position # player location
+
 	if _behavior_state == BehaviorState.SEARCH_LAST_KNOWN:
 		target_pos = _last_known_player_pos
 
-	# TODO: We got here, LOS doesn't work, we have to rebuild grid
-	
-	if _behavior_state == BehaviorState.CHASE and has_los:
-		_set_path(PackedVector2Array([_body.global_position, player_body.global_position]))
-		return
-	
 	# Build A* grid and compute ID path fallbacks.
 	var graph_ok: bool = _build_grid(target_pos)
 
@@ -261,9 +288,9 @@ func _follow_path(delta: float) -> void:
 
 	_body.velocity = Vector2.ZERO
 	_body.move_and_slide()
+#endregion
 
-
-# A* grid
+#region A* grid
 ## Build an A* grid around tracked actors and destination target.
 func _build_grid(target_pos: Vector2) -> bool:
 	# Compute bounds from pillars, goblins, player, and target.
@@ -278,6 +305,10 @@ func _build_grid(target_pos: Vector2) -> bool:
 	tracked.append_array(get_tree().get_nodes_in_group("goblin"))
 	tracked.append_array(get_tree().get_nodes_in_group("player"))
 	tracked.append(self)
+	for group_name in blocking_elements_groups_astar:
+		if group_name.is_empty():
+			continue
+		tracked.append_array(get_tree().get_nodes_in_group(group_name))
 
 	for node in tracked:
 		if node is Node2D:
@@ -318,52 +349,38 @@ func _build_grid(target_pos: Vector2) -> bool:
 	)
 	_astar.update()
 
-	# Mark pillar occupancy as blocked cells.
-	_mark_pillar_blocked_cells(step)
-	_mark_wall_blocked_cells(step)
+	_mark_blocked_cells_for_astar_groups(step)
 	return true
 
 
-## Mark blocked grid cells around each pillar based on radius.
-func _mark_pillar_blocked_cells(step: int) -> void:
-	for node in get_tree().get_nodes_in_group("pillar"):
-		if !(node is Node2D):
+## Mark blocked grid cells around each A* blocker (groups from blocking_elements_groups_astar).
+func _mark_blocked_cells_for_astar_groups(step: int) -> void:
+	var seen: Dictionary = {}
+	for group_name in blocking_elements_groups_astar:
+		if group_name.is_empty():
 			continue
+		for node in get_tree().get_nodes_in_group(group_name):
+			if seen.has(node):
+				continue
+			seen[node] = true
+			if !(node is Node2D):
+				continue
 
-		var pillar_node: Node2D = node as Node2D
-		var block_radius_px: float = _pillar_block_radius_for(pillar_node)
-		var center_id: Vector2i = _world_to_cell(pillar_node.global_position)
-		var block_radius_cells: int = max(1, int(ceil(block_radius_px / float(step))))
-		for y in range(-block_radius_cells, block_radius_cells + 1):
-			for x in range(-block_radius_cells, block_radius_cells + 1):
-				var sample_world: Vector2 = _cell_to_world(center_id + Vector2i(x, y))
-				if sample_world.distance_to(pillar_node.global_position) > block_radius_px:
-					continue
-				var test_id := center_id + Vector2i(x, y)
-				if _is_cell_in_bounds(test_id):
-					_astar.set_point_solid(test_id, true)
+			var blocker: Node2D = node as Node2D
+			var block_radius_px: float = _pillar_block_radius_for(blocker)
+			var center_id: Vector2i = _world_to_cell(blocker.global_position)
+			var block_radius_cells: int = max(1, int(ceil(block_radius_px / float(step))))
+			for y in range(-block_radius_cells, block_radius_cells + 1):
+				for x in range(-block_radius_cells, block_radius_cells + 1):
+					var sample_world: Vector2 = _cell_to_world(center_id + Vector2i(x, y))
+					if sample_world.distance_to(blocker.global_position) > block_radius_px:
+						continue
+					var test_id := center_id + Vector2i(x, y)
+					if _is_cell_in_bounds(test_id):
+						_astar.set_point_solid(test_id, true)
+#endregion
 
-func _mark_wall_blocked_cells(step: int) -> void:
-	for node in get_tree().get_nodes_in_group("wall"):
-		if !(node is Node2D):
-			continue
-
-		var pillar_node: Node2D = node as Node2D
-		var block_radius_px: float = _pillar_block_radius_for(pillar_node)
-		print(block_radius_px)
-		var center_id: Vector2i = _world_to_cell(pillar_node.global_position)
-		var block_radius_cells: int = max(1, int(ceil(block_radius_px / float(step))))
-		for y in range(-block_radius_cells, block_radius_cells + 1):
-			for x in range(-block_radius_cells, block_radius_cells + 1):
-				var sample_world: Vector2 = _cell_to_world(center_id + Vector2i(x, y))
-				if sample_world.distance_to(pillar_node.global_position) > block_radius_px:
-					continue
-				var test_id := center_id + Vector2i(x, y)
-				if _is_cell_in_bounds(test_id):
-					_astar.set_point_solid(test_id, true)
-
-
-# Node lookup and coordinate helpers
+#region Node lookup and coordinates
 ## Return the first player CharacterBody2D in the player group.
 func _get_player_body() -> CharacterBody2D:
 	var players: Array[Node] = get_tree().get_nodes_in_group("player")
@@ -399,14 +416,14 @@ func _is_cell_in_bounds(cell: Vector2i) -> bool:
 		and cell.x < _astar.region.end.x
 		and cell.y < _astar.region.end.y
 	)
+#endregion
 
-
-# Path storage
+#region Path storage
 ## Store a new world-space path and reset waypoint index.
 func _set_path(points: PackedVector2Array) -> void:
 	_path_points = points
 	_path_index = 0
-	queue_redraw()		# for debugging : draw the path
+	queue_redraw() # for debugging : draw the path
 
 
 ## Clear active path data and request redraw when needed.
@@ -415,11 +432,10 @@ func _clear_path() -> void:
 		return
 	_path_points = PackedVector2Array()
 	_path_index = 0
-	queue_redraw()		# for debugging : draw the path
+	queue_redraw() # for debugging : draw the path
+#endregion
 
-
-
-# Perception and smoothing
+#region Perception and path smoothing
 ## Return true when no pillar blocks line of sight to the player (line of sight)
 func _has_clear_line_to_player(player_body: CharacterBody2D) -> bool:
 	if _body == null or player_body == null:
@@ -440,11 +456,19 @@ func _has_clear_line_to_player(player_body: CharacterBody2D) -> bool:
 	var collider := hit.get("collider") as Node
 	if collider == null:
 		return true
-	return !_node_or_ancestor_in_group(collider, "pillar")
+
+	# check line of sight blocked
+	var blocked = false
+	for group_name in blocking_elements_groups_los:
+		if _node_or_ancestor_in_group(collider, group_name):
+			blocked = true
+			break
+
+	return !blocked
 
 
-## Return true when a straight segment intersects a pillar collider.
-func _is_line_blocked_by_pillar(from_pos: Vector2, to_pos: Vector2) -> bool:
+## Return true when a straight segment's first physics hit is in blocking_elements_groups_astar.
+func _is_line_blocked_by_astar_groups(from_pos: Vector2, to_pos: Vector2) -> bool:
 	var space_state := get_world_2d().direct_space_state
 	if space_state == null:
 		return false
@@ -459,10 +483,15 @@ func _is_line_blocked_by_pillar(from_pos: Vector2, to_pos: Vector2) -> bool:
 	var collider := hit.get("collider") as Node
 	if collider == null:
 		return false
-	return _node_or_ancestor_in_group(collider, "pillar")
+	for group_name in blocking_elements_groups_astar:
+		if group_name.is_empty():
+			continue
+		if _node_or_ancestor_in_group(collider, group_name):
+			return true
+	return false
 
 
-## Simplify path points by removing collinear (points on a single line) and visible intermediate nodes
+## Simplify path points by removing collinear points and skipping nodes only when the chord is free of A* blockers.
 func _smooth_path_points(points: PackedVector2Array) -> PackedVector2Array:
 	# First pass: remove mostly collinear points.
 	if points.size() <= 2:
@@ -484,14 +513,14 @@ func _smooth_path_points(points: PackedVector2Array) -> PackedVector2Array:
 	if collinear_reduced.size() <= 2:
 		return collinear_reduced
 
-	# Second pass: greedily skip points with direct pillar-free visibility
+	# Second pass: greedily skip points when anchor-to-next chord does not hit blocking_elements_groups_astar.
 	var simplified: PackedVector2Array = PackedVector2Array()
 	simplified.append(collinear_reduced[0])
 	var anchor: int = 0
 	var i: int = 1
 	while i < collinear_reduced.size() - 1:
 		var next_i: int = i + 1
-		if !_is_line_blocked_by_pillar(collinear_reduced[anchor], collinear_reduced[next_i]):
+		if !_is_line_blocked_by_astar_groups(collinear_reduced[anchor], collinear_reduced[next_i]):
 			i += 1
 			continue
 		simplified.append(collinear_reduced[i])
@@ -499,20 +528,22 @@ func _smooth_path_points(points: PackedVector2Array) -> PackedVector2Array:
 		i += 1
 	simplified.append(collinear_reduced[collinear_reduced.size() - 1])
 	return simplified
+#endregion
 
-
-# Runtime helpers
+#region Goblin root helpers and rotation
 ## Return whether the goblin root currently reports a dazed state.
 func _is_goblin_dazed() -> bool:
 	if _goblin_root == null:
 		return false
 	return _goblin_root.has_method("get_dazed") and _goblin_root.call("get_dazed")
 
+
 ## get true if we are using the chasing state of the attacking
 func _is_goblin_chasing() -> bool:
 	if _goblin_root == null:
-		return false		
+		return false
 	return _goblin_root.has_method("get_chase_state") and _goblin_root.call("get_chase_state")
+
 
 ## Rotate body smoothly toward movement direction.
 func _rotate_body_toward(move_dir: Vector2, delta: float) -> void:
@@ -523,22 +554,24 @@ func _rotate_body_toward(move_dir: Vector2, delta: float) -> void:
 	var desired_rot: float = move_dir.angle()
 	var weight: float = 1.0 - exp(-max(0.01, rotation_speed) * delta)
 	_body.rotation = lerp_angle(_body.rotation, desired_rot, weight)
+#endregion
 
-
-# Pillar/block helpers
-## Compute pillar blocking radius from collision shape and configured buffer.
+#region Blocker footprint and group tests
+## Compute blocker footprint radius from collision shape (CharacterBody2D or StaticBody2D child) and buffer.
 func _pillar_block_radius_for(pillar_node: Node2D) -> float:
 	var radius_px: float = max(4.0, pillar_block_radius_px)
-	var body := pillar_node.get_node_or_null("CharacterBody2D") as CharacterBody2D
-	if body == null:
+	var physics_body: CollisionObject2D = pillar_node.get_node_or_null("CharacterBody2D") as CharacterBody2D
+	if physics_body == null:
+		physics_body = pillar_node.get_node_or_null("StaticBody2D") as StaticBody2D
+	if physics_body == null:
 		return radius_px + max(0.0, pillar_block_buffer_px)
 
-	var collider_shape := body.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	var collider_shape := physics_body.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if collider_shape == null or collider_shape.shape == null:
 		return radius_px + max(0.0, pillar_block_buffer_px)
 
 	# Derive approximate radius from known 2D shape types.
-	var scale_current: Vector2 = body.global_transform.get_scale().abs()
+	var scale_current: Vector2 = physics_body.global_transform.get_scale().abs()
 	var shape := collider_shape.shape
 	if shape is RectangleShape2D:
 		var rect: RectangleShape2D = shape
@@ -562,11 +595,9 @@ func _node_or_ancestor_in_group(node: Node, group: StringName) -> bool:
 			return true
 		current = current.get_parent()
 	return false
-	
-	
+#endregion
 
-
-# Debug draw
+#region Debug draw
 ## Draw current path preview from body to remaining waypoints.
 func _draw() -> void:
 	if !draw_path_enabled or _path_points.is_empty():
@@ -585,3 +616,4 @@ func _draw() -> void:
 	for i in range(next_index, _path_points.size()):
 		local_points.append(to_local(_path_points[i]))
 	draw_polyline(local_points, path_line_color, path_line_width, true)
+#endregion

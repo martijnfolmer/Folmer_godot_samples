@@ -4,11 +4,14 @@ Concrete steps (20 - 26 april):
 	- create a debris.tscn, with a movement, and slowdown, and collision, and falling down
 	- player gets a knockback component, gets hit with goblin attack
 
-	- goblin a star, make a list export of groups that block, add glass
+
+
+
+
+	- goblin a star, make a list export of groups that block, add glass (done these)
 		- has_los doesn't work
 		- pillars are not blocking
 		- neither are glass and wall
-	
 	- cleanup text box.gd code (done)
 	- function to create txt box and pass list (done)
 	- text_box sfx every thing (done)

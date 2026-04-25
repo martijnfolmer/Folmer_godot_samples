@@ -13,46 +13,49 @@ extends Node2D
 @export var sprite_glass_3 : Texture2D
 
 @export_group("visual")
-## the initial scale of the debris
-@export var ini_scale : float = 1.0
+## Spawn scale used the moment debris appears.
+@export var ini_scale : float = 0.5
+## Scale reached shortly after spawn.
+@export var target_scale: float = 0.1
+## Duration for scale settle phase.
+@export var scale_settle_duration_sec: float = 0.5
+## Random initial spin range.
+@export var initial_spin_speed_min: float = -12.0
+@export var initial_spin_speed_max: float = 12.0
 
 @export_group("movement")
-## The friction with which it stops moving
+## Translation friction while ON_CELL.
 @export var friction : float = 0.9
+## minimum velocity, below which it stops
+@export var min_velocity : float = 1.0
+## Rotation friction while ON_CELL.
+@export var rotation_friction: float = 0.9
+## minimum rotation, below which it stops
+@export var min_angular_velocity: float = 1.0
+
+@export_group("falling")
+@export var falling_rotation_step: float = 0.1
+@export var falling_scale_step: float = 0.01
 
 @export_group("cell overlap")
 @export_flags_2d_physics var floor_collision_mask: int = 2
 
+@export_group("Collisions")
+@export var body_path : NodePath
+@onready var parentBody := get_node_or_null(body_path) as CharacterBody2D
 
-'''
-todo:
-	- scale (done)
-	- glass and wall textures (done)
-	- add to debris group (done)
-	- initial rotation (done)
-	- collision with cell floor (done)
-	- update movement as well (done)
-	- only check if we are on the floor if we are moving (done)
-	
-	- fall of the edge (non collision perhaps)
-	- give impulse (velocity added to current velocity, and a bit of rotation)
-	- rotation update when we are moving
-
-	- initialization of the glass and wall
-	-- looking partially like it is part of the class
-	-- etending y scale as we are 'falling'
-	-- overall scale goes down, so it looks like we are falling on the ground
-'''
-
-
-var sprite
+var sprite: Sprite2D
 var texture_1 : Texture2D
 var texture_2 : Texture2D
 var texture_3 : Texture2D
 
 var velocity : Vector2 = Vector2.ZERO
-var is_on_cell: bool = false
-
+var angular_velocity: float = 0.0
+var _has_launch_velocity: bool = false
+var _launch_velocity: Vector2 = Vector2.ZERO
+var _scale_settle_elapsed: float = 0.0
+var _scale_settle_done: bool = false
+var _collision_checks_enabled: bool = true
 
 var _state : Enums.GroundState = Enums.GroundState.ON_CELL
 
@@ -60,27 +63,54 @@ var _state : Enums.GroundState = Enums.GroundState.ON_CELL
 func _ready() -> void:
 	add_to_group("debris")
 
-	_create_debris_sprite()		# create the sprite for the debris from options
-	_set_scale(ini_scale)	# the initial scale of the debris
-	rotation = randf() * 2 * PI	#random initial roation
-	
-	velocity.x += (randf() * 2 - 1) * 100
-	velocity.y += (randf() * 2 - 1) * 100
-	
+	_create_debris_sprite()
+	_set_scale(ini_scale)
+	rotation = 0.0
+	if sprite != null:
+		sprite.rotation = randf() * 2.0 * PI
+	angular_velocity = randf_range(initial_spin_speed_min, initial_spin_speed_max)
 
-func add_velocity(vel : Vector2) -> void:
-	velocity.x += vel.x
-	velocity.y += vel.y 
-	
+	if _has_launch_velocity:
+		velocity += _launch_velocity
+		_has_launch_velocity = false
+	else:
+		velocity = Vector2(
+			(randf() * 2.0 - 1.0) * 100.0,
+			(randf() * 2.0 - 1.0) * 100.0
+		)
+
+func setup_launch(away_dir: Vector2, launch_speed: float, debris_cat: int = -1) -> void:
+	var launch_dir := away_dir.normalized()
+	if !launch_dir.is_finite() or launch_dir.length_squared() <= 0.0:
+		launch_dir = Vector2.RIGHT
+
+	_launch_velocity = launch_dir * maxf(0.0, launch_speed)
+	_has_launch_velocity = true
+
+	if debris_cat >= 0:
+		cat = debris_cat
+		if sprite != null:
+			_set_debris_sprite()
+
+	if is_node_ready():
+		velocity += _launch_velocity
+		_has_launch_velocity = false
+
 
 func _create_debris_sprite() -> void:
 	# get the sprite2D
-	sprite = $Sprite2D
+	sprite = get_node_or_null("CharacterBody2D/Sprite2D")
+	if sprite == null:
+		sprite = get_node_or_null("Sprite2D")
 
 	if sprite == null:
 		sprite = Sprite2D.new()
-		add_child(sprite)
-	
+		if parentBody != null:
+			parentBody.add_child(sprite)
+		else:
+			add_child(sprite)
+
+	_ensure_sprite_pivot()
 	_set_debris_sprite()
 
 func _set_debris_sprite() -> void:
@@ -112,57 +142,117 @@ func _set_debris_sprite() -> void:
 	
 	var choice_index = randi() % all_sprites.size()
 	sprite.texture = all_sprites[choice_index]
+	_ensure_sprite_pivot()
 
-## Set the scale of the sprite to the 	
-func _set_scale(_scale) -> void:
-	sprite.scale.x = _scale
-	sprite.scale.y = _scale
+func _ensure_sprite_pivot() -> void:
+	if sprite == null:
+		return
+	sprite.centered = true
+	sprite.offset = Vector2.ZERO
+
+func _set_scale(_scale: float) -> void:
+	if sprite != null:
+		sprite.scale = Vector2(_scale, _scale)
+	else:
+		scale = Vector2(_scale, _scale)
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	
-	# Check if we are on the cell (if we are moving)
-	if velocity!=Vector2.ZERO and _state == Enums.GroundState.ON_CELL:
-		is_on_cell = _is_colliding_with_cell_square()
-		if !is_on_cell:
-			_state = Enums.GroundState.FALLING
+	if _state == Enums.GroundState.ON_CELL:
+		_process_scale_settle(delta)
+		_refresh_floor_state()
 
-	# process velocity in normal function
-	_process_velocity(delta)
+	_process_velocity_and_rotation(delta)
+	_process_falling()
+
+
+func _process_scale_settle(delta: float) -> void:
+	if _scale_settle_done:
+		return
+
+	if scale_settle_duration_sec <= 0.0:
+		_set_scale(target_scale)
+		_scale_settle_done = true
+		return
+
+	_scale_settle_elapsed = minf(scale_settle_duration_sec, _scale_settle_elapsed + delta)
+	var t := _scale_settle_elapsed / scale_settle_duration_sec
+	_set_scale(lerpf(ini_scale, target_scale, t))
+	if t >= 1.0:
+		_scale_settle_done = true
+
+
+func _process_velocity_and_rotation(delta: float) -> void:
 	
-	# process falling
-	_process_falling(delta)
-	
-func _process_falling(delta:float) -> void:
-	
-	# Don't process if we are not falling
+	if _state == Enums.GroundState.ON_CELL:
+		velocity -= velocity * friction * delta
+		angular_velocity -= angular_velocity * rotation_friction * delta
+
+	if velocity.length() <= min_velocity:
+		velocity = Vector2.ZERO
+	if absf(angular_velocity) <= min_angular_velocity:
+		angular_velocity = 0.0
+
+	if sprite != null:
+		sprite.rotation += angular_velocity * delta
+
+	if _state != Enums.GroundState.ON_CELL:
+		return
+	if velocity == Vector2.ZERO:
+		return
+
+	if parentBody == null:
+		position += velocity * delta
+		return
+
+	var motion := velocity * delta
+	if !_collision_checks_enabled:
+		position += motion
+		return
+
+	var collision := parentBody.move_and_collide(motion)
+	_sync_root_to_body()
+	if collision != null:
+		velocity = Vector2.ZERO
+		angular_velocity = 0.0
+		_collision_checks_enabled = false
+
+
+func _process_falling() -> void:
 	if _state == Enums.GroundState.ON_CELL:
 		return
-	
-	rotation += 5 * delta
-	scale.x -= 0.5 * delta
-	scale.y -= 0.5 * delta
-	
-	# delete if we are falling
+
+	if sprite != null:
+		sprite.rotation += falling_rotation_step
+	else:
+		rotation += falling_rotation_step
+
+	if sprite != null:
+		sprite.scale.x = move_toward(sprite.scale.x, 0.0, falling_scale_step)
+		sprite.scale.y = move_toward(sprite.scale.y, 0.0, falling_scale_step)
+		if sprite.scale.x <= 0.01:
+			queue_free()
+		return
+
+	scale.x = move_toward(scale.x, 0.0, falling_scale_step)
+	scale.y = move_toward(scale.y, 0.0, falling_scale_step)
 	if scale.x <= 0.01:
 		queue_free()
-	
 
-func _process_velocity(delta: float) -> void:
-	
-	# friction if we are on the normal state
-	if _state == Enums.GroundState.ON_CELL:
-		velocity.x -= velocity.x * friction * delta
-		velocity.y -= velocity.y * friction * delta
 
-	# zero if we are too slow
-	if velocity.length_squared()<=0.001:
-		velocity = Vector2.ZERO
-	
-	# movement
-	position.x += velocity.x * delta
-	position.y += velocity.y * delta
+func _refresh_floor_state() -> void:
+	if _state != Enums.GroundState.ON_CELL:
+		return
+	if !_is_colliding_with_cell_square():
+		_state = Enums.GroundState.FALLING
+
+
+func _sync_root_to_body() -> void:
+	if parentBody == null:
+		return
+	if parentBody.position != Vector2.ZERO:
+		global_position += parentBody.position
+		parentBody.position = Vector2.ZERO
 
 
 ## Return true when this debris overlaps a cell_square area.
@@ -175,7 +265,10 @@ func _is_colliding_with_cell_square() -> bool:
 		return false
 
 	var query := PhysicsPointQueryParameters2D.new()
-	query.position = global_position
+	if parentBody != null:
+		query.position = parentBody.global_position
+	else:
+		query.position = global_position
 	query.collide_with_areas = true
 	query.collide_with_bodies = false
 	query.collision_mask = floor_collision_mask

@@ -1,39 +1,35 @@
-Concrete steps (20 - 26 april):
-	
-	- move arm of goblin back when we are recharging after attack
-	- create a debris.tscn, with a movement, and slowdown, and collision, and falling down
-	- player gets a knockback component, gets hit with goblin attack
 
+27 april - 3 mei
+-- debris : come to complete stop when below threshold
+-- wall/glass : replace particles with debris
+-- input : make all spacebar and keys which we have hardcoded, and use input instead
+-- sfx : pass on volume
+-- sfx : max number of same single sfx
+-- Astar : figure out how to reduce goblin (astar needs to be larger masks of object, goblins smaller)
+-- respawn
+-- goblin all : auto aim at pillars or other goblins when kicked.
+-- gobline all : if mostly off off edge, move a little more towards the edge.
 
-
-
-
-	- goblin a star, make a list export of groups that block, add glass (done these)
-		- has_los doesn't work
-		- pillars are not blocking
-		- neither are glass and wall
-	- cleanup text box.gd code (done)
-	- function to create txt box and pass list (done)
-	- text_box sfx every thing (done)
-	- all enums in a global script (start with goblin enums)	(done)
-	- different pitch in the sfx singleton (done)
-	
 Todo:
+	debris:
+		- create script that will make them move again.
 	input:
-		make all spacebar and keys which we have hardcoded, and use input instead
+		
 	SFX :
-		- pass on volume
-		- maximum number of same single sfx
+		
 	Textbox :
 		- loud and soft text should have loud and soft sfx sound
-	
 	General:
+		- create 2 lvls
+		- sounds for txt ticks, different for alchemist or other one
+		- talk to npc in screen, spawn stuff
+		- knockback code cleanup
 	Goblin all:
-		- if mostly off off edge, move a little more towards the edge.
-		- auto aim at pillars or other goblins when kicked.
+		- don't just freeze when we are done 
 	Goblin basic
 		- arms go back and forth when walking
 		- auto aim goblin into other goblins and pillars
+		- goblin basic will still go down
 		- on componcelloverlap, add a list of sprites instead of just one, and rotate them all
 	Ranged goblin:
 		- gets in range, wind up (flashing), fire an arrow
@@ -56,12 +52,9 @@ Todo:
 		- heart of the dungeon, must kick enough goblins into it.
 		- floating off the platform, you must kick goblins onto it
 		- it messes with the platform, changing the arena to previous lvls
+	player:
+		- when damaged, we bleed
 	
-	General:
-		
-		- create 2 lvls
-		- sounds for txt ticks, different for alchemist or other one
-		- talk to npc in screen, spawn stuff
 
 	Screen
 	
@@ -88,5 +81,21 @@ Todo:
 		- deathless mode
 		- rebindable keys
 		- fullscreen and windowed
-		
+
+
+
+Concrete steps (20 - 26 april):
+	- create a debris.tscn, with a movement, and slowdown, and collision, and falling down (done)
+	- move arm of goblin back when we are recharging after attack (done)
+	- goblin a star, make a list export of groups that block, add glass (done these)
+		- has_los doesn't work
+		- pillars are not blocking
+		- neither are glass and wall
+	- cleanup text box.gd code (done)
+	- function to create txt box and pass list (done)
+	- text_box sfx every thing (done)
+	- all enums in a global script (start with goblin enums)	(done)
+	- different pitch in the sfx singleton (done)
+	
+
 		

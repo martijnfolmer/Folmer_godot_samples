@@ -8,6 +8,7 @@ size = Vector2(100, 36)
 
 [node name="Wall" type="Node2D" unique_id=592342518]
 script = ExtResource("1_dxn8d")
+spawn_particles = false
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1646489819]
 

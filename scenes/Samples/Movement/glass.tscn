@@ -8,6 +8,7 @@ size = Vector2(100, 24)
 
 [node name="Glass" type="Node2D" unique_id=680498862]
 script = ExtResource("1_fxgtv")
+spawn_particles = false
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=329130932]
 

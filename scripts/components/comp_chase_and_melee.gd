@@ -47,6 +47,8 @@ var _windup_modulate_cache: Array[Color] = []
 ## True while windup sprite/modulate caches are valid for the current windup.
 var _windup_cache_built: bool = false
 
+var punch_dir : Vector2 = Vector2.RIGHT 	# the direction we are punching
+
 
 ## Cache the goblin root (parent) and CharacterBody2D used for distances and punch aim.
 func _ready() -> void:
@@ -114,7 +116,7 @@ func _process(delta: float) -> void:
 				_attack_arm_baselines_captured = true
 			_phase_time += delta
 			var strike_t := clampf(_phase_time / maxf(attack_duration_sec, 0.001), 0.0, 1.0)
-			var punch_dir := chest.to_local(player.global_position)
+			punch_dir = chest.to_local(player.global_position)
 			if punch_dir.length_squared() > 0.0001:
 				punch_dir = punch_dir.normalized()
 			else:
@@ -139,6 +141,15 @@ func _process(delta: float) -> void:
 	elif goblin_attack_status == Enums.AttackState.RELOAD:
 		# wait for a certain amount of time
 		_phase_time += delta
+		
+		# return the arm to original position
+		var strike_t := clampf(1 - _phase_time / maxf(attack_duration_sec, 0.001), 0.0, 1.0)
+		var punch_offset := punch_dir * punch_arm_reach_px
+		var arm_r := _get_sprite_arm_right()
+		var arm_r_outline := _get_sprite_arm_right_outline()
+		arm_r.position = _arm_r_base.lerp(_arm_r_base + punch_offset, strike_t)
+		arm_r_outline.position = _arm_r_base.lerp(_arm_r_base + punch_offset, strike_t)
+		
 		if _phase_time >= reload_duration_sec:
 			_phase_time = 0.0
 			_hit_applied_this_attack = false

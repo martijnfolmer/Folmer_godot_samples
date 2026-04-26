@@ -3,13 +3,15 @@
 -- debris : come to complete stop when below threshold (done)
 -- wall/glass : replace particles with debris (done)
 -- input : make all spacebar and keys which we have hardcoded, and use input instead (done)
+-- sfx : pass on volume (done)
+-- sfx : max number of same single sfx (done)
+-- goblin all : reduce in speed quicker and slam less quickly (done)
 
--- sfx : pass on volume
--- sfx : max number of same single sfx
 -- Astar : figure out how to reduce goblin (astar needs to be larger masks of object, goblins smaller)
 -- respawn (reset lvl)
--- goblin all : auto aim at pillars or other goblins when kicked.
--- gobline all : if mostly off off edge, move a little more towards the edge.
+-- goblin all : if mostly off off edge, move a little more towards the edge.
+
+
 
 NICES
 -- create a lvl that we load
@@ -18,6 +20,15 @@ NICES
 
 
 Todo:
+	floor :
+		- 
+	goblin : 
+		- dazed sprite replace (with something with an outline)
+	player :
+		- replace 
+	
+	walls:
+		- indestructible walls
 	debris:
 		- create script that will make them move again.
 	input:
@@ -34,6 +45,7 @@ Todo:
 		- knockback code cleanup
 	Goblin all:
 		- don't just freeze when we are done 
+		- goblin all : auto aim at pillars or other goblins when kicked. (maybe)
 	Goblin basic
 		- arms go back and forth when walking
 		- auto aim goblin into other goblins and pillars

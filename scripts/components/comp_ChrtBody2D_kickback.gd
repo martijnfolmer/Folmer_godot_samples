@@ -14,7 +14,7 @@ signal body_slammed(collision: KinematicCollision2D, speed: float, velocity_befo
 @export var weight:float = 1.0
 @export var friction: float = 1.25
 @export var stop_speed: float = 8.0
-@export var body_path:NodePath
+@export var body_path: NodePath
 @export var movement_shake_scale: float = 0.08
 
 @export_group("Push transfer")

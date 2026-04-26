@@ -17,7 +17,7 @@ size = Vector2(53, 112)
 
 [node name="GoblinBasic" type="Node2D" unique_id=574766309]
 script = ExtResource("1_goblin")
-wall_slam_speed_min = 10.0
+wall_slam_speed_min = 50.0
 blood_smear_scene = ExtResource("2_bawqr")
 sprite_arm_left_path = NodePath("CharacterBody2D/SpriteChest/SpriteArmLeft")
 sprite_arm_right_path = NodePath("CharacterBody2D/SpriteChest/SpriteArmRight")
@@ -31,6 +31,8 @@ sprite_head_outline_path = NodePath("CharacterBody2D/SpriteChest/SpriteHead_outl
 blood_smear_color = Color(0, 0.4016261, 0.6899639, 1)
 
 [node name="CompBodyKickback" parent="." unique_id=876922541 instance=ExtResource("3_bawqr")]
+friction = 1.5
+stop_speed = 100.0
 body_path = NodePath("../CharacterBody2D")
 movement_shake_scale = 0.01
 

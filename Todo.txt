@@ -1,8 +1,9 @@
 
 27 april - 3 mei
--- debris : come to complete stop when below threshold
--- wall/glass : replace particles with debris
--- input : make all spacebar and keys which we have hardcoded, and use input instead
+-- debris : come to complete stop when below threshold (done)
+-- wall/glass : replace particles with debris (done)
+-- input : make all spacebar and keys which we have hardcoded, and use input instead (done)
+
 -- sfx : pass on volume
 -- sfx : max number of same single sfx
 -- Astar : figure out how to reduce goblin (astar needs to be larger masks of object, goblins smaller)
@@ -19,6 +20,7 @@ Todo:
 		
 	Textbox :
 		- loud and soft text should have loud and soft sfx sound
+		- colored shadow for the txt
 	General:
 		- create 2 lvls
 		- sounds for txt ticks, different for alchemist or other one

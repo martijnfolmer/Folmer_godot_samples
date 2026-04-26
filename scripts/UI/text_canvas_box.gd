@@ -460,4 +460,4 @@ func _get_sfx_singleton() -> Node:
 
 ## Return true when the key event is a non-repeated Space press.
 func _is_space_pressed(event: InputEvent) -> bool:
-	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
+	return Input.get_action_strength("ui_test_space")

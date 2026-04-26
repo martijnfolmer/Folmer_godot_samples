@@ -72,11 +72,3 @@ func _physics_process(delta: float) -> void:
 			)
 			var ang := randf() * TAU
 			camera.offset = Vector2.from_angle(ang) * _shake_magnitude * strength
-
-
-#TODO: TESTING: make screenshake happen
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		var key_event := event as InputEventKey
-		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_B:
-			add_screen_shake(50, 3)

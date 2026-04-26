@@ -55,9 +55,11 @@ func _create_textBox() -> void:
 ## Handle debug input and trigger the pillar push test.
 func _unhandled_input(event: InputEvent) -> void:
 	#if _is_space_pressed(event):
+	#if Input.get_action_strength("ui_test_space"):
 		#_move_two_closest_pillars_towards_player()
 		#write_and_read_json()
-	if _is_K_pressed(event):
+	#if _is_K_pressed(event):
+	if Input.get_action_strength("ui_test_k"):
 		_create_textBox()
 		
 	

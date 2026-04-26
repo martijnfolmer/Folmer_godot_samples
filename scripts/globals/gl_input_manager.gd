@@ -1,5 +1,12 @@
 extends Node
 
+"""
+	Usage : 
+		Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
+		Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+"""
+
+
 # Choose what you want to add
 @export var add_keys := true
 @export var add_mouse_buttons := true
@@ -23,6 +30,13 @@ func ensure_default_inputs(use_keys: bool = true, use_mouse: bool = true) -> voi
 		_add_key_if_missing("ui_left", KEY_LEFT)
 		_add_key_if_missing("ui_right", KEY_RIGHT)
 
+		# TODO: Remove testing input key presses
+		_add_key_if_missing("ui_test_space", KEY_SPACE)
+		_add_key_if_missing("ui_test_v", KEY_V)
+		_add_key_if_missing("ui_test_k", KEY_K)
+		_add_key_if_missing("ui_test_b", KEY_B)
+		
+
 	if use_mouse:
 		_add_mouse_button_if_missing("ui_primary_action", MOUSE_BUTTON_LEFT)
 
@@ -32,6 +46,14 @@ func ensure_actions() -> void:
 	_ensure_action("ui_left")
 	_ensure_action("ui_right")
 	_ensure_action("ui_primary_action")
+	
+	# TODO: Remove testing input key presses
+	_ensure_action("ui_test_space")
+	_ensure_action("ui_test_v")
+	_ensure_action("ui_test_k")
+	_ensure_action("ui_test_b")
+	
+	
 
 func _ensure_action(action_name: StringName) -> void:
 	if not InputMap.has_action(action_name):

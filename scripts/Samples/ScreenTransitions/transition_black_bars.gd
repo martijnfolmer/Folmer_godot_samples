@@ -58,8 +58,9 @@ func _toggle() -> void:
 			set_process(true)
 			queue_redraw()
 
+#TODO: remove _is_space_pressed
 func _is_space_pressed(event: InputEvent) -> bool:
-	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
+	return Input.get_action_strength("ui_test_space")
 
 func _process(delta: float) -> void:
 	match _phase:

@@ -37,8 +37,11 @@ func play_sfx_rand_pitch(sfx_name: String, from : float = 0.0, random_pitch_min 
 
 #TODO: TESTING: make sfx happen
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		var key_event := event as InputEventKey
-		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_V:
-			#play_sfx("hit1")
-			play_sfx_rand_pitch("hit1", 0)
+	if Input.get_action_strength("ui_test_v"):
+		#play_sfx("hit1")
+		play_sfx_rand_pitch("hit1", 0)
+	#if event is InputEventKey:
+		#var key_event := event as InputEventKey
+		#if key_event.pressed and not key_event.echo and key_event.keycode == KEY_V:
+			##play_sfx("hit1")
+			#play_sfx_rand_pitch("hit1", 0)

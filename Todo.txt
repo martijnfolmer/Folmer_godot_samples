@@ -7,9 +7,15 @@
 -- sfx : pass on volume
 -- sfx : max number of same single sfx
 -- Astar : figure out how to reduce goblin (astar needs to be larger masks of object, goblins smaller)
--- respawn
+-- respawn (reset lvl)
 -- goblin all : auto aim at pillars or other goblins when kicked.
 -- gobline all : if mostly off off edge, move a little more towards the edge.
+
+NICES
+-- create a lvl that we load
+-- create another lvl 
+-- move between two lvls
+
 
 Todo:
 	debris:

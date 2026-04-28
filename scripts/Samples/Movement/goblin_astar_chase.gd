@@ -264,6 +264,7 @@ func _rebuild_path_for_state() -> void:
 		world_points.append(_cell_to_world(cell))
 	world_points.append(target_pos)
 
+
 	# Remove unnecessary points before storing path.
 	_set_path(_smooth_path_points(world_points))
 
@@ -527,6 +528,17 @@ func _smooth_path_points(points: PackedVector2Array) -> PackedVector2Array:
 		anchor = i
 		i += 1
 	simplified.append(collinear_reduced[collinear_reduced.size() - 1])
+	
+	# Check if the next point is actual closer than the first point
+	if simplified.size() >= 2:
+		var player_body := _get_player_body()
+		var p1 = simplified.get(0)
+		var p2 = simplified.get(1)
+		var len1 = p1.distance_to(player_body.global_position)
+		var len2 = p2.distance_to(player_body.global_position)
+		if len2<len1:
+			simplified.remove_at(0)
+	
 	return simplified
 #endregion
 

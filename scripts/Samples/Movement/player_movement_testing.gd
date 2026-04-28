@@ -1,5 +1,10 @@
 extends Node2D
 
+"""
+	Only testing things!
+"""
+
+
 # TODO: TESTING: create the text canvas box
 const TEXT_CANVAS_BOX_SCENE := preload("res://scenes/UI/text_canvas_box.tscn")
 
@@ -60,9 +65,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		#write_and_read_json()
 	#if _is_K_pressed(event):
 	if Input.get_action_strength("ui_test_k"):
-		_create_textBox()
-		
-	
+		#_create_textBox()
+		_reset_lvl()
+
+
+# TODO: TESTING: reset the thing
+func _reset_lvl() -> void:
+	get_tree().reload_current_scene()
+
 # TODO: TESTING: space bar pressed
 ## Return true when the key event is a non-repeated Space press.
 func _is_space_pressed(event: InputEvent) -> bool:

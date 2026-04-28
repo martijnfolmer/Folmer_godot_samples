@@ -12,6 +12,7 @@ var _shake_time_left: float = 0.0
 var _shake_duration: float = 0.0
 var _shake_magnitude: float = 0.0
 
+var _first_frame: bool = true
 
 func _ready() -> void:
 	camera.make_current()
@@ -56,7 +57,10 @@ func _physics_process(delta: float) -> void:
 			h * aim.y * screen_margin_fraction / z.y
 		)
 		var desired := player_pos + framing
-		global_position = global_position.move_toward(desired, follow_speed * delta)
+		if _first_frame:
+			global_position = desired
+		else:
+			global_position = global_position.move_toward(desired, follow_speed * delta)
 
 	if _shake_time_left > 0.0:
 		_shake_time_left = maxf(_shake_time_left - delta, 0.0)

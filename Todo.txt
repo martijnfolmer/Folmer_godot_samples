@@ -15,6 +15,12 @@
 -- astar path : make it so it can't do astar of the beaten path, so it doesn't just fall of cells
 -- astar path : add goblins that are not themselves to the astar calculations
 
+Astar remake:
+	-- visualise the grid
+	-- stop goblins from moving
+	-- show them rethinking their path to player every couple of turns
+	-- visualise collisions with the walls and goblins and glass and pillars
+
 NICES
 -- create a lvl that we load
 -- create another lvl 

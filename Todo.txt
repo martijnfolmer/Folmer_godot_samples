@@ -7,10 +7,10 @@
 -- sfx : max number of same single sfx (done)
 -- goblin all : reduce in speed quicker and slam less quickly (done)
 -- Astar : figure out how to reduce goblin (astar needs to be larger masks of object, goblins smaller) (done)
-
 -- respawn (reset lvl using test code) (done, in player script)
 -- camera : start at the player locaiton on start up (done)
 -- astar path : check if first point or next point is closer to current when we recalculate (done)
+
 
 -- astar path : make it so it can't do astar of the beaten path, so it doesn't just fall of cells
 -- astar path : add goblins that are not themselves to the astar calculations
@@ -22,6 +22,8 @@ NICES
 
 
 Todo:
+	Walls and glass:
+		- debris is actually pieces of the wall, and kicking it just makes it spike
 	Astar :
 		- make it so we don't get stuck on walls, when next to walls (because if enemy hugs walls, they are stuck)
 		- give goblins different speeds based on distance to player? so those behind lag behind

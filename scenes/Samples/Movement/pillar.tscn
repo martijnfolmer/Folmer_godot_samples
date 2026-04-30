@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://csjysumvwrhys" path="res://scripts/Samples/Movement/pillar.gd" id="1_dootu"]
 [ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="3_0vmoy"]
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="4_nu50h"]
-[ext_resource type="PackedScene" path="res://scenes/components/comp_on_cell_overlap.tscn" id="5_9v0r5"]
+[ext_resource type="PackedScene" uid="uid://g1n38uj15vxs" path="res://scenes/components/comp_on_cell_overlap.tscn" id="5_9v0r5"]
 [ext_resource type="Texture2D" uid="uid://bc7nelq85kvfu" path="res://png/environment/pillar.png" id="6_hsxdt"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ls6d4"]

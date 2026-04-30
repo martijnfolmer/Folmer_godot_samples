@@ -19,7 +19,7 @@ extends Node2D
 ## Physics groups whose colliders block line-of-sight raycasts to the player.
 @export var blocking_elements_groups_los: Array[String] = ["pillar", "wall"]
 ## Physics groups treated as solid for A* grid marking and path-smoothing obstacle checks.
-@export var blocking_elements_groups_astar: Array[String] = ["pillar", "wall", "glass"]
+@export var blocking_elements_groups_astar: Array[String] = ["pillar", "wall", "glass", "goblin"]
 
 @export_group("Movement")
 ## Target speed along the path toward the current waypoint (pixels per second).
@@ -48,6 +48,8 @@ extends Node2D
 @export var pillar_block_radius_px: float = 54.0
 ## Extra padding added to computed blocker radii so nearby cells stay walkable-safe.
 @export var pillar_block_buffer_px: float = 12.0
+## Extra radius (px) added around every A* blocker (pillar, wall, glass, goblin) for grid solids. Path smoothing treats chords that enter the same padded disk (footprint + this) as blocked. 0 disables only the extra segment check; grid footprint buffer still applies.
+@export var astar_personal_space_px: float = 88.0
 ## When true, allows diagonal edges on the A* grid; when false, only cardinal moves.
 @export var allow_diagonal_movement: bool = true
 
@@ -313,7 +315,7 @@ func _build_grid(target_pos: Vector2) -> bool:
 
 	for node in tracked:
 		if node is Node2D:
-			var pos: Vector2 = (node as Node2D).global_position
+			var pos: Vector2 = _astar_blocker_anchor_world(node as Node2D)
 			if !bounds_ok:
 				min_x = pos.x
 				min_y = pos.y
@@ -325,6 +327,21 @@ func _build_grid(target_pos: Vector2) -> bool:
 				min_y = min(min_y, pos.y)
 				max_x = max(max_x, pos.x)
 				max_y = max(max_y, pos.y)
+
+	# This goblin's CharacterBody2D moves while the root may not; always include the body in bounds.
+	if _body != null:
+		var pos: Vector2 = _body.global_position
+		if !bounds_ok:
+			min_x = pos.x
+			min_y = pos.y
+			max_x = pos.x
+			max_y = pos.y
+			bounds_ok = true
+		else:
+			min_x = min(min_x, pos.x)
+			min_y = min(min_y, pos.y)
+			max_x = max(max_x, pos.x)
+			max_y = max(max_y, pos.y)
 
 	if !bounds_ok:
 		return false
@@ -368,13 +385,24 @@ func _mark_blocked_cells_for_astar_groups(step: int) -> void:
 				continue
 
 			var blocker: Node2D = node as Node2D
+			if _is_astar_blocker_this_goblin(blocker):
+				continue
 			var block_radius_px: float = _pillar_block_radius_for(blocker)
-			var center_id: Vector2i = _world_to_cell(blocker.global_position)
+			block_radius_px += max(0.0, astar_personal_space_px)
+			var anchor_world: Vector2 = _astar_blocker_anchor_world(blocker)
+			var center_id: Vector2i = _world_to_cell(anchor_world)
+			# Always mark the centre cell: the blocker may be smaller than one
+			# cell (e.g. a goblin on a 128 px grid), so the distance check alone
+			# would skip even the cell the blocker is standing in.
+			if _is_cell_in_bounds(center_id):
+				_astar.set_point_solid(center_id, true)
 			var block_radius_cells: int = max(1, int(ceil(block_radius_px / float(step))))
 			for y in range(-block_radius_cells, block_radius_cells + 1):
 				for x in range(-block_radius_cells, block_radius_cells + 1):
+					if x == 0 and y == 0:
+						continue
 					var sample_world: Vector2 = _cell_to_world(center_id + Vector2i(x, y))
-					if sample_world.distance_to(blocker.global_position) > block_radius_px:
+					if sample_world.distance_to(anchor_world) > block_radius_px:
 						continue
 					var test_id := center_id + Vector2i(x, y)
 					if _is_cell_in_bounds(test_id):
@@ -468,11 +496,12 @@ func _has_clear_line_to_player(player_body: CharacterBody2D) -> bool:
 	return !blocked
 
 
-## Return true when a straight segment's first physics hit is in blocking_elements_groups_astar.
+## Return true when a straight segment's first physics hit is in blocking_elements_groups_astar,
+## or when it passes inside any blocker's padded disk (same radius as grid marking).
 func _is_line_blocked_by_astar_groups(from_pos: Vector2, to_pos: Vector2) -> bool:
 	var space_state := get_world_2d().direct_space_state
 	if space_state == null:
-		return false
+		return _segment_too_close_to_astar_blockers(from_pos, to_pos)
 	var query := PhysicsRayQueryParameters2D.create(from_pos, to_pos)
 	query.collide_with_bodies = true
 	query.collide_with_areas = false
@@ -480,15 +509,43 @@ func _is_line_blocked_by_astar_groups(from_pos: Vector2, to_pos: Vector2) -> boo
 		query.exclude = [_body.get_rid()]
 	var hit: Dictionary = space_state.intersect_ray(query)
 	if hit.is_empty():
-		return false
+		return _segment_too_close_to_astar_blockers(from_pos, to_pos)
 	var collider := hit.get("collider") as Node
 	if collider == null:
-		return false
+		return _segment_too_close_to_astar_blockers(from_pos, to_pos)
 	for group_name in blocking_elements_groups_astar:
 		if group_name.is_empty():
 			continue
 		if _node_or_ancestor_in_group(collider, group_name):
 			return true
+	return _segment_too_close_to_astar_blockers(from_pos, to_pos)
+
+
+## True when the segment passes inside any blocker's padded disk: same as
+## _pillar_block_radius_for + astar_personal_space_px used in _mark_blocked_cells_for_astar_groups.
+## If astar_personal_space_px is 0, this extra check is skipped (raycast-only smoothing).
+func _segment_too_close_to_astar_blockers(from_pos: Vector2, to_pos: Vector2) -> bool:
+	if astar_personal_space_px <= 0.0:
+		return false
+	var personal: float = max(0.0, astar_personal_space_px)
+	var seen: Dictionary = {}
+	for group_name in blocking_elements_groups_astar:
+		if group_name.is_empty():
+			continue
+		for node in get_tree().get_nodes_in_group(group_name):
+			if seen.has(node):
+				continue
+			seen[node] = true
+			if !(node is Node2D):
+				continue
+			var blocker: Node2D = node as Node2D
+			if _is_astar_blocker_this_goblin(blocker):
+				continue
+			var eff_radius_px: float = _pillar_block_radius_for(blocker) + personal
+			var anchor: Vector2 = _astar_blocker_anchor_world(blocker)
+			var closest: Vector2 = Geometry2D.get_closest_point_to_segment(anchor, from_pos, to_pos)
+			if anchor.distance_to(closest) <= eff_radius_px:
+				return true
 	return false
 
 
@@ -569,6 +626,25 @@ func _rotate_body_toward(move_dir: Vector2, delta: float) -> void:
 #endregion
 
 #region Blocker footprint and group tests
+## World position used to place a blocker on the grid (body moves; wrapper Node2D may not).
+func _astar_blocker_anchor_world(blocker: Node2D) -> Vector2:
+	var physics_body: CollisionObject2D = blocker.get_node_or_null("CharacterBody2D") as CharacterBody2D
+	if physics_body == null:
+		physics_body = blocker.get_node_or_null("StaticBody2D") as StaticBody2D
+	if physics_body != null:
+		return physics_body.global_position
+	if blocker is CollisionObject2D:
+		return (blocker as CollisionObject2D).global_position
+	return blocker.global_position
+
+
+## True when this A* blocker node is the goblin that owns this chase component (or its descendant).
+func _is_astar_blocker_this_goblin(blocker: Node) -> bool:
+	if _goblin_root == null:
+		return false
+	return blocker == _goblin_root or _goblin_root.is_ancestor_of(blocker)
+
+
 ## Compute blocker footprint radius from collision shape (CharacterBody2D or StaticBody2D child) and buffer.
 func _pillar_block_radius_for(pillar_node: Node2D) -> float:
 	var radius_px: float = max(4.0, pillar_block_radius_px)

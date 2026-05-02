@@ -3,13 +3,13 @@
 [ext_resource type="Script" uid="uid://oyt3wxf0cj4i" path="res://scripts/Samples/Movement/goblin.gd" id="1_goblin"]
 [ext_resource type="PackedScene" uid="uid://blbn8ivlmvmdb" path="res://scenes/components/comp_damage.tscn" id="2_5palr"]
 [ext_resource type="PackedScene" uid="uid://cqf6eoofrp6j5" path="res://scenes/Samples/Particles/partBloodSmearGreenPersistent.tscn" id="2_bawqr"]
-[ext_resource type="Script" uid="uid://cfo7hjn8if7e5" path="res://scripts/Samples/Movement/goblin_astar_chase.gd" id="2_chase"]
 [ext_resource type="Texture2D" uid="uid://ej2b4un6xg5e" path="res://png/goblin/goblin_arm.png" id="3_armtex"]
 [ext_resource type="PackedScene" uid="uid://b33a6t85b1200" path="res://scenes/components/comp_ChrtBody2D_kickback.tscn" id="3_bawqr"]
 [ext_resource type="PackedScene" uid="uid://g1n38uj15vxs" path="res://scenes/components/comp_on_cell_overlap.tscn" id="4_rsxvf"]
 [ext_resource type="PackedScene" uid="uid://hdpa5sph2ccr" path="res://scenes/components/comp_chase_and_melee.tscn" id="6_fofqr"]
 [ext_resource type="Script" uid="uid://ulnv3k3d3q81" path="res://scripts/components/comp_chase_and_melee.gd" id="7_35bxk"]
 [ext_resource type="Texture2D" uid="uid://dlr4g80qmc2b8" path="res://png/goblin/goblin_arm_outline.png" id="8_fofqr"]
+[ext_resource type="PackedScene" uid="uid://ba3wxx0rj0ek0" path="res://scenes/components/comp_pathfinding_astar.tscn" id="8_tr4uu"]
 [ext_resource type="Texture2D" uid="uid://duysp723u3tob" path="res://png/goblin/goblin_v2/goblin_chest.png" id="9_tr4uu"]
 [ext_resource type="Texture2D" uid="uid://cpesc3gfd6hb7" path="res://png/goblin/goblin_v2/goblin_left_arm.png" id="10_ykqws"]
 [ext_resource type="Texture2D" uid="uid://b7ry68mqjx5pk" path="res://png/goblin/goblin_v2/goblin_right_arm.png" id="11_0lie0"]
@@ -44,9 +44,9 @@ sprite_path = NodePath("../CharacterBody2D/SpriteChest")
 [node name="CompChaseAndMelee" parent="." unique_id=832466147 instance=ExtResource("6_fofqr")]
 script = ExtResource("7_35bxk")
 
-[node name="GoblinAStarChase" type="Node2D" parent="." unique_id=1495848707]
-script = ExtResource("2_chase")
-cell_size = 128
+[node name="CompPathfindingAstar" parent="." unique_id=1591297447 instance=ExtResource("8_tr4uu")]
+BottomRight = Vector2(2000, 2000)
+CellSize = Vector2(64, 64)
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=2036670946]
 

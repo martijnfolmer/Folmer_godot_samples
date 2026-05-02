@@ -61,13 +61,7 @@ position = Vector2(1023, 740)
 position = Vector2(441, 1089)
 
 [node name="GoblinBasic" parent="." unique_id=574766309 instance=ExtResource("3_00l21")]
-position = Vector2(590, 574)
-
-[node name="GoblinBasic2" parent="." unique_id=2052670920 instance=ExtResource("3_00l21")]
-position = Vector2(432, 569)
-
-[node name="GoblinBasic3" parent="." unique_id=503990667 instance=ExtResource("3_00l21")]
-position = Vector2(986, 1106)
+position = Vector2(486, 551)
 
 [node name="Wall" parent="." unique_id=592342518 instance=ExtResource("8_cxbq3")]
 position = Vector2(390, 720)

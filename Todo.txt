@@ -10,16 +10,25 @@
 -- respawn (reset lvl using test code) (done, in player script)
 -- camera : start at the player locaiton on start up (done)
 -- astar path : check if first point or next point is closer to current when we recalculate (done)
+-- astar grid visualisation
+
+# Astar to do:
+# TODO: inside of this script
+	# TopLeft and BottomRight for astar grid, which we can find, and use for finding topLeft and Bottom
+	# If no cell, it is blocked as well
+	# forward propagation : turn grid values to -1, calling position to 0
+	# backward propagation : find path, and store
+	# check if first element is better second element, otherwise, remove first element
+	# Line of sight : if we can have line of sight, and blocking elements also don't block, we use that as path
+
+	# TODO in chase_and_melee
+	# In chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
+	# In chase_and_melee -> follow the path and move with it.
+
+	# Upgrades: get a cell grid, which should only be updated if the cells change? If that is even something we do
+	# upgrades: Movement is not strictly along a line, but rather it has movement speed and rotation speed
 
 
--- astar path : make it so it can't do astar of the beaten path, so it doesn't just fall of cells
--- astar path : add goblins that are not themselves to the astar calculations
-
-Astar remake:
-	-- visualise the grid
-	-- stop goblins from moving
-	-- show them rethinking their path to player every couple of turns
-	-- visualise collisions with the walls and goblins and glass and pillars
 
 NICES
 -- create a lvl that we load

@@ -1,5 +1,8 @@
 extends Node2D
 
+@export var enable : bool = true
+
+
 ## The top left coordinates of the grid we check
 @export var TopLeft : Vector2 = Vector2.ZERO
 ## The bottom right coordinates of the grid we check
@@ -41,20 +44,6 @@ var grid_width : int = 0
 # height of the grid, in number of cells
 var grid_height : int = 0
 
-# Todo:
-# initializing grids (done)
-# - get all nodes from a certain group (general) (done)
-# - set TopLeft, BottomRight, CellSize + reset grid
-# draw the grid based on true or false
-
-# Populate occ grid with whether it overlaps with any blockers
-# Add lines to the drawing of the grid
-
-# - line of sight function : only pillar and walls block sight
-# - Populate grid (but not with the one calling it)
-# - recreate grid
-
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -63,6 +52,7 @@ func _ready() -> void:
 	
 
 func _initialize_grid() -> void:
+	
 	# find out how many cells there are
 	grid_width = ceil((BottomRight.x - TopLeft.x)/CellSize.x)
 	grid_height = ceil((BottomRight.y - TopLeft.y)/CellSize.y)
@@ -79,30 +69,119 @@ func _initialize_grid() -> void:
 #region Lifetime
 func _process(delta: float) -> void:
 	
-	# Occupied the occ
-	_populate_occ_grid()
+	if enable:
+		# Occupied the occ
+		_populate_occ_grid()
 
-	# Redraw the grid for testing
-	if draw_astar_enabled:
-		queue_redraw()
+		# Redraw the grid for testing
+		if draw_astar_enabled:
+			queue_redraw()
 
 #endregion
 
 
-#region processing grid
+#region OCC grid, where we check which cells are blocked
 
 func _populate_occ_grid() -> void:
-	
-	# Reset the grid
 	grid_occ.reset_grid(false)
+	if grid_occ.cellSize.x <= 0.0 or grid_occ.cellSize.y <= 0.0:
+		return
 
-	# find collisions
-	var allNodes = General._nodes_in_groups(self, blocking_elements_groups_astar)
+	var all_nodes: Array[Node] = General._nodes_in_groups(self, blocking_elements_groups_astar)
+	
+	# filter the parent node (goblin) from this population
+	var exclude_node := get_parent()
+	all_nodes = all_nodes.filter(func(n: Node) -> bool:
+		return n != exclude_node
+	)
+	
+	var seen: Dictionary = {}
+	for n in all_nodes:
+		if seen.has(n):
+			continue
+		seen[n] = true
+		# check for collisionshapes
+		for child in n.find_children("*", "CollisionShape2D", true, false):
+			_mark_cells_for_collision_shape(child as CollisionShape2D)
+		# check for collisionpolygons (TODO: check if we removed all of these, if so, don't use it)
+		for child in n.find_children("*", "CollisionPolygon2D", true, false):
+			_mark_cells_for_collision_polygon(child as CollisionPolygon2D)
 
+
+## Axis-aligned world bounds of a collision shape (handles rotation / skew).
+func _collision_shape_world_aabb(cs: CollisionShape2D) -> Rect2:
+	if cs == null or cs.disabled or cs.shape == null:
+		return Rect2()
+	var lr: Rect2 = cs.shape.get_rect()
+	var xf: Transform2D = cs.global_transform
+	var corners: Array[Vector2] = [
+		xf * lr.position,
+		xf * Vector2(lr.end.x, lr.position.y),
+		xf * Vector2(lr.position.x, lr.end.y),
+		xf * lr.end,
+	]
+	var r := Rect2(corners[0], Vector2.ZERO)
+	for i in range(1, 4):
+		r = r.merge(Rect2(corners[i], Vector2.ZERO))
+	return r
+
+
+func _collision_polygon_world_aabb(cp: CollisionPolygon2D) -> Rect2:
+	if cp == null or cp.disabled or cp.polygon.is_empty():
+		return Rect2()
+	var xf: Transform2D = cp.global_transform
+	var min_v: Vector2 = xf * cp.polygon[0]
+	var max_v: Vector2 = min_v
+	for i in range(1, cp.polygon.size()):
+		var q: Vector2 = xf * cp.polygon[i]
+		min_v.x = min(min_v.x, q.x)
+		min_v.y = min(min_v.y, q.y)
+		max_v.x = max(max_v.x, q.x)
+		max_v.y = max(max_v.y, q.y)
+	return Rect2(min_v, max_v - min_v)
+
+## turn collisionshape into a rectangle that we can mark cells with
+func _mark_cells_for_collision_shape(cs: CollisionShape2D) -> void:
+	var aabb := _collision_shape_world_aabb(cs)
+	_mark_cells_for_world_rect(aabb)
+
+## turn polygon to rectangle, so we can mark cells that collide with the rectangle
+func _mark_cells_for_collision_polygon(cp: CollisionPolygon2D) -> void:
+	var aabb := _collision_polygon_world_aabb(cp)
+	_mark_cells_for_world_rect(aabb)
+
+
+## Marks cells whose world-space cell rectangles intersect `world_aabb` (clipped to the grid).
+func _mark_cells_for_world_rect(world_aabb: Rect2) -> void:
+	if !world_aabb.has_area():
+		return
+	var tl: Vector2 = grid_occ.topLeft
+	var csz: Vector2 = grid_occ.cellSize
+	var gw: int = grid_occ.grid_width_cells
+	var gh: int = grid_occ.grid_height_cells
+	var grid_rect := Rect2(tl, Vector2(gw * csz.x, gh * csz.y))
+	var clipped := world_aabb.intersection(grid_rect)
+	if !clipped.has_area():
+		return
+
+	var i0: int = clampi(int(floor((clipped.position.x - tl.x) / csz.x)), 0, gw - 1)
+	var i1: int = clampi(int(ceil((clipped.end.x - tl.x) / csz.x)) - 1, 0, gw - 1)
+	var j0: int = clampi(int(floor((clipped.position.y - tl.y) / csz.y)), 0, gh - 1)
+	var j1: int = clampi(int(ceil((clipped.end.y - tl.y) / csz.y)) - 1, 0, gh - 1)
+	if i1 < i0 or j1 < j0:
+		return
+
+	for j in range(j0, j1 + 1):
+		for i in range(i0, i1 + 1):
+			var cell_rect := Rect2(tl.x + i * csz.x, tl.y + j * csz.y, csz.x, csz.y)
+			if cell_rect.intersects(clipped):
+				grid_occ.set_cell(Vector2i(i, j), true)
 
 #endregion
 
+#region Path grid, forward propagation, path generation, etc
 
+#endregion
 
 
 
@@ -124,44 +203,37 @@ func draw_grid_occ(target_grid: Grid) -> void:
 			color.a = alpha
 			
 			var pos := Vector2(
-				x * target_grid.cellSize.x,
-				y * target_grid.cellSize.y
+				x * target_grid.cellSize.x - global_position.x,
+				y * target_grid.cellSize.y - global_position.y
 			)
+
 
 			var rect := Rect2(pos, target_grid.cellSize)
 			draw_rect(rect, color, true)
+			
+	var width_px = target_grid.grid_width_cells * target_grid.cellSize.x
+	var height_px = target_grid.grid_height_cells * target_grid.cellSize.y
 
-#func draw_grid_occ(target_grid: Grid) -> void:
-##
-##
-##
-##
-##
-	##var width_px = target_grid.grid_width_cells * target_grid.cellSize.x
-	##var height_px = target_grid.grid_height_cells * target_grid.cellSize.y
-##
-##
-##
-##
-	### Vertical lines
-	##for x in range(target_grid.grid_width_cells + 1):
-		##var px = x * target_grid.cellSize.x
-		##draw_line(
-			##Vector2(px, 0),
-			##Vector2(px, height_px),
-			##target_grid.grid_color,
-			##target_grid.grid_line_width
-		##)
-##
-	### Horizontal lines
-	##for y in range(target_grid.grid_height_cells + 1):
-		##var py = y * target_grid.cellSize.y
-		##draw_line(
-			##Vector2(0, py),
-			##Vector2(width_px, py),
-			##target_grid.grid_color,
-			##target_grid.grid_line_width
-		##)
+	# Vertical lines
+	for x in range(target_grid.grid_width_cells + 1):
+		var px = x * target_grid.cellSize.x
+		draw_line(
+			Vector2(px - global_position.x,  - global_position.y),
+			Vector2(px - global_position.x, height_px - global_position.y),
+			target_grid.grid_color,
+			target_grid.grid_line_width
+		)
+
+	# Horizontal lines
+	for y in range(target_grid.grid_height_cells + 1):
+		var py = y * target_grid.cellSize.y
+		draw_line(
+			Vector2(-global_position.x, py - global_position.y),
+			Vector2(width_px - global_position.x, py - global_position.y),
+			target_grid.grid_color,
+			target_grid.grid_line_width
+		)
+
 
 
 

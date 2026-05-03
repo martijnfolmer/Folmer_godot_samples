@@ -1,4 +1,6 @@
-
+toposts:
+	- astar path calculation
+	- astar path following
 
 4 mei - 10 mei : 
 	-- astar : forward propagation - copy occ grid to cost grid, any cell that is next to occ will also get a higher cost to move onto?
@@ -11,9 +13,6 @@
 	-- chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
 	-- chase_and_melee -> follow the path and move with it. Dont update path if our state is not conducive to it
 	-- movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line
-	
-
-
 
 NICES
 -- create a lvl that we load
@@ -44,7 +43,7 @@ Todo:
 	input:
 		
 	SFX :
-		
+		- text sfx (different ones for different characters)
 	Textbox :
 		- loud and soft text should have loud and soft sfx sound
 		- colored shadow for the txt

@@ -13,10 +13,11 @@
 -- astar grid visualisation
 -- grid : get all border coordinates and values
 -- grid : world coordinates to cell coordinates
+-- astar : Use selection rect to define where it is
 
 # Astar to do:
 # TODO: inside of this script
-	# TopLeft and BottomRight for astar grid, which we can find, and use for finding topLeft and Bottom
+
 	# If no cell, it is blocked as well
 	# forward propagation : turn grid values to -1, calling position to 0
 	# backward propagation : find path, and store

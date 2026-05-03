@@ -1,5 +1,16 @@
 extends Node2D
 
+"""
+	This is the component that does astar pathfinding without using the astar build in data type
+	of godot. We use the grid class we made (class_grid.gd) to hold the 2d grid we use for 
+	forward and backward propagation
+
+	Uses CompPathfindingSelectionRect to define the bounds of where the Astar is going to go
+	
+	Any cell that is not on top of a floor cell will be unoccupied
+"""
+
+
 @export var enable : bool = true
 
 
@@ -9,6 +20,9 @@ extends Node2D
 @export var BottomRight : Vector2 = Vector2.ZERO
 ## The size of the cell (width x height)
 @export var CellSize : Vector2 = Vector2.ZERO
+
+
+
 
 @export_group("blocking_elements")
 ## Physics groups whose colliders block line-of-sight raycasts to the player.
@@ -52,6 +66,20 @@ func _ready() -> void:
 	
 
 func _initialize_grid() -> void:
+	
+	# Find the closest selection rect that we can use for pathfinding
+	var allSelectionRects = General.get_nodes_with_base_name(self, "CompPathfindingSelectionRect")
+	if allSelectionRects.size() > 0:
+		# Find the closest rect
+		var closestRect= allSelectionRects.get(0)
+		for rect in allSelectionRects.slice(1, allSelectionRects.size()-1):
+			# are we inside of this rect
+			if rect.has_point(global_position):
+				closestRect = rect
+				break
+		TopLeft = closestRect.get_global_top_left()
+		BottomRight = closestRect.get_global_bottom_right()
+
 	
 	# find out how many cells there are
 	grid_width = ceil((BottomRight.x - TopLeft.x)/CellSize.x)
@@ -109,6 +137,8 @@ func _populate_occ_grid() -> void:
 		# check for collisionpolygons (TODO: check if we removed all of these, if so, don't use it)
 		for child in n.find_children("*", "CollisionPolygon2D", true, false):
 			_mark_cells_for_collision_polygon(child as CollisionPolygon2D)
+			
+	# Any grid cell that does not have its center on a cell node should have its occ as true
 
 
 ## Axis-aligned world bounds of a collision shape (handles rotation / skew).

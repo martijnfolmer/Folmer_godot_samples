@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://hdpa5sph2ccr" path="res://scenes/components/comp_chase_and_melee.tscn" id="6_fofqr"]
 [ext_resource type="Script" uid="uid://ulnv3k3d3q81" path="res://scripts/components/comp_chase_and_melee.gd" id="7_35bxk"]
 [ext_resource type="Texture2D" uid="uid://dlr4g80qmc2b8" path="res://png/goblin/goblin_arm_outline.png" id="8_fofqr"]
-[ext_resource type="PackedScene" uid="uid://ba3wxx0rj0ek0" path="res://scenes/components/comp_pathfinding_astar.tscn" id="8_tr4uu"]
+[ext_resource type="PackedScene" uid="uid://ba3wxx0rj0ek0" path="res://scenes/components/pathfinding/comp_pathfinding_astar.tscn" id="8_tr4uu"]
 [ext_resource type="Texture2D" uid="uid://duysp723u3tob" path="res://png/goblin/goblin_v2/goblin_chest.png" id="9_tr4uu"]
 [ext_resource type="Texture2D" uid="uid://cpesc3gfd6hb7" path="res://png/goblin/goblin_v2/goblin_left_arm.png" id="10_ykqws"]
 [ext_resource type="Texture2D" uid="uid://b7ry68mqjx5pk" path="res://png/goblin/goblin_v2/goblin_right_arm.png" id="11_0lie0"]

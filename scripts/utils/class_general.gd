@@ -40,3 +40,13 @@ static func _node_or_ancestor_in_groups(node: Node, group_list: Array[StringName
 				return true
 		current = current.get_parent()
 	return false
+	
+## return all nodes that start with a given name
+static func get_nodes_with_base_name(node: Node, base_name: String) -> Array[Node]:
+	var matches: Array[Node] = []
+
+	for nodec in node.get_tree().current_scene.find_children("*", "", true, false):
+		if nodec.name.begins_with(base_name):
+			matches.append(nodec)
+
+	return matches

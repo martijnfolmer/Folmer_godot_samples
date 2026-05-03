@@ -137,8 +137,37 @@ func _populate_occ_grid() -> void:
 		# check for collisionpolygons (TODO: check if we removed all of these, if so, don't use it)
 		for child in n.find_children("*", "CollisionPolygon2D", true, false):
 			_mark_cells_for_collision_polygon(child as CollisionPolygon2D)
-			
-	# Any grid cell that does not have its center on a cell node should have its occ as true
+
+	var floor_rects := _collect_cell_floor_world_rects()
+	var gw: int = grid_occ.grid_width_cells
+	var gh: int = grid_occ.grid_height_cells
+	for j in range(gh):
+		for i in range(gw):
+			var center := grid_occ.get_center_pix(Vector2i(i, j))
+			if !_center_on_any_floor_rect(center, floor_rects):
+				grid_occ.set_cell(Vector2i(i, j), true)
+
+
+func _collect_cell_floor_world_rects() -> Array[Rect2]:
+	var rects: Array[Rect2] = []
+	var tree := get_tree()
+	if tree == null:
+		return rects
+	for n in tree.get_nodes_in_group("cell_floor"):
+		if !is_instance_valid(n):
+			continue
+		for child in n.find_children("*", "CollisionShape2D", true, false):
+			var r := _collision_shape_world_aabb(child as CollisionShape2D)
+			if r.has_area():
+				rects.append(r)
+	return rects
+
+
+func _center_on_any_floor_rect(center: Vector2, floor_rects: Array[Rect2]) -> bool:
+	for r in floor_rects:
+		if r.has_point(center):
+			return true
+	return false
 
 
 ## Axis-aligned world bounds of a collision shape (handles rotation / skew).

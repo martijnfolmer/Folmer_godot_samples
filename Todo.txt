@@ -14,12 +14,12 @@
 -- grid : get all border coordinates and values
 -- grid : world coordinates to cell coordinates
 -- astar : Use selection rect to define where it is
+-- astar : no cell, it is blocked as well
 
 # Astar to do:
 # TODO: inside of this script
 
-	# If no cell, it is blocked as well
-	# forward propagation : turn grid values to -1, calling position to 0
+	# forward propagation : turn grid values to -1, calling position to 0, move forward, get 
 	# backward propagation : find path, and store
 	# check if first element is better second element, otherwise, remove first element
 	# Line of sight : if we can have line of sight, and blocking elements also don't block, we use that as path

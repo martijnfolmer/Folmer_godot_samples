@@ -73,6 +73,9 @@ func _process(delta: float) -> void:
 		# Occupied the occ
 		_populate_occ_grid()
 
+		# forward propagation
+		
+
 		# Redraw the grid for testing
 		if draw_astar_enabled:
 			queue_redraw()
@@ -179,10 +182,14 @@ func _mark_cells_for_world_rect(world_aabb: Rect2) -> void:
 
 #endregion
 
-#region Path grid, forward propagation, path generation, etc
+#region forward propagation
 
 #endregion
 
+
+#region backward propagation
+
+#endregion
 
 
 

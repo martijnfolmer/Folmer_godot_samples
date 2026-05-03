@@ -11,19 +11,31 @@ var topLeft: Vector2
 var bottomRight : Vector2
 var cellSize : Vector2
 
-#TODO: World_to_cell:
-"""
-	## Convert world position to current grid cell coordinates.
-func _world_to_cell(world_pos: Vector2) -> Vector2i:
-	var step: float = float(max(8, cell_size))
-	var local: Vector2 = world_pos - _grid_origin
-	return Vector2i(
-		int(floor(local.x / step)),
-		int(floor(local.y / step))
-	)
+# constants
+const BORDER_COOR_NO_DIAGONAL: Array[Vector2i] = [
+	Vector2i(1, 0),
+	Vector2i(0, -1),
+	Vector2i(-1, 0),
+	Vector2i(0, 1),
+]
 
-"""
+const BORDER_COOR_ONLY_DIAGONAL: Array[Vector2i] = [
+	Vector2i(1, -1),
+	Vector2i(-1, -1),
+	Vector2i(-1, 1),
+	Vector2i(1, 1),
+]
 
+const BORDER_COOR_ALL: Array[Vector2i] = [
+	Vector2i(1, 0),
+	Vector2i(1, -1),
+	Vector2i(0, -1),
+	Vector2i(-1, -1),
+	Vector2i(-1, 0),
+	Vector2i(-1, 1),
+	Vector2i(0, 1),
+	Vector2i(1, 1),
+]
 
 # Drawing the grid
 @export var grid_color: Color = Color(0.225, 0.608, 0.0, 1.0)
@@ -37,13 +49,7 @@ func _init(width: int = 10, height: int = 10, default_value: Variant = null) -> 
 	reset_grid(default_value)
 
 
-func reset_grid(val: Variant = null) -> void:
-	set_region(
-		Vector2i(0, 0),
-		Vector2i(grid_width_cells - 1, grid_height_cells - 1),
-		val
-	)
-
+#region Pixel to cell and cell to pixel
 ## set the intrinsic pixel coordinates of the grid
 func set_pixel_coordinates(top_left : Vector2, bottom_right : Vector2, cell_size : Vector2):
 	cellSize = cell_size
@@ -80,7 +86,21 @@ func get_center_pix(pos: Vector2i) -> Vector2:
 	var y2 = y1 + cellSize.y
 	return Vector2((x1 + x2)/2, (y1 + y2)/2)
 
+## Take a world coordinate, and find its grid coordinate
+func world_to_grid(pos: Vector2) -> Vector2i:
+	if topLeft == null:
+		push_error("Grid.topLeft is not set")
+	if cellSize == null:
+		push_error("Grid.topLeft is not set")
+		
+	var x = floor((pos.x - topLeft.x)/cellSize.x)
+	var y = floor((pos.y - topLeft.y)/cellSize.y)
+	return Vector2(x, y)
 
+#endregion
+
+
+#region resize grid
 ## Change the size of the grid
 func resize_grid(width: int, height: int, default_value: Variant = null) -> void:
 	grid_width_cells = width
@@ -92,23 +112,16 @@ func resize_grid(width: int, height: int, default_value: Variant = null) -> void
 	for i in range(grid_size):
 		grid[i] = default_value
 
+#endregion
 
-func is_in_bounds(pos: Vector2i) -> bool:
-	return pos.x >= 0 and pos.y >= 0 and pos.x < grid_width_cells and pos.y < grid_height_cells
-
-## The grid is a single dimension array, so this turns the 2d vector (x,y) to the position
-func get_index(pos: Vector2i) -> int:
-	return pos.x + pos.y * grid_width_cells
-
-
-## Get value at position in the grid
-func get_cell(pos: Vector2i) -> Variant:
-	if not is_in_bounds(pos):
-		push_error("Grid.get_cell: position out of bounds: %s" % pos)
-		return null
-
-	return grid[get_index(pos)]
-
+#region setting cells
+## set all values inside of a grid to a certain value
+func reset_grid(val: Variant = null) -> void:
+	set_region(
+		Vector2i(0, 0),
+		Vector2i(grid_width_cells - 1, grid_height_cells - 1),
+		val
+	)
 
 ## Set value at position in the grid
 func set_cell(pos: Vector2i, val: Variant) -> void:
@@ -117,7 +130,6 @@ func set_cell(pos: Vector2i, val: Variant) -> void:
 		return
 
 	grid[get_index(pos)] = val
-
 
 ## Set a specific region of the grid to a certain value
 func set_region(top_left: Vector2i, bottom_right: Vector2i, val: Variant) -> void:
@@ -129,3 +141,55 @@ func set_region(top_left: Vector2i, bottom_right: Vector2i, val: Variant) -> voi
 	for y in range(start_y, end_y + 1):
 		for x in range(start_x, end_x + 1):
 			grid[x + y * grid_width_cells] = val
+
+#endregion
+
+#region Getting cells
+## Get value at position in the grid
+func get_cell(pos: Vector2i) -> Variant:
+	if not is_in_bounds(pos):
+		push_error("Grid.get_cell: position out of bounds: %s" % pos)
+		return null
+
+	return grid[get_index(pos)]
+
+## Get border cells values
+func get_border_values(pos: Vector2i, allow_diagonal: bool) -> Array:
+	
+	var all_values = []
+	
+	# check diagonal or not
+	var border = BORDER_COOR_NO_DIAGONAL	
+	if allow_diagonal:
+		border = BORDER_COOR_ALL
+	
+	# get the coordinats that are within bounds of the coordinate
+	var border_coor = get_border_coordinates(pos, border)
+	
+	# Get the values
+	for coor in border_coor:
+		all_values.append(get_cell(coor))
+
+	return all_values
+
+## Get the coordinates of the border cells, if they are in bounds of the grid
+func get_border_coordinates(pos: Vector2i, border_coor: Array) -> Array:
+	
+	var all_coordinates = []
+	for coor in border_coor:
+		if is_in_bounds(Vector2i(pos.x + coor.x, pos.y + coor.y)):
+			all_coordinates.append(Vector2i(pos.x + coor.x, pos.y + coor.y))
+	return all_coordinates
+
+
+#endregion
+
+
+#region Helpers
+func is_in_bounds(pos: Vector2i) -> bool:
+	return pos.x >= 0 and pos.y >= 0 and pos.x < grid_width_cells and pos.y < grid_height_cells
+
+## The grid is a single dimension array, so this turns the 2d vector (x,y) to the position
+func get_index(pos: Vector2i) -> int:
+	return pos.x + pos.y * grid_width_cells
+#endregion

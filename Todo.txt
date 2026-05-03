@@ -11,6 +11,8 @@
 -- camera : start at the player locaiton on start up (done)
 -- astar path : check if first point or next point is closer to current when we recalculate (done)
 -- astar grid visualisation
+-- grid : get all border coordinates and values
+-- grid : world coordinates to cell coordinates
 
 # Astar to do:
 # TODO: inside of this script

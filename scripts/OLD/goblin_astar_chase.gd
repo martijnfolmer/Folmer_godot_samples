@@ -685,6 +685,9 @@ func _node_or_ancestor_in_group(node: Node, group: StringName) -> bool:
 	return false
 #endregion
 
+
+
+
 #region Debug draw
 ## Draw current path preview from body to remaining waypoints.
 func _draw() -> void:

@@ -26,7 +26,7 @@ H = 12
 cell_scene = ExtResource("1_vg2uj")
 
 [node name="CompPathfindingSelectionRect" parent="." unique_id=867552878 instance=ExtResource("5_rx6ah")]
-bottomRight = Vector2(2200, 1300)
+bottomRight = Vector2(2200, 1100)
 
 [node name="Pillar" parent="." unique_id=1493386293 instance=ExtResource("1_bjjws")]
 position = Vector2(374, 826)

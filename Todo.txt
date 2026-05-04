@@ -3,9 +3,10 @@ toposts:
 	- astar path following
 
 4 mei - 10 mei : 
-	-- astar : forward propagation - copy occ grid to cost grid, any cell that is next to occ will also get a higher cost to move onto?
+	-- (done) astar : forward propagation - cost and path grid, give extra cost to infinities adjacents
+	-- (done) astar : forward propagation - draw the cost grid on the cell, and check if cost calculation makes sense ( we want to give higher cost to edges)
+	
 	-- astar : forward propagation - turn grid values to -1, calling position to 0, move forward, get 
-	-- astar : forward propagation - draw the cost grid on the cell, and check if cost calculation makes sense
 	-- backward propagation : find the path and return it to the calling goblin
 	-- path : show the path for the goblin, as we move around, test near walls and such. What happens if goblin is standing on blocked cell?
 	-- path ; check if first element is better second element, otherwise, remove first element

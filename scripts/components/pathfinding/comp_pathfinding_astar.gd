@@ -42,17 +42,24 @@ extends Node2D
 @export var path_line_width: float = 2.0
 ## The color of the grid if it is available / non-blocked
 @export var grid_color_available: Color = Color(0.2, 0.2, 1.0, 0.949)
+## the color of the grid if is is available, but more expensive
+@export var grid_color_expensive: Color = Color(0.897, 0.968, 0.368, 0.949)
 ## The color of the grid if is is not available
 @export var grid_color_blocked : Color = Color(1.0, 0.2, 0.4, 0.949)
 ## Width of the lines showing the grid
 @export var grid_line_width: float = 3.0
+## Font size used for grid_path value text.
+@export var grid_path_value_font_size: int = 14
+## Color used for grid_path value text.
+@export var grid_path_value_color: Color = Color.WHITE
 
-
+# how much the ENWS borders of a cell that has cost INF also get a further cost
+const EDGE_COST = 1
 
 # The grid that is just true or false, based on whether it is blocked or not
-var grid_occ : Grid
-# The grid that we ust for forward and backward propagation
 var grid_cost : Grid
+# The grid that we ust for forward and backward propagation
+var grid_path : Grid
 # width of the grid, in number of cells
 var grid_width : int = 0
 # height of the grid, in number of cells
@@ -86,11 +93,11 @@ func _initialize_grid() -> void:
 	grid_height = ceil((BottomRight.y - TopLeft.y)/CellSize.y)
 	
 	# initialize our grid with 0 values
-	grid_cost = Grid.new(grid_width, grid_height, 0)
-	grid_cost.set_pixel_coordinates(TopLeft, BottomRight, CellSize)
+	grid_path = Grid.new(grid_width, grid_height, -1)
+	grid_path.set_pixel_coordinates(TopLeft, BottomRight, CellSize)
 
-	grid_occ = Grid.new(grid_width, grid_height, false)
-	grid_occ.set_pixel_coordinates(TopLeft, BottomRight, CellSize)
+	grid_cost = Grid.new(grid_width, grid_height, 1)
+	grid_cost.set_pixel_coordinates(TopLeft, BottomRight, CellSize)
 
 
 
@@ -102,7 +109,7 @@ func _process(delta: float) -> void:
 		_populate_occ_grid()
 
 		# forward propagation
-		
+		forward_propagation()
 
 		# Redraw the grid for testing
 		if draw_astar_enabled:
@@ -114,8 +121,8 @@ func _process(delta: float) -> void:
 #region OCC grid, where we check which cells are blocked
 
 func _populate_occ_grid() -> void:
-	grid_occ.reset_grid(false)
-	if grid_occ.cellSize.x <= 0.0 or grid_occ.cellSize.y <= 0.0:
+	grid_cost.reset_grid(1)       # how much it costs to go to that place
+	if grid_cost.cellSize.x <= 0.0 or grid_cost.cellSize.y <= 0.0:
 		return
 
 	var all_nodes: Array[Node] = General._nodes_in_groups(self, blocking_elements_groups_astar)
@@ -139,13 +146,20 @@ func _populate_occ_grid() -> void:
 			_mark_cells_for_collision_polygon(child as CollisionPolygon2D)
 
 	var floor_rects := _collect_cell_floor_world_rects()
-	var gw: int = grid_occ.grid_width_cells
-	var gh: int = grid_occ.grid_height_cells
+	var gw: int = grid_cost.grid_width_cells
+	var gh: int = grid_cost.grid_height_cells
 	for j in range(gh):
 		for i in range(gw):
-			var center := grid_occ.get_center_pix(Vector2i(i, j))
+			var center := grid_cost.get_center_pix(Vector2i(i, j))
 			if !_center_on_any_floor_rect(center, floor_rects):
-				grid_occ.set_cell(Vector2i(i, j), true)
+				grid_cost.set_cell(Vector2i(i, j), INF)
+				
+				# give cost to edges as well
+				var border_coor = grid_cost.get_border_coordinates(Vector2i(i, j), grid_path.BORDER_COOR_NO_DIAGONAL)
+				for coor in border_coor:
+					var val = grid_cost.get_cell(coor)
+					if val != INF:
+						grid_cost.set_cell(coor, val + EDGE_COST) # give any nearby grids an extra cost
 
 
 func _collect_cell_floor_world_rects() -> Array[Rect2]:
@@ -217,10 +231,10 @@ func _mark_cells_for_collision_polygon(cp: CollisionPolygon2D) -> void:
 func _mark_cells_for_world_rect(world_aabb: Rect2) -> void:
 	if !world_aabb.has_area():
 		return
-	var tl: Vector2 = grid_occ.topLeft
-	var csz: Vector2 = grid_occ.cellSize
-	var gw: int = grid_occ.grid_width_cells
-	var gh: int = grid_occ.grid_height_cells
+	var tl: Vector2 = grid_cost.topLeft
+	var csz: Vector2 = grid_cost.cellSize
+	var gw: int = grid_cost.grid_width_cells
+	var gh: int = grid_cost.grid_height_cells
 	var grid_rect := Rect2(tl, Vector2(gw * csz.x, gh * csz.y))
 	var clipped := world_aabb.intersection(grid_rect)
 	if !clipped.has_area():
@@ -237,16 +251,40 @@ func _mark_cells_for_world_rect(world_aabb: Rect2) -> void:
 		for i in range(i0, i1 + 1):
 			var cell_rect := Rect2(tl.x + i * csz.x, tl.y + j * csz.y, csz.x, csz.y)
 			if cell_rect.intersects(clipped):
-				grid_occ.set_cell(Vector2i(i, j), true)
+				grid_cost.set_cell(Vector2i(i, j), INF)
+				
+				# give cost to edges as well
+				var border_coor = grid_cost.get_border_coordinates(Vector2i(i, j), grid_path.BORDER_COOR_NO_DIAGONAL)
+				for coor in border_coor:
+					var val = grid_cost.get_cell(coor)
+					if val != INF:
+						grid_cost.set_cell(coor, val + EDGE_COST) # give any nearby grids an extra cost
 
 #endregion
 
 #region forward propagation
 
+func reset_grid_path() -> void:
+	
+	grid_path.reset_grid(-1)
+	var coor = grid_path.world_to_grid(global_position)
+	grid_path.set_cell(coor, 0)
+	
+						
+func forward_propagation() -> void:
+	
+	reset_grid_path()
+	
+	
+	
+
+
 #endregion
 
 
 #region backward propagation
+func backward_propagation() -> void:
+	print("backward propagation")
 
 #endregion
 
@@ -257,15 +295,25 @@ func _mark_cells_for_world_rect(world_aabb: Rect2) -> void:
 
 #region : Drawing Helpers
 func _draw() -> void:
-	draw_grid_occ(grid_occ)
+	draw_grid_cost(grid_cost)
+	draw_grid_path_values(grid_path)
 
-func draw_grid_occ(target_grid: Grid) -> void:
+func draw_grid_cost(target_grid: Grid) -> void:
 	var alpha := 0.4 # 0.0 = invisible, 1.0 = opaque
 
 	for x in range(target_grid.grid_width_cells):
 		for y in range(target_grid.grid_height_cells):
 			var val = target_grid.get_cell(Vector2(x, y))
-			var color: Color = grid_color_available if !val else grid_color_blocked
+			#var color: Color = grid_color_available if !val else grid_color_blocked
+			
+			var color: Color = grid_color_available
+			if is_inf(val):
+				color = grid_color_blocked
+			elif val > 1:
+				color = grid_color_expensive
+			else:
+				color = grid_color_available 
+			
 			color.a = alpha
 			
 			var pos := Vector2(
@@ -300,7 +348,51 @@ func draw_grid_occ(target_grid: Grid) -> void:
 			target_grid.grid_line_width
 		)
 
+func draw_grid_path_values(target_grid: Grid) -> void:
+	if target_grid == null:
+		return
 
+	var font: Font = ThemeDB.fallback_font
+	if font == null:
+		return
+
+	for x in range(target_grid.grid_width_cells):
+		for y in range(target_grid.grid_height_cells):
+			var coor := Vector2i(x, y)
+			var val = target_grid.get_cell(coor)
+			var text := str(val)
+
+			# Center of the cell in world coordinates.
+			var world_center: Vector2 = target_grid.get_center_pix(coor)
+
+			# Convert world position to this Node2D's local draw coordinates.
+			var local_center: Vector2 = to_local(world_center)
+
+			var text_size: Vector2 = font.get_string_size(
+				text,
+				HORIZONTAL_ALIGNMENT_LEFT,
+				-1,
+				grid_path_value_font_size
+			)
+
+			var ascent := font.get_ascent(grid_path_value_font_size)
+			var descent := font.get_descent(grid_path_value_font_size)
+
+			# draw_string() uses a baseline position, so compensate for visual centering.
+			var text_pos := Vector2(
+				local_center.x - text_size.x * 0.5,
+				local_center.y + (ascent - descent) * 0.5
+			)
+
+			draw_string(
+				font,
+				text_pos,
+				text,
+				HORIZONTAL_ALIGNMENT_LEFT,
+				-1,
+				grid_path_value_font_size,
+				grid_path_value_color
+			)
 
 
 

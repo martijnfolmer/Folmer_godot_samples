@@ -10,6 +10,7 @@ toposts:
 	-- record this for a post
 	
 	-- backward propagation : find the path and return it to the calling goblin
+	-- math : reverse the arrays, is there a standard function for it
 	-- path : show the path for the goblin, as we move around, test near walls and such. What happens if goblin is standing on blocked cell?
 	
 	-- record this for a post

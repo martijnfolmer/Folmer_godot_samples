@@ -265,6 +265,7 @@ func _mark_cells_for_world_rect(world_aabb: Rect2) -> void:
 
 #region forward propagation
 
+## Do the forward propagation, where we calculate the cost from the calling cell onward
 func forward_propagation() -> void:
 	
 	# reset the grid
@@ -300,8 +301,25 @@ func forward_propagation() -> void:
 
 
 #region backward propagation
-func backward_propagation() -> void:
-	print("backward propagation")
+func backward_propagation(goal_coor : Vector2) -> void:
+	
+	'''
+		To return
+		path_cell -> cell coordinate
+		path_cost -> how much it costs to go there
+		path_coor -> real world coordinates
+	'''
+	
+	# cell coordinates for path
+	var path_cell = []
+	# 
+	var path_cost = []
+	var path_coor = []
+	
+	
+	var path = []
+	path.append(goal_coor)
+	grid_path.get_cell(goal_coor)
 
 #endregion
 

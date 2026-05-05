@@ -53,8 +53,9 @@ extends Node2D
 ## Color used for grid_path value text.
 @export var grid_path_value_color: Color = Color.WHITE
 
-# how much the ENWS borders of a cell that has cost INF also get a further cost
-const EDGE_COST = 1
+@export_group("path cost")
+## how much the ENWS borders of a cell that has cost INF also get a further cost
+@export var EDGE_COST: int = 2
 
 # The grid that is just true or false, based on whether it is blocked or not
 var grid_cost : Grid
@@ -264,21 +265,37 @@ func _mark_cells_for_world_rect(world_aabb: Rect2) -> void:
 
 #region forward propagation
 
-func reset_grid_path() -> void:
+func forward_propagation() -> void:
 	
+	# reset the grid
 	grid_path.reset_grid(-1)
+	
+	# add 0 to the location of the calling instance
 	var coor = grid_path.world_to_grid(global_position)
 	grid_path.set_cell(coor, 0)
 	
-						
-func forward_propagation() -> void:
+	# start the cueu
+	var check_queue = []
+	check_queue.append(coor)
 	
-	reset_grid_path()
-	
-	
-	
-
-
+	# do the forward propagation
+	while check_queue.size() > 0:
+		var check_coor = check_queue.pop_front()
+		var check_cost = grid_path.get_cell(check_coor)
+		
+		var borders = grid_path.get_border_coordinates(check_coor, grid_path.BORDER_COOR_ALL)
+		
+		for b_coor in borders:
+			var b_current_cost = grid_path.get_cell(b_coor)
+			var b_cost_to_get_there = grid_cost.get_cell(b_coor)
+			var new_cost = check_cost + b_cost_to_get_there
+			
+			if b_current_cost == -1:
+				grid_path.set_cell(b_coor, new_cost)
+				check_queue.append(b_coor)
+			elif new_cost < b_current_cost:
+				grid_path.set_cell(b_coor, new_cost)
+				check_queue.append(b_coor)
 #endregion
 
 

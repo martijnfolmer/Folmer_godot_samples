@@ -5,20 +5,35 @@ toposts:
 4 mei - 10 mei : 
 	-- (done) astar : forward propagation - cost and path grid, give extra cost to infinities adjacents
 	-- (done) astar : forward propagation - draw the cost grid on the cell, and check if cost calculation makes sense ( we want to give higher cost to edges)
+	-- (done) astar : forward propagation - turn grid values to -1, calling position to 0, move forward, get 
+
+	-- record this for a post
 	
-	-- astar : forward propagation - turn grid values to -1, calling position to 0, move forward, get 
 	-- backward propagation : find the path and return it to the calling goblin
 	-- path : show the path for the goblin, as we move around, test near walls and such. What happens if goblin is standing on blocked cell?
+	
+	-- record this for a post
+	
 	-- path ; check if first element is better second element, otherwise, remove first element
 	-- path : line of sight function, if we have LOS, and blocking elements don't block, we use it as a path.
 	-- chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
 	-- chase_and_melee -> follow the path and move with it. Dont update path if our state is not conducive to it
 	-- movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line
 
+	-- record multiple goblins doing their thing with pathfinding
+
 NICES
 -- create a lvl that we load
 -- create another lvl 
 -- move between two lvls
+
+Astar updates:
+	- only update every N seconds
+	- only update if we are in active state
+	- spread out forward propagation over multiple frames
+	- do forward propagation on one pip
+	- do backward propagation on another pip
+	- do early breaking of the forward propagation, when target is fully surrounded with costs
 
 
 Todo:

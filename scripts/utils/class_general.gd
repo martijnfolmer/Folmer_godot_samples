@@ -3,6 +3,7 @@ class_name General
 
 """
 	All general functions that we want to reuse
+	
 """
 
 
@@ -50,3 +51,38 @@ static func get_nodes_with_base_name(node: Node, base_name: String) -> Array[Nod
 			matches.append(nodec)
 
 	return matches
+	
+## return the minimum value of an array
+static func get_min_arr(arr: Array):
+	var index = get_min_index_arr(arr)
+	return arr[index]
+
+## return the index of the minimum value of an array
+static func get_min_index_arr(arr: Array) -> int:
+	if arr.is_empty():
+		return -1
+
+	var min_index := 0
+
+	for i in range(1, arr.size()):
+		if arr[i] < arr[min_index]:
+			min_index = i
+
+	return min_index
+
+## return the maximum value of the array
+static func get_max_arr(arr: Array):
+	var index = get_max_index_arr(arr)
+	return arr[index]
+
+static func get_max_index_arr(arr: Array) -> int:
+	if arr.is_empty():
+		return -1
+
+	var max_index := 0
+
+	for i in range(1, arr.size()):
+		if arr[i] < arr[max_index]:
+			max_index = i
+
+	return max_index

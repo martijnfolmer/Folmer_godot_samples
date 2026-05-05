@@ -37,9 +37,9 @@ extends Node2D
 @export var draw_astar_enabled: bool = true
 
 ## Color used for path debug lines.
-@export var path_line_color: Color = Color(0.2, 1.0, 0.2, 0.95)
+@export var path_line_color: Color = Color(0.495, 0.001, 0.658, 0.949)
 ## Width of path debug lines.
-@export var path_line_width: float = 2.0
+@export var path_line_width: float = 5.0
 ## The color of the grid if it is available / non-blocked
 @export var grid_color_available: Color = Color(0.2, 0.2, 1.0, 0.949)
 ## the color of the grid if is is available, but more expensive
@@ -65,6 +65,10 @@ var grid_path : Grid
 var grid_width : int = 0
 # height of the grid, in number of cells
 var grid_height : int = 0
+
+var path_cell : Array = []
+var path_cost : Array = []
+var path_coor : Array = []
 
 
 # Called when the node enters the scene tree for the first time.
@@ -111,6 +115,12 @@ func _process(delta: float) -> void:
 
 		# forward propagation
 		forward_propagation()
+
+		# backward propagation
+		var player_nodes = General._nodes_in_group(self, "player")
+		if player_nodes.size()>0:
+			var player_node = player_nodes.get(0)
+			backward_propagation(grid_cost.world_to_grid(player_node.global_position))# player coordinat
 
 		# Redraw the grid for testing
 		if draw_astar_enabled:
@@ -311,15 +321,43 @@ func backward_propagation(goal_coor : Vector2) -> void:
 	'''
 	
 	# cell coordinates for path
-	var path_cell = []
-	# 
-	var path_cost = []
-	var path_coor = []
+	path_cell = []
+	# Cost of moving to a certain part
+	path_cost = []
+	# grid coordinates for path
+	path_coor = []
 	
 	
-	var path = []
-	path.append(goal_coor)
-	grid_path.get_cell(goal_coor)
+	var cur_loc = goal_coor
+	path_cell.append(goal_coor)
+	path_cost.append(grid_path.get_cell(goal_coor))
+	path_coor.append(grid_path.get_center_pix(goal_coor))
+	var kn = 0
+
+	while true:
+		var all_val = grid_path.get_border_values(cur_loc, true)
+		var all_loc = grid_path.get_border_coordinates(cur_loc, grid_path.BORDER_COOR_ALL)
+		
+		var min_val_idx = General.get_min_index_arr(all_val)
+		var min_val = General.get_min_arr(all_val)
+		var min_coor = all_loc[min_val_idx]
+		
+		cur_loc = min_coor
+		path_cell.append(min_coor)
+		path_cost.append(min_val)
+		path_coor.append(grid_path.get_center_pix(min_coor))
+		
+		if min_val == 0:
+			break
+		kn += 1
+		if kn >= 100:
+			break
+
+	# reverse the paths
+	path_cell.reverse()
+	path_cost.reverse()
+	path_coor.reverse()
+
 
 #endregion
 
@@ -332,6 +370,25 @@ func backward_propagation(goal_coor : Vector2) -> void:
 func _draw() -> void:
 	draw_grid_cost(grid_cost)
 	draw_grid_path_values(grid_path)
+	draw_path_coor()
+
+func draw_path_coor() -> void:
+	if !draw_astar_enabled:
+		return
+
+	if path_coor.size() < 2:
+		return
+
+	for i in range(path_coor.size() - 1):
+		var from_pos: Vector2 = to_local(path_coor[i])
+		var to_pos: Vector2 = to_local(path_coor[i + 1])
+
+		draw_line(
+			from_pos,
+			to_pos,
+			path_line_color,
+			path_line_width
+		)
 
 func draw_grid_cost(target_grid: Grid) -> void:
 	var alpha := 0.4 # 0.0 = invisible, 1.0 = opaque

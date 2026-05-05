@@ -6,12 +6,10 @@ toposts:
 	-- (done) astar : forward propagation - cost and path grid, give extra cost to infinities adjacents
 	-- (done) astar : forward propagation - draw the cost grid on the cell, and check if cost calculation makes sense ( we want to give higher cost to edges)
 	-- (done) astar : forward propagation - turn grid values to -1, calling position to 0, move forward, get 
-
-	-- record this for a post
-	
-	-- backward propagation : find the path and return it to the calling goblin
-	-- math : reverse the arrays, is there a standard function for it
-	-- path : show the path for the goblin, as we move around, test near walls and such. What happens if goblin is standing on blocked cell?
+	-- (done) record this for a post
+	-- (done) backward propagation : find the path and return it to the calling goblin
+	-- (done) general : find min/max index and value of lists
+	-- (done) path : show the path for the goblin, as we move around, test near walls and such. What happens if goblin is standing on blocked cell?
 	
 	-- record this for a post
 	
@@ -70,6 +68,20 @@ Todo:
 		- sounds for txt ticks, different for alchemist or other one
 		- talk to npc in screen, spawn stuff
 		- knockback code cleanup
+	Generals class
+		--mean of an array
+		--summation of an array
+		-- get all nodes belong to group, and closest
+		-- get all nodes belong to group and farthest
+		-- donut random location
+		-- random location circle
+		-- random location more closer than farther away
+	grid class:
+		-- get summation of region
+		-- get summation of column
+		-- get summation of row
+		-- remove column
+		-- remove row
 	Goblin all:
 		- don't just freeze when we are done 
 		- arms go back and forth when walking

@@ -47,6 +47,7 @@ script = ExtResource("7_35bxk")
 [node name="CompPathfindingAstar" parent="." unique_id=1591297447 instance=ExtResource("8_tr4uu")]
 BottomRight = Vector2(2000, 2000)
 CellSize = Vector2(64, 64)
+path_line_width = 10.0
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=2036670946]
 

@@ -56,6 +56,8 @@ extends Node2D
 @export_group("path cost")
 ## how much the ENWS borders of a cell that has cost INF also get a further cost
 @export var EDGE_COST: int = 2
+## How much moving diagonally costs more than moving straight
+@export var additional_diagonal_cost : float = 0.1
 
 # The grid that is just true or false, based on whether it is blocked or not
 var grid_cost : Grid
@@ -297,9 +299,16 @@ func forward_propagation() -> void:
 		var borders = grid_path.get_border_coordinates(check_coor, grid_path.BORDER_COOR_ALL)
 		
 		for b_coor in borders:
+			
+			# Check if this is a diagonal thing. If so, we add a little extra cost
+			var dist = abs(check_coor.x - b_coor.x) + abs(check_coor.y - b_coor.y)
+			var add_cost = 0
+			if dist > 1.0:
+				add_cost = additional_diagonal_cost
+			
 			var b_current_cost = grid_path.get_cell(b_coor)
 			var b_cost_to_get_there = grid_cost.get_cell(b_coor)
-			var new_cost = check_cost + b_cost_to_get_there
+			var new_cost = check_cost + b_cost_to_get_there + add_cost
 			
 			if b_current_cost == -1:
 				grid_path.set_cell(b_coor, new_cost)

@@ -30,6 +30,9 @@ sprite_chest_outline_path = NodePath("CharacterBody2D/SpriteChest/SpriteChest_ou
 sprite_head_outline_path = NodePath("CharacterBody2D/SpriteChest/SpriteHead_outline")
 
 [node name="CompDamage" parent="." unique_id=1256099559 instance=ExtResource("2_5palr")]
+shake_intensity = 10.0
+shake_duration = 1.0
+shake_target_path = NodePath("../CharacterBody2D/SpriteChest")
 blood_smear_color = Color(0, 0.4016261, 0.6899639, 1)
 
 [node name="CompBodyKickback" parent="." unique_id=876922541 instance=ExtResource("3_bawqr")]

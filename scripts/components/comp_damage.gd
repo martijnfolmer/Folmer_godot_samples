@@ -7,6 +7,8 @@ extends Node
 @export var shake_intensity: float = 8.0
 @export var shake_duration: float = 0.4
 @export var shake_frequency: float = 30.0
+## When set, shake offsets this node's local `position` only (collision / actor root stay stable). When empty, shakes `get_parent()` (legacy).
+@export var shake_target_path: NodePath = NodePath("")
 
 @export_group("Blood smear")
 @export var blood_smear_enabled: bool = true
@@ -17,6 +19,7 @@ const DEFAULT_BLOOD_SMEAR_SCENE := preload("res://scenes/Samples/particles/partB
 var hp_c: int
 var _shake_timer: float = 0.0
 var _origin_pos: Vector2
+var _shake_target: Node2D
 
 var blood_smear_scene: PackedScene
 var blood_smear_direction = null
@@ -30,6 +33,9 @@ func _ready() -> void:
 	# Start with full health and disable shake processing until needed.
 	hp_c = hp_total
 	set_process(false)
+
+	if not shake_target_path.is_empty():
+		_shake_target = get_node_or_null(shake_target_path) as Node2D
 
 	# Use the default smear scene when none was injected in-editor.
 	if blood_smear_scene == null:
@@ -50,29 +56,37 @@ func _process(delta: float) -> void:
 ################
 # Shake feedback
 ################
-## Begin the short random shake effect on the parent node.
+## Begin the short random shake effect on the configured shake node (or parent when path is unset).
 func _start_shake() -> void:
-	# Capture original position so it can be restored when shake ends.
-	_origin_pos = get_parent().position
+	var node := _shake_node()
+	if node == null:
+		return
+	_origin_pos = node.position
 	_shake_timer = shake_duration
 	set_process(true)
 
 ## Update the active shake effect and decay amplitude over time.
 func _shaking(delta: float) -> void:
-	_shake_timer -= delta
-	if _shake_timer <= 0.0:
-		get_parent().position = _origin_pos
+	var node := _shake_node()
+	if node == null:
+		_shake_timer = 0.0
 		set_process(false)
 		return
 
-	# Compute decayed random offset and apply to parent.
+	_shake_timer -= delta
+	if _shake_timer <= 0.0:
+		node.position = _origin_pos
+		set_process(false)
+		return
+
+	# Compute decayed random offset and apply in the shake target's local space.
 	var decay: float = _shake_timer / shake_duration
 	var amplitude: float = shake_intensity * decay
 	var offset := Vector2(
 		randf_range(-amplitude, amplitude),
 		randf_range(-amplitude, amplitude)
 	)
-	get_parent().position = _origin_pos + offset
+	node.position = _origin_pos + offset
 
 
 ###################
@@ -168,6 +182,13 @@ func spawn_blood_smear(global_pos: Vector2, color: Color = Color.GREEN) -> void:
 ###########
 # Helpers
 ###########
+## Node whose local position receives shake offsets: explicit target, else parent as Node2D.
+func _shake_node() -> Node2D:
+	if _shake_target != null and is_instance_valid(_shake_target):
+		return _shake_target
+	return get_parent() as Node2D
+
+
 ## Return the first CharacterBody2D sibling under the same parent, if any.
 func get_characterbody2d_sibling() -> CharacterBody2D:
 	var parent := get_parent()

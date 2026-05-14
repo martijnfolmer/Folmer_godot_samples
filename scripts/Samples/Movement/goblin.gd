@@ -63,6 +63,9 @@ var _base_scale_arm_r_outline: Vector2 = Vector2.ONE
 var _base_scale_chest_outline: Vector2 = Vector2.ONE
 var _base_scale_head_outline: Vector2 = Vector2.ONE
 
+## Physics body whose world position is authoritative; root follows so siblings (e.g. pathfinding) stay aligned.
+var _character_body: CharacterBody2D
+
 
 # =========================================================
 # LIFECYCLE
@@ -71,6 +74,7 @@ var _base_scale_head_outline: Vector2 = Vector2.ONE
 ## Register goblin group membership and hook kickback events.
 func _ready() -> void:
 	add_to_group("goblin")
+	_character_body = get_node_or_null("CharacterBody2D") as CharacterBody2D
 
 	# Bind kickback signals from CompBodyKickBack used for dazed state and slam death.
 	var kickback := get_node_or_null("CompBodyKickback")
@@ -94,6 +98,11 @@ func _ready() -> void:
 
 ## Update visuals each frame while active.
 func _process(delta: float) -> void:
+	# Kickback moves CharacterBody2D only; move root so components under GoblinBasic share world origin.
+	if _character_body != null:
+		global_position = _character_body.global_position
+		_character_body.position = Vector2.ZERO
+
 	_update_part_scale_pulse(delta)
 
 	if not _dazed or _dazed_orbit_sprites.is_empty():

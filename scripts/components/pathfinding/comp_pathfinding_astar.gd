@@ -114,16 +114,41 @@ func _initialize_grid() -> void:
 func _process(delta: float) -> void:
 	
 	if enable:
-		# Occupied the occ
-		_populate_occ_grid()
-
-		# forward propagation
-		forward_propagation()
-
-		# backward propagation
+		
+		#region Check direct line of sight possible
+		
+		# check if player exists
+		var player_node = null
 		var player_nodes = General.nodes_in_group(self, "player")
-		if player_nodes.size()>0:
-			var player_node = player_nodes.get(0)
+		if player_nodes.size() > 0:
+			player_node = player_nodes.get(0)
+		else:
+			return
+		
+		var player_world: Vector2 = player_node.global_position
+		var enemy_world: Vector2 = global_position
+		var blocked = General._blocked_by_LOS(
+			self,
+			enemy_world.x,
+			enemy_world.y,
+			player_world.x,
+			player_world.y,
+			blocking_elements_groups_astar
+		)
+		
+		# Do a line of sight path
+		if !blocked:
+			path_coor = []
+			path_coor.append(enemy_world)
+			path_coor.append(player_world)
+		else:
+			# Occupied the occ
+			_populate_occ_grid()
+
+			# forward propagation
+			forward_propagation()
+
+			# backward propagation
 			backward_propagation(grid_cost.world_to_grid(player_node.global_position))# player coordinat
 
 		# Redraw the grid for testing
@@ -348,7 +373,6 @@ func backward_propagation(goal_coor : Vector2) -> void:
 		var second_dist = second_coor.distance_to(global_position)
 		
 		if second_dist < first_dist + first_to_second_dist:
-			
 			path_cell.pop_front()
 			path_cost.pop_front()
 			path_coor.pop_front()

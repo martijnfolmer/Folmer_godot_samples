@@ -9,7 +9,7 @@ class_name General
 ## Line of sight collision
 static func _blocked_by_LOS(node: Node, x1 : float, y1: float, x2 : float, y2 : float, groups: Array[StringName]) -> bool:
 	
-	var all_nodes = nodes_in_groups(node, groups)
+	var all_nodes = nodes_in_groups(node, groups, true)
 	if all_nodes.size()==0:
 		return false
 	
@@ -71,16 +71,29 @@ static func collision_polygon_world_aabb(cp: CollisionPolygon2D) -> Rect2:
 
 
 ## Get all nodes in the current tree of this node that belong to a certain group
-static func nodes_in_group(node: Node, group: StringName) -> Array[Node]:
-	return node.get_tree().get_nodes_in_group(group)
+static func nodes_in_group(node: Node, group: StringName, exclude_self: bool = false) -> Array[Node]:
+	var allNodes = node.get_tree().get_nodes_in_group(group)
+	
+	# Don't pass ourself away if we are excluding self
+	if exclude_self:
+		var nodesAdd = []
+		for nodec in allNodes:
+			if nodec != node and nodec.get_parent()!= node:
+				nodesAdd.append(nodec)
+		allNodes = nodesAdd
+	
+	return allNodes
 
 ## Return all nodes in the scene that the node belongs to, that belong to at least one group as 
 ## defined in the group array
-static func nodes_in_groups(node: Node, groups: Array[StringName]) -> Array[Node]:
+static func nodes_in_groups(node: Node, groups: Array[StringName], exclude_self: bool = false) -> Array[Node]:
 	var all_nodes: Array[Node] = []
 	for group in groups:
 		var NodeArray = nodes_in_group(node, group)
 		for nodeCur in NodeArray:
+			
+			if exclude_self and (nodeCur == node or nodeCur == node.get_parent()):
+				continue	
 			all_nodes.append(nodeCur)
 	return all_nodes
 

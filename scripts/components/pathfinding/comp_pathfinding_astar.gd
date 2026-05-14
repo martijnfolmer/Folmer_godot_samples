@@ -69,9 +69,9 @@ var grid_width : int = 0
 # height of the grid, in number of cells
 var grid_height : int = 0
 
-var path_cell : Array = []
-var path_cost : Array = []
-var path_coor : Array = []
+var path_cell : Array = []		# the cell coordinates of the path
+var path_cost : Array = []		# how much it costs to go there
+var path_coor : Array = []		# the pixel coordinates
 
 
 # Called when the node enters the scene tree for the first time.
@@ -336,6 +336,22 @@ func backward_propagation(goal_coor : Vector2) -> void:
 	path_cell.reverse()
 	path_cost.reverse()
 	path_coor.reverse()
+
+
+	# check if the next coordinate is closer than the first
+	if path_coor.size() > 1:
+		var first_coor = path_coor.get(0)
+		var second_coor = path_coor.get(1)
+		
+		var first_dist = first_coor.distance_to(global_position)
+		var first_to_second_dist = first_coor.distance_to(second_coor)
+		var second_dist = second_coor.distance_to(global_position)
+		
+		if second_dist < first_dist + first_to_second_dist:
+			
+			path_cell.pop_front()
+			path_cost.pop_front()
+			path_coor.pop_front()
 
 
 #endregion

@@ -182,6 +182,56 @@ func get_border_coordinates(pos: Vector2i, border_coor: Array) -> Array:
 	return all_coordinates
 
 
+## Cell values along the discrete line from [param pos1] to [param pos2] (inclusive order).
+## Only in-bounds cells are included, pass on world coordinates
+func get_line_values_pix_coor(pos1: Vector2, pos2: Vector2) -> Array:
+	var cellCoor1 = world_to_grid(pos1)
+	var cellCoor2 = world_to_grid(pos2)
+	return get_line_values_grid_coor(cellCoor1, cellCoor2)
+
+
+## Cell values along the discrete line from [param pos1] to [param pos2] (inclusive order).
+## Only in-bounds cells are included, pass on grid coordinates
+func get_line_values_grid_coor(pos1: Vector2i, pos2: Vector2i) -> Array:
+	var all_values: Array = []
+
+	for coor in get_line_coordinates(pos1, pos2):
+		all_values.append(get_cell(coor))
+
+	return all_values
+
+
+## Integer Bresenham line from [param pos1] to [param pos2], inclusive, in traversal order.
+## Only coordinates inside the grid are returned so callers can safely use [method get_cell]
+func get_line_coordinates(pos1: Vector2i, pos2: Vector2i) -> Array[Vector2i]:
+	var all_coordinates: Array[Vector2i] = []
+	var x0: int = pos1.x
+	var y0: int = pos1.y
+	var x1: int = pos2.x
+	var y1: int = pos2.y
+	var dx: int = absi(x1 - x0)
+	var dy: int = -absi(y1 - y0)
+	var sx: int = signi(x1 - x0)
+	var sy: int = signi(y1 - y0)
+	var err: int = dx + dy
+
+	while true:
+		var p := Vector2i(x0, y0)
+		if is_in_bounds(p):
+			all_coordinates.append(p)
+		if x0 == x1 and y0 == y1:
+			break
+		var e2: int = err + err
+		if e2 >= dy:
+			err += dy
+			x0 += sx
+		if e2 <= dx:
+			err += dx
+			y0 += sy
+
+	return all_coordinates
+
+
 #endregion
 
 

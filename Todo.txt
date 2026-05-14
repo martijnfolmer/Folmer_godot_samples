@@ -9,10 +9,11 @@ toposts:
 	-- chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
 	-- chase_and_melee -> follow the path and move with it. Dont update path if our state is not conducive to it
 	-- movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line
+	-- record multiple goblins doing their thing with pathfinding
+	
 	-- (done) manual grid placement
 	-- (done) path drawing takes the topleft into account
-	-- cleanup
-	-- record multiple goblins doing their thing with pathfinding
+	-- (done) cleanup arena with sorting all things below nodes
 
 NICES
 -- create a lvl that we load

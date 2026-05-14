@@ -34,6 +34,9 @@ extends Node2D
 ## When true, draws the active path from the body to waypoints in the editor/game view.
 @export var draw_astar_enabled: bool = true
 
+## When true, draws the line of sight to the player, if the player still exists
+@export var draw_los_enabled: bool = true
+
 ## Color used for path debug lines.
 @export var path_line_color: Color = Color(0.495, 0.001, 0.658, 0.949)
 ## Width of path debug lines.
@@ -118,7 +121,7 @@ func _process(delta: float) -> void:
 		forward_propagation()
 
 		# backward propagation
-		var player_nodes = General._nodes_in_group(self, "player")
+		var player_nodes = General.nodes_in_group(self, "player")
 		if player_nodes.size()>0:
 			var player_node = player_nodes.get(0)
 			backward_propagation(grid_cost.world_to_grid(player_node.global_position))# player coordinat
@@ -137,7 +140,7 @@ func _populate_occ_grid() -> void:
 	if grid_cost.cellSize.x <= 0.0 or grid_cost.cellSize.y <= 0.0:
 		return
 
-	var all_nodes: Array[Node] = General._nodes_in_groups(self, blocking_elements_groups_astar)
+	var all_nodes: Array[Node] = General.nodes_in_groups(self, blocking_elements_groups_astar)
 	
 	# filter the parent node (goblin) from this population
 	var exclude_node := get_parent()
@@ -183,7 +186,7 @@ func _collect_cell_floor_world_rects() -> Array[Rect2]:
 		if !is_instance_valid(n):
 			continue
 		for child in n.find_children("*", "CollisionShape2D", true, false):
-			var r := _collision_shape_world_aabb(child as CollisionShape2D)
+			var r := General.collision_shape_world_aabb(child as CollisionShape2D)
 			if r.has_area():
 				rects.append(r)
 	return rects
@@ -196,46 +199,14 @@ func _center_on_any_floor_rect(center: Vector2, floor_rects: Array[Rect2]) -> bo
 	return false
 
 
-## Axis-aligned world bounds of a collision shape (handles rotation / skew).
-func _collision_shape_world_aabb(cs: CollisionShape2D) -> Rect2:
-	if cs == null or cs.disabled or cs.shape == null:
-		return Rect2()
-	var lr: Rect2 = cs.shape.get_rect()
-	var xf: Transform2D = cs.global_transform
-	var corners: Array[Vector2] = [
-		xf * lr.position,
-		xf * Vector2(lr.end.x, lr.position.y),
-		xf * Vector2(lr.position.x, lr.end.y),
-		xf * lr.end,
-	]
-	var r := Rect2(corners[0], Vector2.ZERO)
-	for i in range(1, 4):
-		r = r.merge(Rect2(corners[i], Vector2.ZERO))
-	return r
-
-
-func _collision_polygon_world_aabb(cp: CollisionPolygon2D) -> Rect2:
-	if cp == null or cp.disabled or cp.polygon.is_empty():
-		return Rect2()
-	var xf: Transform2D = cp.global_transform
-	var min_v: Vector2 = xf * cp.polygon[0]
-	var max_v: Vector2 = min_v
-	for i in range(1, cp.polygon.size()):
-		var q: Vector2 = xf * cp.polygon[i]
-		min_v.x = min(min_v.x, q.x)
-		min_v.y = min(min_v.y, q.y)
-		max_v.x = max(max_v.x, q.x)
-		max_v.y = max(max_v.y, q.y)
-	return Rect2(min_v, max_v - min_v)
-
 ## turn collisionshape into a rectangle that we can mark cells with
 func _mark_cells_for_collision_shape(cs: CollisionShape2D) -> void:
-	var aabb := _collision_shape_world_aabb(cs)
+	var aabb = General.collision_shape_world_aabb(cs)
 	_mark_cells_for_world_rect(aabb)
 
 ## turn polygon to rectangle, so we can mark cells that collide with the rectangle
 func _mark_cells_for_collision_polygon(cp: CollisionPolygon2D) -> void:
-	var aabb := _collision_polygon_world_aabb(cp)
+	var aabb = General.collision_polygon_world_aabb(cp)
 	_mark_cells_for_world_rect(aabb)
 
 
@@ -375,10 +346,52 @@ func backward_propagation(goal_coor : Vector2) -> void:
 
 
 #region : Drawing Helpers
+
+func draw_los() -> void:
+	
+	if draw_los_enabled:
+	
+		# check if player exists
+		var player_node = null
+		var player_nodes = General.nodes_in_group(self, "player")
+		if player_nodes.size()>0:
+			player_node = player_nodes.get(0)
+		else:
+			return
+
+		# LOS checks use world-space AABBs (see General._blocked_by_LOS).
+		var player_world: Vector2 = player_node.global_position
+		var enemy_world: Vector2 = global_position
+		var blocked = General._blocked_by_LOS(
+			self,
+			enemy_world.x,
+			enemy_world.y,
+			player_world.x,
+			player_world.y,
+			blocking_elements_groups_los
+		)
+
+		var color = Color.GREEN
+		if blocked:
+			color = Color.RED
+
+		# _draw() expects local coordinates (same as draw_path_coor).
+		draw_line(
+			Vector2.ZERO,
+			to_local(player_world),
+			color,
+			path_line_width
+		)
+		#draw_circle(enemy_pos, 150.0, Color.AQUA)
+		#draw_circle(player_pos, 150.0, Color.AQUA)
+	
+
 func _draw() -> void:
 	draw_grid_cost(grid_cost)
 	draw_grid_path_values(grid_path)
 	draw_path_coor()
+	
+	draw_los()
 
 func draw_path_coor() -> void:
 	if !draw_astar_enabled:

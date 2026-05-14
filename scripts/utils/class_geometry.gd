@@ -147,6 +147,93 @@ static func closest_point_to_polygon(p: Vector2, poly: PackedVector2Array, inclu
 
 	return best
 
+#region Intersection
+##############
+# Intersection
+###############
+
+## Checks if two bounded lines intersect or not
+static func line_intersects_line(x1: float, y1: float, x2: float, y2: float,
+								x3: float, y3: float, x4: float, y4: float) -> bool:
+	var p := Vector2(x1, y1)
+	var r := Vector2(x2 - x1, y2 - y1)
+
+	var q := Vector2(x3, y3)
+	var s := Vector2(x4 - x3, y4 - y3)
+
+	var rxs := r.cross(s)
+	var q_p := q - p
+	var qpxr := q_p.cross(r)
+
+	# Collinear
+	if is_zero_approx(rxs) and is_zero_approx(qpxr):
+		var r_dot_r := r.dot(r)
+		if is_zero_approx(r_dot_r):
+			return p == q
+
+		var t0 := q_p.dot(r) / r_dot_r
+		var t1 := t0 + s.dot(r) / r_dot_r
+
+		if t0 > t1:
+			var temp := t0
+			t0 = t1
+			t1 = temp
+
+		return t0 <= 1.0 and t1 >= 0.0
+
+	# Parallel but not collinear
+	if is_zero_approx(rxs):
+		return false
+
+	var t := q_p.cross(s) / rxs
+	var u := q_p.cross(r) / rxs
+
+	return t >= 0.0 and t <= 1.0 and u >= 0.0 and u <= 1.0
+
+## Checks if a bounded line intersects with a rectangle
+static func line_intersects_rect(x1: float, y1: float,x2: float, y2: float,rect: Rect2) -> bool:
+	var p1 := Vector2(x1, y1)
+	var p2 := Vector2(x2, y2)
+
+	# If either endpoint is inside the rectangle
+	if rect.has_point(p1) or rect.has_point(p2):
+		return true
+
+	var left := rect.position.x
+	var right := rect.position.x + rect.size.x
+	var top := rect.position.y
+	var bottom := rect.position.y + rect.size.y
+
+	# Check against all 4 rectangle edges
+	return (
+		line_intersects_line(x1, y1, x2, y2, left, top, right, top) or
+		line_intersects_line(x1, y1, x2, y2, right, top, right, bottom) or
+		line_intersects_line(x1, y1, x2, y2, right, bottom, left, bottom) or
+		line_intersects_line(x1, y1, x2, y2, left, bottom, left, top)
+	)
+
+## Check if a bounded line intersects with a circle 
+static func line_intersects_circle(x1: float, y1: float,x2: float, y2: float,circle_center: Vector2,radius: float) -> bool:
+	var a := Vector2(x1, y1)
+	var b := Vector2(x2, y2)
+
+	var ab := b - a
+	var ac := circle_center - a
+
+	var ab_len_sq := ab.length_squared()
+
+	# Degenerate line: the segment is just a point
+	if is_zero_approx(ab_len_sq):
+		return a.distance_squared_to(circle_center) <= radius * radius
+
+	# Project circle center onto the bounded segment
+	var t := ac.dot(ab) / ab_len_sq
+	t = clamp(t, 0.0, 1.0)
+
+	var closest_point := a + ab * t
+
+	return closest_point.distance_squared_to(circle_center) <= radius * radius
+#endregion
 
 # -----------------------------
 # Overlaps

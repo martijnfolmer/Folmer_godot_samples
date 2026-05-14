@@ -614,62 +614,72 @@ position = Vector2(1300, 0)
 topLeft = Vector2(-100, -100)
 bottomRight = Vector2(1500, 1250)
 
-[node name="Pillar" parent="." unique_id=1493386293 instance=ExtResource("1_bjjws")]
-position = Vector2(374, 826)
-
-[node name="Pillar2" parent="." unique_id=139601998 instance=ExtResource("1_bjjws")]
-position = Vector2(1306, 482)
-
-[node name="Pillar3" parent="." unique_id=411479620 instance=ExtResource("1_bjjws")]
-position = Vector2(1374, 1063)
-
-[node name="Pillar4" parent="." unique_id=1840937098 instance=ExtResource("1_bjjws")]
-position = Vector2(717, 1137)
-
-[node name="Pillar5" parent="." unique_id=468483794 instance=ExtResource("1_bjjws")]
-position = Vector2(672, 160)
-
-[node name="Pillar6" parent="." unique_id=1377363234 instance=ExtResource("1_bjjws")]
-position = Vector2(1378, 774)
-
-[node name="Pillar7" parent="." unique_id=543767131 instance=ExtResource("1_bjjws")]
-position = Vector2(928, 160)
-
-[node name="Pillar8" parent="." unique_id=953461983 instance=ExtResource("1_bjjws")]
-position = Vector2(1073, 388)
-
-[node name="Pillar9" parent="." unique_id=1156426203 instance=ExtResource("1_bjjws")]
-position = Vector2(688, 560)
-
-[node name="Pillar10" parent="." unique_id=1224326118 instance=ExtResource("1_bjjws")]
-position = Vector2(366, 318)
-
-[node name="Pillar11" parent="." unique_id=1751347978 instance=ExtResource("1_bjjws")]
-position = Vector2(1023, 740)
-
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
 position = Vector2(441, 1089)
 
-[node name="GoblinBasic" parent="." unique_id=574766309 instance=ExtResource("3_00l21")]
-position = Vector2(486, 551)
+[node name="EnvironmentalObjects" type="Node2D" parent="." unique_id=1557441985]
 
-[node name="Wall" parent="." unique_id=592342518 instance=ExtResource("8_cxbq3")]
+[node name="walls" type="Node2D" parent="EnvironmentalObjects" unique_id=926002764]
+
+[node name="Wall" parent="EnvironmentalObjects/walls" unique_id=592342518 instance=ExtResource("8_cxbq3")]
 position = Vector2(390, 720)
 
-[node name="Wall2" parent="." unique_id=1092318142 instance=ExtResource("8_cxbq3")]
+[node name="Wall2" parent="EnvironmentalObjects/walls" unique_id=1092318142 instance=ExtResource("8_cxbq3")]
 position = Vector2(491, 720)
 
-[node name="Wall3" parent="." unique_id=860934339 instance=ExtResource("8_cxbq3")]
+[node name="Wall3" parent="EnvironmentalObjects/walls" unique_id=860934339 instance=ExtResource("8_cxbq3")]
 position = Vector2(592, 720)
 
-[node name="Glass" parent="." unique_id=680498862 instance=ExtResource("9_7ql2u")]
+[node name="Glass" type="Node2D" parent="EnvironmentalObjects" unique_id=1741319501]
+
+[node name="Glass" parent="EnvironmentalObjects/Glass" unique_id=680498862 instance=ExtResource("9_7ql2u")]
 position = Vector2(838, 920)
 rotation = 1.5707964
 
-[node name="Glass2" parent="." unique_id=1970894080 instance=ExtResource("9_7ql2u")]
+[node name="Glass2" parent="EnvironmentalObjects/Glass" unique_id=1970894080 instance=ExtResource("9_7ql2u")]
 position = Vector2(838, 1017)
 rotation = 1.5707964
 
-[node name="Glass3" parent="." unique_id=1725767937 instance=ExtResource("9_7ql2u")]
+[node name="Glass3" parent="EnvironmentalObjects/Glass" unique_id=1725767937 instance=ExtResource("9_7ql2u")]
 position = Vector2(838, 1117)
 rotation = 1.5707964
+
+[node name="Pillars" type="Node2D" parent="EnvironmentalObjects" unique_id=2002426855]
+
+[node name="Pillar" parent="EnvironmentalObjects/Pillars" unique_id=1493386293 instance=ExtResource("1_bjjws")]
+position = Vector2(374, 826)
+
+[node name="Pillar2" parent="EnvironmentalObjects/Pillars" unique_id=139601998 instance=ExtResource("1_bjjws")]
+position = Vector2(1306, 482)
+
+[node name="Pillar3" parent="EnvironmentalObjects/Pillars" unique_id=411479620 instance=ExtResource("1_bjjws")]
+position = Vector2(1374, 1063)
+
+[node name="Pillar4" parent="EnvironmentalObjects/Pillars" unique_id=1840937098 instance=ExtResource("1_bjjws")]
+position = Vector2(717, 1137)
+
+[node name="Pillar5" parent="EnvironmentalObjects/Pillars" unique_id=468483794 instance=ExtResource("1_bjjws")]
+position = Vector2(672, 160)
+
+[node name="Pillar6" parent="EnvironmentalObjects/Pillars" unique_id=1377363234 instance=ExtResource("1_bjjws")]
+position = Vector2(1378, 774)
+
+[node name="Pillar7" parent="EnvironmentalObjects/Pillars" unique_id=543767131 instance=ExtResource("1_bjjws")]
+position = Vector2(928, 160)
+
+[node name="Pillar8" parent="EnvironmentalObjects/Pillars" unique_id=953461983 instance=ExtResource("1_bjjws")]
+position = Vector2(1073, 388)
+
+[node name="Pillar9" parent="EnvironmentalObjects/Pillars" unique_id=1156426203 instance=ExtResource("1_bjjws")]
+position = Vector2(688, 560)
+
+[node name="Pillar10" parent="EnvironmentalObjects/Pillars" unique_id=1224326118 instance=ExtResource("1_bjjws")]
+position = Vector2(366, 318)
+
+[node name="Pillar11" parent="EnvironmentalObjects/Pillars" unique_id=1751347978 instance=ExtResource("1_bjjws")]
+position = Vector2(1023, 740)
+
+[node name="Enemies" type="Node2D" parent="." unique_id=484721479]
+
+[node name="GoblinBasic" parent="Enemies" unique_id=574766309 instance=ExtResource("3_00l21")]
+position = Vector2(486, 551)

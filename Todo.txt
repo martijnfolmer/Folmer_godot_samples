@@ -2,23 +2,14 @@ toposts:
 	- astar path calculation
 	- astar path following
 
-4 mei - 10 mei : 
-	-- (done) astar : forward propagation - cost and path grid, give extra cost to infinities adjacents
-	-- (done) astar : forward propagation - draw the cost grid on the cell, and check if cost calculation makes sense ( we want to give higher cost to edges)
-	-- (done) astar : forward propagation - turn grid values to -1, calling position to 0, move forward, get 
-	-- (done) record this for a post
-	-- (done) backward propagation : find the path and return it to the calling goblin
-	-- (done) general : find min/max index and value of lists
-	-- (done) path : show the path for the goblin, as we move around, test near walls and such. What happens if goblin is standing on blocked cell?
-	
-	-- record this for a post
-	
+
+- 11 mei - 17 mei
 	-- path ; check if first element is better second element, otherwise, remove first element
 	-- path : line of sight function, if we have LOS, and blocking elements don't block, we use it as a path.
 	-- chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
 	-- chase_and_melee -> follow the path and move with it. Dont update path if our state is not conducive to it
 	-- movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line
-
+	-- manual grid placement
 	-- record multiple goblins doing their thing with pathfinding
 
 NICES
@@ -173,3 +164,14 @@ Concrete steps (20 - 26 april):
 	-- grid : world coordinates to cell coordinates
 	-- astar : Use selection rect to define where it is
 	-- astar : no cell, it is blocked as well
+
+4 mei - 10 mei : 
+	-- (done) astar : forward propagation - cost and path grid, give extra cost to infinities adjacents
+	-- (done) astar : forward propagation - draw the cost grid on the cell, and check if cost calculation makes sense ( we want to give higher cost to edges)
+	-- (done) astar : forward propagation - turn grid values to -1, calling position to 0, move forward, get 
+	-- (done) record this for a post
+	-- (done) backward propagation : find the path and return it to the calling goblin
+	-- (done) general : find min/max index and value of lists
+	-- (done) path : show the path for the goblin, as we move around, test near walls and such. What happens if goblin is standing on blocked cell?
+	-- (done) path : extra cost to diagonal
+	-- (done) record this for a post

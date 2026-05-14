@@ -21,7 +21,7 @@ func _draw() -> void:
 	draw_rect(local_rect, rect_color, true)
 	draw_rect(local_rect, border_color, false, 2.0)
 	
-	print(rect)
+	#print(rect)
 
 func set_rect_from_points(a: Vector2, b: Vector2) -> void:
 	# Points are in this node's local coordinate space.

@@ -14,14 +14,12 @@ extends Node2D
 @export var enable : bool = true
 
 
-## The top left coordinates of the grid we check
+## The top left coordinates of the grid we check (should be overwritten)
 @export var TopLeft : Vector2 = Vector2.ZERO
-## The bottom right coordinates of the grid we check
+## The bottom right coordinates of the grid we check (should be overwritten)
 @export var BottomRight : Vector2 = Vector2.ZERO
 ## The size of the cell (width x height)
 @export var CellSize : Vector2 = Vector2.ZERO
-
-
 
 
 @export_group("blocking_elements")
@@ -83,6 +81,7 @@ func _initialize_grid() -> void:
 	
 	# Find the closest selection rect that we can use for pathfinding
 	var allSelectionRects = General.get_nodes_with_base_name(self, "CompPathfindingSelectionRect")
+
 	if allSelectionRects.size() > 0:
 		# Find the closest rect
 		var closestRect= allSelectionRects.get(0)
@@ -418,8 +417,8 @@ func draw_grid_cost(target_grid: Grid) -> void:
 			color.a = alpha
 			
 			var pos := Vector2(
-				x * target_grid.cellSize.x - global_position.x,
-				y * target_grid.cellSize.y - global_position.y
+				x * target_grid.cellSize.x - global_position.x + TopLeft.x,
+				y * target_grid.cellSize.y - global_position.y + TopLeft.y
 			)
 
 
@@ -433,8 +432,8 @@ func draw_grid_cost(target_grid: Grid) -> void:
 	for x in range(target_grid.grid_width_cells + 1):
 		var px = x * target_grid.cellSize.x
 		draw_line(
-			Vector2(px - global_position.x,  - global_position.y),
-			Vector2(px - global_position.x, height_px - global_position.y),
+			Vector2(px - global_position.x,  - global_position.y) + TopLeft,
+			Vector2(px - global_position.x, height_px - global_position.y) + TopLeft,
 			target_grid.grid_color,
 			target_grid.grid_line_width
 		)
@@ -443,8 +442,8 @@ func draw_grid_cost(target_grid: Grid) -> void:
 	for y in range(target_grid.grid_height_cells + 1):
 		var py = y * target_grid.cellSize.y
 		draw_line(
-			Vector2(-global_position.x, py - global_position.y),
-			Vector2(width_px - global_position.x, py - global_position.y),
+			Vector2(-global_position.x, py - global_position.y)+ TopLeft,
+			Vector2(width_px - global_position.x, py - global_position.y)+ TopLeft,
 			target_grid.grid_color,
 			target_grid.grid_line_width
 		)
@@ -484,6 +483,7 @@ func draw_grid_path_values(target_grid: Grid) -> void:
 				local_center.x - text_size.x * 0.5,
 				local_center.y + (ascent - descent) * 0.5
 			)
+			
 
 			draw_string(
 				font,
@@ -494,7 +494,4 @@ func draw_grid_path_values(target_grid: Grid) -> void:
 				grid_path_value_font_size,
 				grid_path_value_color
 			)
-
-
-
 #endregion

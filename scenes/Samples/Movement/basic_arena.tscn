@@ -644,6 +644,18 @@ rotation = 1.5707964
 position = Vector2(838, 1117)
 rotation = 1.5707964
 
+[node name="Glass4" parent="EnvironmentalObjects/Glass" unique_id=1585850609 instance=ExtResource("9_7ql2u")]
+position = Vector2(200, 600)
+rotation = 1.5707964
+
+[node name="Glass5" parent="EnvironmentalObjects/Glass" unique_id=2029890020 instance=ExtResource("9_7ql2u")]
+position = Vector2(199.99994, 500)
+rotation = 1.5707964
+
+[node name="Glass6" parent="EnvironmentalObjects/Glass" unique_id=1048279192 instance=ExtResource("9_7ql2u")]
+position = Vector2(200, 400)
+rotation = 1.5707964
+
 [node name="Pillars" type="Node2D" parent="EnvironmentalObjects" unique_id=2002426855]
 
 [node name="Pillar" parent="EnvironmentalObjects/Pillars" unique_id=1493386293 instance=ExtResource("1_bjjws")]

@@ -397,7 +397,7 @@ static func IOU_rect(box1: Rect2, box2: Rect2) -> float:
 	
 	
 # points: Array[Vector2] or PackedVector2Array
-## Returns the polygon area as a positive float.	
+## Returns the polygon area as a positive float, using shoelace theorem
 static func polygon_area(points: PackedVector2Array) -> float:
 
 	if points.size() < 3:

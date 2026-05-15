@@ -121,7 +121,7 @@ var _cur_ry: float = 1.0
 # Leg alignment/cache state
 ## Last non-zero movement direction used when velocity is near zero
 var _last_move_dir: Vector2 = Vector2.RIGHT
-## Smoothed world-space center point shared by both legs
+## Smoothed body-local center point shared by both legs
 var _legs_center: Vector2 = Vector2.ZERO
 ## Local leg rotation relative to body, smoothed each frame
 var _legs_rotation: float = 0.0
@@ -172,7 +172,7 @@ func _ready() -> void:
 	leg_left.scale = Vector2(_cur_lx, _cur_ly)
 	leg_right.scale = Vector2(_cur_rx, _cur_ry)
 
-	_legs_center = sprite.global_position
+	_legs_center = Vector2.ZERO
 	_legs_rotation = 0.0
 
 	# Create kick hitbox used for close-range overlap detection
@@ -285,8 +285,9 @@ func _physics_process(delta: float) -> void:
 		_last_move_dir = vel_dir
 	var move_dir: Vector2 = _last_move_dir.normalized()
 
-	# Rotate body toward aim; sprite remains unrotated locally
+	# Rotate body toward aim; torso stays centered on the body origin
 	rotation = lerp_angle(rotation, desired_body_rot, angular_speed * delta)
+	sprite.position = Vector2.ZERO
 	sprite.rotation = 0.0
 
 	# Rotate legs toward kick angle or movement direction
@@ -296,18 +297,18 @@ func _physics_process(delta: float) -> void:
 	leg_left.rotation = _legs_rotation
 	leg_right.rotation = _legs_rotation
 
-	# Update legs center and side offsets relative to body
-	var center_target: Vector2 = sprite.global_position
+	# Update legs center and side offsets in body-local space
+	var center_target: Vector2 = Vector2.ZERO
 	if moving and !_attack_active:
-		center_target -= vel_dir * trail_distance
+		center_target -= vel_dir.rotated(-rotation) * trail_distance
 	_legs_center = _legs_center.lerp(center_target, 1.0 - exp(-leg_follow_smooth * delta))
 
-	var perp: Vector2 = Vector2.RIGHT.rotated(rotation).orthogonal().normalized()
-	leg_left.global_position = _legs_center - perp * leg_side_offset
-	leg_right.global_position = _legs_center + perp * leg_side_offset
+	var perp: Vector2 = Vector2.RIGHT.orthogonal().normalized()
+	leg_left.position = _legs_center - perp * leg_side_offset
+	leg_right.position = _legs_center + perp * leg_side_offset
 	if _attack_active:
-		var kick_forward: Vector2 = Vector2.RIGHT.rotated(_attack_angle)
-		leg_left.global_position += kick_forward * kick_leg_forward_offset
+		var kick_forward: Vector2 = Vector2.RIGHT.rotated(_attack_angle - rotation)
+		leg_left.position += kick_forward * kick_leg_forward_offset
 
 	# Keep legs behind body depth
 	leg_left.z_index = sprite.z_index - 1
@@ -356,10 +357,10 @@ func _physics_process(delta: float) -> void:
 	leg_left.scale = Vector2(_cur_lx, _cur_ly)
 	leg_right.scale = Vector2(_cur_rx, _cur_ry)
 
-	# Snap visuals to integer pixels for crisp sprite rendering
-	sprite.global_position = sprite.global_position.round()
-	leg_left.global_position = leg_left.global_position.round()
-	leg_right.global_position = leg_right.global_position.round()
+	# Snap body and leg locals to integer pixels (avoid rounding child global positions while rotating)
+	global_position = global_position.round()
+	leg_left.position = leg_left.position.round()
+	leg_right.position = leg_right.position.round()
 
 	# Keep kick hitbox at the tip of the active kicking leg
 	if _attack_active:

@@ -354,8 +354,8 @@ static func point_in_rectangle(point: Vector2, pointTopLeft: Vector2, pointBotto
 ## @param pointBottomRight1 The bottom-right corner of the first rectangle.
 ## @param pointTopLeft2 The top-left corner of the second rectangle.
 ## @param pointBottomRight2 The bottom-right corner of the second rectangle.
-## @return A value in the range `[0.0, 1.0]` representing the IoU.
-static func IOU(
+## @return A value in the range [0.0, 1.0] representing the IoU.
+static func IOU_vect(
 		pointTopLeft1: Vector2, pointBottomRight1: Vector2,
 		pointTopLeft2: Vector2, pointBottomRight2: Vector2
 	) -> float:
@@ -380,3 +380,35 @@ static func IOU(
 		return 0.0
 
 	return inter_area / union_area
+
+## Get the intersection over union for two rectangles [0, 1]
+static func IOU_rect(box1: Rect2, box2: Rect2) -> float:
+	var inter := box1.intersection(box2)
+	var inter_area := inter.get_area()
+
+	if inter_area <= 0.0:
+		return 0.0
+
+	var union_area := box1.get_area() + box2.get_area() - inter_area
+	if union_area <= 0.0:
+		return 0.0
+
+	return inter_area / union_area
+	
+	
+# points: Array[Vector2] or PackedVector2Array
+## Returns the polygon area as a positive float.	
+static func polygon_area(points: PackedVector2Array) -> float:
+
+	if points.size() < 3:
+		return 0.0
+
+	var sum := 0.0
+	var count := points.size()
+
+	for i in count:
+		var j := (i + 1) % count
+		sum += points[i].x * points[j].y
+		sum -= points[j].x * points[i].y
+
+	return abs(sum) * 0.5

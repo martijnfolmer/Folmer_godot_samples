@@ -382,7 +382,6 @@ func _apply_kick_to_target(target: Node) -> void:
 ## Handle kick hit on a static destructible (glass/wall) that lacks kickback components
 func _apply_kick_to_static(target: Node) -> void:
 	_kick_hit_bodies.append(target)
-	print("Kick connected with static object: ", target.name)
 	
 	# actually destroy
 	var ang: float = (get_global_mouse_position() - global_position).angle()

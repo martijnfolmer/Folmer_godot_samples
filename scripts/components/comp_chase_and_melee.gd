@@ -30,9 +30,21 @@ extends Node
 ## Target tint blended with each sprite’s normal modulate during windup (pulses with a sine wave).
 @export var windup_flash_color: Color = Color(0.0, 0.559, 0.812, 1.0)
 
+@export_group("Chase path")
+## Countdown in CHASE; when it drops below zero it resets and calls CompPathfindingAstar.refind_path().
+@export var chase_repath_interval_sec: float = 0.5
+## First path waypoint farther than this from the body is used as the facing target (pixels).
+@export var chase_waypoint_advance_epsilon_px: float = 4.0
+## Max rotation per second toward the path while chasing (radians).
+@export var chase_rotation_speed_rad: float = 5.0
+
 
 var _goblin_root: Node
 var _goblin_body: Node
+## Sibling CompPathfindingAstar under the goblin root, if present.
+var _pathfinding: Node = null
+## Counts down while in CHASE; reset on expiry to trigger refind_path().
+var _chase_repath_timer: float = 0.0
 
 ## Seconds accumulated in the current attack phase (windup, strike, or reload).
 var _phase_time: float = 0.0
@@ -54,6 +66,8 @@ var punch_dir : Vector2 = Vector2.RIGHT 	# the direction we are punching
 func _ready() -> void:
 	_goblin_root = get_parent()
 	_goblin_body = _goblin_root.get_node_or_null("CharacterBody2D")
+	_pathfinding = _goblin_root.get_node_or_null("CompPathfindingAstar")
+	_chase_repath_timer = maxf(chase_repath_interval_sec, 0.001)
 
 
 ## Drive the melee attack state machine: chase-to-windup entry, windup flash, punch, reload, and return to chase.
@@ -80,6 +94,19 @@ func _process(delta: float) -> void:
 		return
 
 	if goblin_attack_status == Enums.AttackState.CHASE:
+		
+		# recalculating paths again
+		var interval := maxf(chase_repath_interval_sec, 0.001)
+		_chase_repath_timer -= delta
+		if _chase_repath_timer < 0.0:
+			_chase_repath_timer = interval
+			if _pathfinding != null and _pathfinding.has_method("refind_path"):
+				_pathfinding.call("refind_path")
+				
+		# make the goblin face the path
+		_apply_chase_path_facing(delta)
+
+		# check if we are close enough to the player to die
 		var dist_player := _distance_to_player(player)
 		if dist_player <= distance_to_player_for_attack:
 			_reset_melee_phase_state()
@@ -154,6 +181,7 @@ func _process(delta: float) -> void:
 			_phase_time = 0.0
 			_hit_applied_this_attack = false
 			_attack_arm_baselines_captured = false
+			_chase_repath_timer = maxf(chase_repath_interval_sec, 0.001)
 			_set_goblin_attack_status(Enums.AttackState.CHASE)
 
 
@@ -171,6 +199,34 @@ func _reset_melee_phase_state() -> void:
 	_windup_cache_built = false
 	_windup_sprite_cache.clear()
 	_windup_modulate_cache.clear()
+
+
+## Rotate the goblin body toward the next path waypoint from CompPathfindingAstar.path_coor.
+func _apply_chase_path_facing(delta: float) -> void:
+	if chase_rotation_speed_rad <= 0.0:
+		return
+	if _pathfinding == null or _goblin_body == null:
+		return
+	var raw: Variant = _pathfinding.get("path_coor")
+	if raw == null:
+		return
+	var path_pts: Array = raw as Array
+	if path_pts.size() < 2:
+		return
+	var body_pos: Vector2 = _goblin_body.global_position
+	var target_world: Vector2 = path_pts[path_pts.size() - 1] as Vector2
+	for wp_v in path_pts:
+		if not wp_v is Vector2:
+			continue
+		var wp: Vector2 = wp_v as Vector2
+		if body_pos.distance_to(wp) > chase_waypoint_advance_epsilon_px:
+			target_world = wp
+			break
+	var to_target := target_world - body_pos
+	if to_target.length_squared() < 0.0001:
+		return
+	var target_angle := to_target.angle()
+	_goblin_body.rotation = rotate_toward(_goblin_body.rotation, target_angle, chase_rotation_speed_rad * delta)
 
 
 ## Return the goblin’s SpriteChest node under CharacterBody2D, or null if missing.

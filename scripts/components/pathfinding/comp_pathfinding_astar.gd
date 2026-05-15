@@ -112,10 +112,12 @@ func _initialize_grid() -> void:
 
 #region Lifetime
 func _process(delta: float) -> void:
-	
+	refind_path()
+
+
+## Tries to find a path, either direct or using pathfinding
+func refind_path() -> void:
 	if enable:
-		
-		#region Check direct line of sight possible
 		
 		# check if player exists
 		var player_node = null

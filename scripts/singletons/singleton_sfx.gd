@@ -100,7 +100,6 @@ func can_play_sfx(sfx_name: String) -> bool:
 	# Remove players that may already have been freed
 	active_players = active_players.filter(func(player): return is_instance_valid(player))
 	_active_players_by_sfx[sfx_name] = active_players
-	print(active_players.size())
 	return active_players.size() < max_simultaneous
 
 

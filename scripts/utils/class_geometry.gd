@@ -233,6 +233,75 @@ static func line_intersects_circle(x1: float, y1: float,x2: float, y2: float,cir
 	var closest_point := a + ab * t
 
 	return closest_point.distance_squared_to(circle_center) <= radius * radius
+
+## Intersection points between line and polygon edges.
+##
+## @param poly: Ordered polygon vertices, edges connect consecutive points and wrap to the first.
+## @return An Array[Vector2] of intersection points sorted from from toward to, or an empty
+##			array if the segment does not hit the polygon outline. Duplicate hits at shared vertices
+##			are merged within epsilon. If the segment is a single point on a polygon edge, returns
+##			that one-element array. 
+## 		   	TODO : not sure what happens when the line is the same as a segment of the polygon
+
+static func line_polygon_intersections(
+		from: Vector2, to: Vector2,
+		poly: PackedVector2Array
+	) -> Array[Vector2]:
+	var n := poly.size()
+	if n < 2:
+		return []
+
+	var a := from
+	var b := to
+	var ab := b - a
+	var ab_len_sq := ab.length_squared()
+
+	# Degenerate segment: only count a hit if the point lies on a polygon edge, else empty list
+	if is_zero_approx(ab_len_sq):
+		for i in n:
+			if point_on_segment(a, poly[i], poly[(i + 1) % n]):
+				return [a]
+		return []
+
+	var hits: Array[Vector2] = []
+	var ts: Array[float] = []
+
+	# for each segment, check if they collide with the line a-b
+	for i in n:
+		var c := poly[i]
+		var d := poly[(i + 1) % n]
+		var hit: Variant = Geometry2D.segment_intersects_segment(a, b, c, d)
+		if hit == null:
+			continue
+		var p: Vector2 = hit
+		var t := (p - a).dot(ab) / ab_len_sq
+		hits.append(p)
+		ts.append(t)
+
+	# no hits = no collisions
+	if hits.is_empty():
+		return []
+
+	# Sort by parameter t along the segment (closest distance from a to b)
+	var indices: Array[int] = []
+	for i in hits.size():
+		indices.append(i)
+	indices.sort_custom(func(ia: int, ib: int) -> bool: return ts[ia] < ts[ib])
+
+	# remove duplicates (if a point is on the endpoint of on the segments, or grazing corner)
+	var deduped: Array[Vector2] = []
+	const EPS := 0.00001
+	for idx in indices:
+		var p := hits[idx]
+		var is_dup := false
+		for existing in deduped:
+			if existing.distance_squared_to(p) <= EPS * EPS:
+				is_dup = true
+				break
+		if not is_dup:
+			deduped.append(p)
+
+	return deduped
 #endregion
 
 # -----------------------------
@@ -412,6 +481,3 @@ static func polygon_area(points: PackedVector2Array) -> float:
 		sum -= points[j].x * points[i].y
 
 	return abs(sum) * 0.5
-	
-	
-static func polygon_

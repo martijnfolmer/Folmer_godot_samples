@@ -412,3 +412,6 @@ static func polygon_area(points: PackedVector2Array) -> float:
 		sum -= points[j].x * points[i].y
 
 	return abs(sum) * 0.5
+	
+	
+static func polygon_

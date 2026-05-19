@@ -3,25 +3,23 @@ toposts:
 	- astar path following
 
 
-- 11 mei - 17 mei
-	
-	
+18 - 25 mei:
 	-- chase_and_melee -> follow the path and move with it
-	-- movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line
+	-- movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line (it does this, but test with more units)
 	-- record multiple goblins doing their thing with pathfinding
 	
-	-- (done) astar, create a function, make astar to there
-	-- (done) chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
-	-- (done) There is a bug that the player does not always seeme to rotate around his own center, why is that?
-	-- (done) intersection over union code
-	-- (done) shoelace algorithm
-	-- (done) path : line of sight function, if we have LOS, and blocking elements don't block, we use it as a path.
-	-- (done) path and grid : get line of sight function inside of grid, check if there are any infinite blocks we are over
-	-- (done) path : check if first element is better second element, otherwise, remove first element
-	-- (done) path : line of sight function, line of sight blocking and intersection of lines and 
-	-- (done) manual grid placement
-	-- (done) path drawing takes the topleft into account
-	-- (done) cleanup arena with sorting all things below nodes
+	-- only start moving after the player if they are first seen
+	-- when a unit sees a player, show a ! mark that shakes a little
+	
+	-- if we kick, we can't be moved by things we just kicked
+	
+	- give goblins different speeds based on distance to player? so those behind lag behind
+
+	- make certain words shake in the txt
+	- some words go louder (so they are bigger)
+	- certain words get a little sin wave
+		
+	- an actual lvl
 
 NICES
 -- create a lvl that we load
@@ -29,8 +27,6 @@ NICES
 -- move between two lvls
 
 Astar updates:
-	- only update every N seconds
-	- only update if we are in active state
 	- spread out forward propagation over multiple frames
 	- do forward propagation on one pip
 	- do backward propagation on another pip
@@ -41,9 +37,7 @@ Todo:
 	Walls and glass:
 		- debris is actually pieces of the wall, and kicking it just makes it spike
 	Astar :
-		- make it so we don't get stuck on walls, when next to walls (because if enemy hugs walls, they are stuck)
-		- give goblins different speeds based on distance to player? so those behind lag behind
-		- Where is the grid made? Because we don't want a path that gets out of bounds
+		
 	floor :
 		- 
 	goblin : 
@@ -65,6 +59,7 @@ Todo:
 		- loud and soft text should have loud and soft sfx sound
 		- colored shadow for the txt
 		- different txt sounds when murdering
+		
 	General:
 		- create 2 lvls
 		- sounds for txt ticks, different for alchemist or other one
@@ -186,3 +181,18 @@ Concrete steps (20 - 26 april):
 	-- (done) path : show the path for the goblin, as we move around, test near walls and such. What happens if goblin is standing on blocked cell?
 	-- (done) path : extra cost to diagonal
 	-- (done) record this for a post
+	
+- 11 mei - 17 mei
+	
+	-- (done) astar, create a function, make astar to there
+	-- (done) chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
+	-- (done) There is a bug that the player does not always seeme to rotate around his own center, why is that?
+	-- (done) intersection over union code
+	-- (done) shoelace algorithm
+	-- (done) path : line of sight function, if we have LOS, and blocking elements don't block, we use it as a path.
+	-- (done) path and grid : get line of sight function inside of grid, check if there are any infinite blocks we are over
+	-- (done) path : check if first element is better second element, otherwise, remove first element
+	-- (done) path : line of sight function, line of sight blocking and intersection of lines and 
+	-- (done) manual grid placement
+	-- (done) path drawing takes the topleft into account
+	-- (done) cleanup arena with sorting all things below nodes

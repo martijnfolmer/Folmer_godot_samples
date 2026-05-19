@@ -5,13 +5,13 @@ toposts:
 
 - 11 mei - 17 mei
 	
-	-- astar, create a function, make astar to there
-	-- chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
-	-- chase_and_melee -> follow the path and move with it. Dont update path if our state is not conducive to it
+	
+	-- chase_and_melee -> follow the path and move with it
 	-- movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line
 	-- record multiple goblins doing their thing with pathfinding
 	
-	
+	-- (done) astar, create a function, make astar to there
+	-- (done) chase_and_melee -> we do all the astar calling, and every N frames we recalculate, taking state into account
 	-- (done) There is a bug that the player does not always seeme to rotate around his own center, why is that?
 	-- (done) intersection over union code
 	-- (done) shoelace algorithm

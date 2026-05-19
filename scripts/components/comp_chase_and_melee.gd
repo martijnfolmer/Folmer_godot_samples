@@ -37,7 +37,8 @@ extends Node
 @export var chase_waypoint_advance_epsilon_px: float = 4.0
 ## Max rotation per second toward the path while chasing (radians).
 @export var chase_rotation_speed_rad: float = 5.0
-
+## speed with which we go down the path
+@export var chase_path_speed: float = 5.0
 
 var _goblin_root: Node
 var _goblin_body: Node
@@ -105,6 +106,9 @@ func _process(delta: float) -> void:
 				
 		# make the goblin face the path
 		_apply_chase_path_facing(delta)
+		
+		# moving the player
+		_apply_chase_path_move(delta)
 
 		# check if we are close enough to the player to die
 		var dist_player := _distance_to_player(player)
@@ -227,6 +231,21 @@ func _apply_chase_path_facing(delta: float) -> void:
 		return
 	var target_angle := to_target.angle()
 	_goblin_body.rotation = rotate_toward(_goblin_body.rotation, target_angle, chase_rotation_speed_rad * delta)
+
+func _apply_chase_path_move(delta: float) -> void:
+	if _pathfinding == null or _goblin_body == null:
+		return
+		
+	var raw: Variant = _pathfinding.get("path_coor")
+	if raw == null:
+		return
+	var path_pts: Array = raw as Array
+	if path_pts.size() < 2:
+		return
+	
+	_goblin_body.global_position.x += cos(_goblin_body.rotation) * chase_path_speed * delta
+	_goblin_body.global_position.y += sin(_goblin_body.rotation) * chase_path_speed * delta
+	
 
 
 ## Return the goblin’s SpriteChest node under CharacterBody2D, or null if missing.

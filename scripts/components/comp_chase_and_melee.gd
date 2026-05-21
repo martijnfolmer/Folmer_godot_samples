@@ -46,6 +46,8 @@ var _goblin_body: Node
 var _pathfinding: Node = null
 ## Counts down while in CHASE; reset on expiry to trigger refind_path().
 var _chase_repath_timer: float = 0.0
+## Chase speed/direction preserved when leaving a cell (px/s).
+var _fall_velocity: Vector2 = Vector2.ZERO
 
 ## Seconds accumulated in the current attack phase (windup, strike, or reload).
 var _phase_time: float = 0.0
@@ -69,6 +71,9 @@ func _ready() -> void:
 	_goblin_body = _goblin_root.get_node_or_null("CharacterBody2D")
 	_pathfinding = _goblin_root.get_node_or_null("CompPathfindingAstar")
 	_chase_repath_timer = maxf(chase_repath_interval_sec, 0.001)
+	var cell_overlap := _goblin_root.get_node_or_null("CompOnCellOverlap")
+	if cell_overlap != null and cell_overlap.has_signal("left_cell"):
+		cell_overlap.left_cell.connect(_on_chase_left_cell)
 
 
 ## Drive the melee attack state machine: chase-to-windup entry, windup flash, punch, reload, and return to chase.
@@ -90,8 +95,14 @@ func _process(delta: float) -> void:
 	if player == null:
 		return
 
-	# if goblin is dazed or falling, do nothing
-	if goblin_dazed or goblin_grounded_status == Enums.GroundState.FALLING:
+	if goblin_dazed:
+		return
+
+	if goblin_grounded_status == Enums.GroundState.ON_CELL and _fall_velocity != Vector2.ZERO:
+		_fall_velocity = Vector2.ZERO
+
+	if goblin_grounded_status == Enums.GroundState.FALLING:
+		_apply_fall_motion(delta)
 		return
 
 	if goblin_attack_status == Enums.AttackState.CHASE:
@@ -189,7 +200,7 @@ func _process(delta: float) -> void:
 			_set_goblin_attack_status(Enums.AttackState.CHASE)
 
 
-## Local position of SpriteArmRight at the start of the current strike (restored after ATTACKING).
+## Local position of SpriteArmRight at the start of the current strike (restored after ATTACKING)
 var _arm_r_base: Vector2 = Vector2.ZERO
 ## Local position of SpriteArmRight_outline at strike start, if present.
 var _arm_r_outline_base: Vector2 = Vector2.ZERO
@@ -232,6 +243,47 @@ func _apply_chase_path_facing(delta: float) -> void:
 	var target_angle := to_target.angle()
 	_goblin_body.rotation = rotate_toward(_goblin_body.rotation, target_angle, chase_rotation_speed_rad * delta)
 
+## Blocking groups from CompPathfindingAstar, or the same defaults as that component.
+func _get_astar_blocking_groups() -> Array[StringName]:
+	if _pathfinding != null:
+		var groups: Variant = _pathfinding.get("blocking_elements_groups_astar")
+		if groups is Array:
+			return groups as Array[StringName]
+	return [&"pillar", &"wall", &"glass", &"goblin"]
+
+
+## True when a movement segment hits any static blocking collider.
+## Uses CompPathfindingAstar's cached AABB list for O(rects) cost with no scene queries.
+func _is_chase_segment_blocked(from: Vector2, to: Vector2) -> bool:
+	if _goblin_body == null:
+		return false
+	if from.distance_squared_to(to) < 0.0001:
+		return false
+	if _pathfinding != null and _pathfinding.has_method("is_segment_blocked"):
+		return _pathfinding.call("is_segment_blocked", from, to)
+	return General._blocked_by_LOS(
+		_goblin_body,
+		from.x, from.y, to.x, to.y,
+		_get_astar_blocking_groups()
+	)
+
+
+## Return the farthest point along from→to that does not cross a blocker.
+func _clamp_chase_motion(from: Vector2, to: Vector2) -> Vector2:
+	if not _is_chase_segment_blocked(from, to):
+		return to
+	var low := 0.0
+	var high := 1.0
+	for _i in 8:
+		var mid := (low + high) * 0.5
+		var mid_pos := from.lerp(to, mid)
+		if _is_chase_segment_blocked(from, mid_pos):
+			high = mid
+		else:
+			low = mid
+	return from.lerp(to, low)
+
+
 func _apply_chase_path_move(delta: float) -> void:
 	if _pathfinding == null or _goblin_body == null:
 		return
@@ -243,9 +295,42 @@ func _apply_chase_path_move(delta: float) -> void:
 	if path_pts.size() < 2:
 		return
 	
-	_goblin_body.global_position.x += cos(_goblin_body.rotation) * chase_path_speed * delta
-	_goblin_body.global_position.y += sin(_goblin_body.rotation) * chase_path_speed * delta
-	
+	var body := _goblin_body as CharacterBody2D
+	if body == null:
+		return
+
+	var chase_vel := Vector2.from_angle(body.rotation) * chase_path_speed
+	body.velocity = chase_vel
+
+	var from := body.global_position
+	var motion := chase_vel * delta
+	var to := from + motion
+	var blocked_full := _is_chase_segment_blocked(from, to)
+	body.global_position = _clamp_chase_motion(from, to)
+	if blocked_full:
+		_chase_repath_timer = 0.0
+
+
+## Capture path speed/direction when CompOnCellOverlap reports leaving a cell.
+func _on_chase_left_cell() -> void:
+	if _goblin_body is CharacterBody2D:
+		var body := _goblin_body as CharacterBody2D
+		if body.velocity.length_squared() > 0.01:
+			_fall_velocity = body.velocity
+		else:
+			_fall_velocity = Vector2.from_angle(body.rotation) * chase_path_speed
+	elif _goblin_body != null:
+		_fall_velocity = Vector2.from_angle(_goblin_body.rotation) * chase_path_speed
+
+
+## Continue moving at preserved chase velocity while FALLING (goblin.gd sets ground state).
+func _apply_fall_motion(delta: float) -> void:
+	if !(_goblin_body is CharacterBody2D):
+		return
+	var body := _goblin_body as CharacterBody2D
+	body.velocity = _fall_velocity
+	body.global_position += _fall_velocity * delta
+
 
 
 ## Return the goblin’s SpriteChest node under CharacterBody2D, or null if missing.

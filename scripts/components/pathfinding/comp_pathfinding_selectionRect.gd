@@ -43,3 +43,8 @@ func get_global_top_left() -> Vector2:
 
 func get_global_bottom_right() -> Vector2:
 	return get_global_rect().end
+
+
+## True when [param world] lies inside this rect in world space.
+func contains_global_point(world: Vector2) -> bool:
+	return get_global_rect().has_point(world)

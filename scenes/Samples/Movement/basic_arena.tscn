@@ -615,7 +615,7 @@ topLeft = Vector2(-100, -100)
 bottomRight = Vector2(1500, 1250)
 
 [node name="Player" parent="." unique_id=809464679 instance=ExtResource("2_00l21")]
-position = Vector2(441, 1089)
+position = Vector2(600, 1100)
 
 [node name="EnvironmentalObjects" type="Node2D" parent="." unique_id=1557441985]
 
@@ -693,5 +693,5 @@ position = Vector2(1023, 740)
 
 [node name="Enemies" type="Node2D" parent="." unique_id=484721479]
 
-[node name="GoblinBasic" parent="Enemies" unique_id=574766309 instance=ExtResource("3_00l21")]
-position = Vector2(486, 551)
+[node name="GoblinBasic3" parent="Enemies" unique_id=1282265249 instance=ExtResource("3_00l21")]
+position = Vector2(500, 500)

@@ -4,8 +4,16 @@ toposts:
 
 
 18 - 25 mei:
-	-- chase_and_melee -> follow the path and move with it
-	-- movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line (it does this, but test with more units)
+	-- (done) chase_and_melee -> follow the path and move with it
+	-- (done) movement : not strictly along a line, but rather it has movement speed and rotation speed and tries to follow line (it does this, but test with more units)
+	-- (done) record single
+	-- (done) some bugfixing and out of bounds stuff. 
+	-- (done) multiple goblins can move
+
+	-- We need to update the forward propagation somewhat (only do it on certain ticks)
+	-- only do new forward propagation if we are 
+	-- early breaking (when we found our guy, don't do it)	
+
 	-- record multiple goblins doing their thing with pathfinding
 	
 	-- only start moving after the player if they are first seen
@@ -20,6 +28,8 @@ toposts:
 	- certain words get a little sin wave
 		
 	- an actual lvl
+	
+	- make it so that the enemies stop looking if you are off the edge/out of bounds
 
 NICES
 -- create a lvl that we load

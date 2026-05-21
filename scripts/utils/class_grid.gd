@@ -92,10 +92,10 @@ func world_to_grid(pos: Vector2) -> Vector2i:
 		push_error("Grid.topLeft is not set")
 	if cellSize == null:
 		push_error("Grid.topLeft is not set")
-		
-	var x = floor((pos.x - topLeft.x)/cellSize.x)
-	var y = floor((pos.y - topLeft.y)/cellSize.y)
-	return Vector2(x, y)
+
+	var x := int(floor((pos.x - topLeft.x) / cellSize.x))
+	var y := int(floor((pos.y - topLeft.y) / cellSize.y))
+	return Vector2i(x, y)
 
 #endregion
 
@@ -124,12 +124,13 @@ func reset_grid(val: Variant = null) -> void:
 	)
 
 ## Set value at position in the grid
-func set_cell(pos: Vector2i, val: Variant) -> void:
+func set_cell(pos: Vector2i, val: Variant) -> bool:
 	if not is_in_bounds(pos):
 		push_error("Grid.set_cell: position out of bounds: %s" % pos)
-		return
+		return false
 
 	grid[get_index(pos)] = val
+	return true
 
 ## Set a specific region of the grid to a certain value
 func set_region(top_left: Vector2i, bottom_right: Vector2i, val: Variant) -> void:

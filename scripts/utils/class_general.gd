@@ -84,16 +84,18 @@ static func nodes_in_group(node: Node, group: StringName, exclude_self: bool = f
 	
 	return allNodes
 
-## Return all nodes in the scene that the node belongs to, that belong to at least one group as 
-## defined in the group array
+## Return all nodes in the scene that the node belongs to, that belong to at least one group as
+## defined in the group array. Each node is returned at most once even if it belongs to multiple groups.
 static func nodes_in_groups(node: Node, groups: Array[StringName], exclude_self: bool = false) -> Array[Node]:
 	var all_nodes: Array[Node] = []
+	var seen: Dictionary = {}
 	for group in groups:
-		var NodeArray = nodes_in_group(node, group)
-		for nodeCur in NodeArray:
-			
+		for nodeCur in node.get_tree().get_nodes_in_group(group):
+			if seen.has(nodeCur):
+				continue
 			if exclude_self and (nodeCur == node or nodeCur == node.get_parent()):
-				continue	
+				continue
+			seen[nodeCur] = true
 			all_nodes.append(nodeCur)
 	return all_nodes
 
@@ -131,7 +133,10 @@ static func get_nodes_with_base_name(node: Node, base_name: String) -> Array[Nod
 ## return the minimum value of an array
 static func get_min_arr(arr: Array):
 	var index = get_min_index_arr(arr)
-	return arr[index]
+	if index>=0 and index<arr.size():
+		return arr[index]
+	return null
+
 
 ## return the index of the minimum value of an array
 static func get_min_index_arr(arr: Array) -> int:
@@ -149,7 +154,9 @@ static func get_min_index_arr(arr: Array) -> int:
 ## return the maximum value of the array
 static func get_max_arr(arr: Array):
 	var index = get_max_index_arr(arr)
-	return arr[index]
+	if index>=0 and index<arr.size():
+		return arr[index]
+	return null
 
 static func get_max_index_arr(arr: Array) -> int:
 	if arr.is_empty():

@@ -46,7 +46,6 @@ sprite_path = NodePath("../CharacterBody2D/SpriteChest")
 
 [node name="CompChaseAndMelee" parent="." unique_id=832466147 instance=ExtResource("6_fofqr")]
 script = ExtResource("7_35bxk")
-chase_repath_interval_sec = 0.0
 chase_rotation_speed_rad = 10.0
 chase_path_speed = 300.0
 

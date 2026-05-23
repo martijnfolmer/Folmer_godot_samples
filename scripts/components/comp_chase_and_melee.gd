@@ -114,7 +114,7 @@ func _process(delta: float) -> void:
 			_chase_repath_timer = interval
 			if _pathfinding != null and _pathfinding.has_method("refind_path"):
 				_pathfinding.call("refind_path")
-				
+
 		# make the goblin face the path
 		_apply_chase_path_facing(delta)
 		

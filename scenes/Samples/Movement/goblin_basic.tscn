@@ -47,7 +47,7 @@ sprite_path = NodePath("../CharacterBody2D/SpriteChest")
 [node name="CompChaseAndMelee" parent="." unique_id=832466147 instance=ExtResource("6_fofqr")]
 script = ExtResource("7_35bxk")
 chase_rotation_speed_rad = 10.0
-chase_path_speed = 300.0
+chase_path_speed = 0.0
 
 [node name="CompPathfindingAstar" parent="." unique_id=1591297447 instance=ExtResource("8_tr4uu")]
 CellSize = Vector2(64, 64)

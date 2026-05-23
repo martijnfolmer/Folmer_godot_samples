@@ -204,13 +204,15 @@ func refind_path() -> void:
 	else:
 		_populate_occ_grid()
 
-		if not forward_propagation():
+		var goal_coor: Vector2i = grid_cost.world_to_grid(player_world)
+		
+		# check if the player is in bounds. If not, remove him
+		if not grid_cost.is_in_bounds(goal_coor):
 			return
 
-		var goal_coor: Vector2i = grid_cost.world_to_grid(player_world)
-		if not grid_cost.is_in_bounds(goal_coor):
-			push_warning("CompPathfindingAstar: player grid cell out of bounds: %s" % goal_coor)
+		if not forward_propagation(true, goal_coor):
 			return
+
 		backward_propagation(goal_coor)
 
 #endregion
@@ -387,10 +389,10 @@ func _mark_cells_for_world_rect(world_aabb: Rect2) -> void:
 #region forward propagation
 
 ## Do the forward propagation, where we calculate the cost from the calling cell onward
-func forward_propagation() -> bool:
+func forward_propagation(early_stopping : bool, goal_coor : Vector2i) -> bool:
 
 	# reset the grid
-	grid_path.reset_grid(-1)
+	grid_path.reset_grid(999)
 
 	var coor: Vector2i = grid_path.world_to_grid(get_pathfinding_world_position())
 	if not grid_path.is_in_bounds(coor):
@@ -427,12 +429,16 @@ func forward_propagation() -> bool:
 			if b_cost_to_get_there != null:
 				var new_cost = check_cost + b_cost_to_get_there + add_cost
 
-				if b_current_cost == -1:
+				if b_current_cost == 999:
 					grid_path.set_cell(b_coor, new_cost)
 					check_queue.append(b_coor)
 				elif new_cost < b_current_cost:
 					grid_path.set_cell(b_coor, new_cost)
 					check_queue.append(b_coor)
+			
+			# if we do early stopping, we return once we found a path to the player
+			if early_stopping == true and b_coor == goal_coor:
+				return true
 
 	# we successfully did it
 	return true
@@ -455,7 +461,6 @@ func backward_propagation(goal_coor: Vector2i) -> void:
 	path_cost = []
 	# grid coordinates for path
 	path_coor = []
-	
 	
 	var cur_loc = goal_coor
 	path_cell.append(goal_coor)

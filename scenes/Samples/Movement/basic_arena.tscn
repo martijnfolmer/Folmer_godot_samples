@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://cgbo4axgtfepr" path="res://scenes/singletons/singleton_camera.tscn" id="1_l7g6b"]
 [ext_resource type="PackedScene" uid="uid://dsf0xhgp0hrv" path="res://scenes/Samples/GridSquare/cell_square.tscn" id="1_vg2uj"]
 [ext_resource type="PackedScene" uid="uid://dmqrwpp2fg11w" path="res://scenes/Samples/Movement/player.tscn" id="2_00l21"]
-[ext_resource type="PackedScene" uid="uid://cy6d05qriys22" path="res://scenes/Samples/Movement/goblin_basic.tscn" id="3_00l21"]
 [ext_resource type="Script" uid="uid://cxh2hdapjg7fa" path="res://scripts/Samples/Movement/basic_arena_cell_grid.gd" id="5_hwd22"]
 [ext_resource type="PackedScene" uid="uid://dgjtvld7nwhe1" path="res://scenes/components/pathfinding/comp_pathfinding_selectionRect.tscn" id="5_rx6ah"]
 [ext_resource type="PackedScene" uid="uid://ce1lmi503xop7" path="res://scenes/Samples/Movement/wall.tscn" id="8_cxbq3"]
@@ -692,6 +691,3 @@ position = Vector2(366, 318)
 position = Vector2(1023, 740)
 
 [node name="Enemies" type="Node2D" parent="." unique_id=484721479]
-
-[node name="GoblinBasic3" parent="Enemies" unique_id=1282265249 instance=ExtResource("3_00l21")]
-position = Vector2(500, 500)

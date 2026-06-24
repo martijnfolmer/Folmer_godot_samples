@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://ctoeo74kawb1u"]
+
+[ext_resource type="Script" uid="uid://b1b7ebvl7p6is" path="res://scripts/Samples/verlet_integration/verlet_integration.gd" id="1_n1sdb"]
+
+[node name="VerletIntegration" type="Node2D" unique_id=1951604186]
+script = ExtResource("1_n1sdb")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=614694419]

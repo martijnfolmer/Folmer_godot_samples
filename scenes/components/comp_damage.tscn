@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://blbn8ivlmvmdb"]
-
-[ext_resource type="Script" uid="uid://d28omdrragmtl" path="res://scripts/components/comp_damage.gd" id="1_6gbae"]
-
-[node name="CompDamage" type="Node2D" unique_id=1256099559]
-script = ExtResource("1_6gbae")

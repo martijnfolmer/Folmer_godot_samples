@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://dgjtvld7nwhe1"]
-
-[ext_resource type="Script" uid="uid://g03kotylgnth" path="res://scripts/components/pathfinding/comp_pathfinding_selectionRect.gd" id="1_y2wsm"]
-
-[node name="CompPathfindingSelectionRect" type="Node2D" unique_id=867552878]
-script = ExtResource("1_y2wsm")

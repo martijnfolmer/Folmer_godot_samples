@@ -15,14 +15,8 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Godot_Template"
-run/main_scene="uid://coyvtxyqheeh"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://SVG/icon.svg"
-
-[autoload]
-
-GlobalGrid="*uid://d10w3ljhide4c"
-GlPlayerInput="*uid://c2e8xve880a8h"
 
 [display]
 

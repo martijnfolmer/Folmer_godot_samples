@@ -1,164 +1,162 @@
-[gd_scene load_steps=3 format=3 uid="uid://to1fid7bcun"]
+[gd_scene format=3 uid="uid://to1fid7bcun"]
 
 [ext_resource type="PackedScene" uid="uid://bspll818f18ug" path="res://scenes/Samples/Easing/easing_sample.tscn" id="1_3sf2c"]
-[ext_resource type="Script" uid="uid://bxcs20koualer" path="res://scripts/utils/setup.gd" id="1_ima52"]
 
-[node name="Easing_Main" type="Node2D"]
-script = ExtResource("1_ima52")
+[node name="Easing_Main" type="Node2D" unique_id=1910905049]
 
-[node name="Easing_sample_linear" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_linear" parent="." unique_id=1539288280 instance=ExtResource("1_3sf2c")]
 end = Vector2(2500, 200)
 easing_type = 0
 
-[node name="Easing_sample_in_quadratic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_quadratic" parent="." unique_id=1523271949 instance=ExtResource("1_3sf2c")]
 start = Vector2(100, 300)
 end = Vector2(500, 300)
 easing_type = 1
 
-[node name="Easing_sample_out_quadratic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_quadratic" parent="." unique_id=1511595661 instance=ExtResource("1_3sf2c")]
 start = Vector2(100, 400)
 end = Vector2(500, 400)
 easing_type = 2
 
-[node name="Easing_sample_in_out_quadratic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_quadratic" parent="." unique_id=803236761 instance=ExtResource("1_3sf2c")]
 start = Vector2(100, 500)
 end = Vector2(500, 500)
 easing_type = 3
 
-[node name="Easing_sample_in_cubic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_cubic" parent="." unique_id=1291421064 instance=ExtResource("1_3sf2c")]
 start = Vector2(100, 600)
 end = Vector2(500, 600)
 easing_type = 4
 
-[node name="Easing_sample_out_cubic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_cubic" parent="." unique_id=309198779 instance=ExtResource("1_3sf2c")]
 start = Vector2(100, 700)
 end = Vector2(500, 700)
 easing_type = 5
 
-[node name="Easing_sample_in_out_cubic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_cubic" parent="." unique_id=471584080 instance=ExtResource("1_3sf2c")]
 start = Vector2(100, 800)
 end = Vector2(500, 800)
 easing_type = 6
 
-[node name="Easing_sample_in_quartic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_quartic" parent="." unique_id=256423962 instance=ExtResource("1_3sf2c")]
 start = Vector2(600, 300)
 end = Vector2(1000, 300)
 easing_type = 7
 
-[node name="Easing_sample_out_quartic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_quartic" parent="." unique_id=74262821 instance=ExtResource("1_3sf2c")]
 start = Vector2(600, 400)
 end = Vector2(1000, 400)
 easing_type = 8
 
-[node name="Easing_sample_in_out_quartic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_quartic" parent="." unique_id=1338333029 instance=ExtResource("1_3sf2c")]
 start = Vector2(600, 500)
 end = Vector2(1000, 500)
 easing_type = 9
 
-[node name="Easing_sample_in_quint" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_quint" parent="." unique_id=1391691034 instance=ExtResource("1_3sf2c")]
 start = Vector2(600, 600)
 end = Vector2(1000, 600)
 easing_type = 10
 
-[node name="Easing_sample_out_quint" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_quint" parent="." unique_id=1229298972 instance=ExtResource("1_3sf2c")]
 start = Vector2(600, 700)
 end = Vector2(1000, 700)
 easing_type = 11
 
-[node name="Easing_sample_in_out_quint" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_quint" parent="." unique_id=689330593 instance=ExtResource("1_3sf2c")]
 start = Vector2(600, 800)
 end = Vector2(1000, 800)
 easing_type = 12
 
-[node name="Easing_sample_in_sine" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_sine" parent="." unique_id=382711010 instance=ExtResource("1_3sf2c")]
 start = Vector2(1100, 300)
 end = Vector2(1500, 300)
 easing_type = 13
 
-[node name="Easing_sample_out_sine" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_sine" parent="." unique_id=179656503 instance=ExtResource("1_3sf2c")]
 start = Vector2(1100, 400)
 end = Vector2(1500, 400)
 easing_type = 14
 
-[node name="Easing_sample_in_out_sine" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_sine" parent="." unique_id=434189415 instance=ExtResource("1_3sf2c")]
 start = Vector2(1100, 500)
 end = Vector2(1500, 500)
 easing_type = 15
 
-[node name="Easing_sample_in_exponential" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_exponential" parent="." unique_id=1976191000 instance=ExtResource("1_3sf2c")]
 start = Vector2(1100, 600)
 end = Vector2(1500, 600)
 easing_type = 16
 
-[node name="Easing_sample_out_exponential" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_exponential" parent="." unique_id=2129821375 instance=ExtResource("1_3sf2c")]
 start = Vector2(1100, 700)
 end = Vector2(1500, 700)
 easing_type = 17
 
-[node name="Easing_sample_in_out_exponential" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_exponential" parent="." unique_id=1465090598 instance=ExtResource("1_3sf2c")]
 start = Vector2(1100, 800)
 end = Vector2(1500, 800)
 easing_type = 18
 
-[node name="Easing_sample_in_circ" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_circ" parent="." unique_id=875484121 instance=ExtResource("1_3sf2c")]
 start = Vector2(1600, 300)
 end = Vector2(2000, 300)
 easing_type = 19
 
-[node name="Easing_sample_out_circ" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_circ" parent="." unique_id=1211577826 instance=ExtResource("1_3sf2c")]
 start = Vector2(1600, 400)
 end = Vector2(2000, 400)
 easing_type = 20
 
-[node name="Easing_sample_in_out_circ" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_circ" parent="." unique_id=1765958609 instance=ExtResource("1_3sf2c")]
 start = Vector2(1600, 500)
 end = Vector2(2000, 500)
 easing_type = 21
 
-[node name="Easing_sample_in_back" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_back" parent="." unique_id=1169868538 instance=ExtResource("1_3sf2c")]
 start = Vector2(1600, 600)
 end = Vector2(2000, 600)
 easing_type = 22
 
-[node name="Easing_sample_out_back" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_back" parent="." unique_id=629459898 instance=ExtResource("1_3sf2c")]
 start = Vector2(1600, 700)
 end = Vector2(2000, 700)
 easing_type = 23
 
-[node name="Easing_sample_in_out_back" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_back" parent="." unique_id=1411472636 instance=ExtResource("1_3sf2c")]
 start = Vector2(1600, 800)
 end = Vector2(2000, 800)
 easing_type = 24
 
-[node name="Easing_sample_in_elastic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_elastic" parent="." unique_id=1643839326 instance=ExtResource("1_3sf2c")]
 start = Vector2(2100, 300)
 end = Vector2(2500, 300)
 easing_type = 25
 
-[node name="Easing_sample_out_elastic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_elastic" parent="." unique_id=1882515296 instance=ExtResource("1_3sf2c")]
 start = Vector2(2100, 400)
 end = Vector2(2500, 400)
 easing_type = 26
 
-[node name="Easing_sample_in_out_elastic" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_elastic" parent="." unique_id=1920059564 instance=ExtResource("1_3sf2c")]
 start = Vector2(2100, 500)
 end = Vector2(2500, 500)
 easing_type = 27
 
-[node name="Easing_sample_in_bounce" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_bounce" parent="." unique_id=1461721253 instance=ExtResource("1_3sf2c")]
 start = Vector2(2100, 600)
 end = Vector2(2500, 600)
 easing_type = 29
 
-[node name="Easing_sample_out_bounce" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_out_bounce" parent="." unique_id=504901353 instance=ExtResource("1_3sf2c")]
 start = Vector2(2100, 700)
 end = Vector2(2500, 700)
 
-[node name="Easing_sample_in_out_bounce" parent="." instance=ExtResource("1_3sf2c")]
+[node name="Easing_sample_in_out_bounce" parent="." unique_id=1755863485 instance=ExtResource("1_3sf2c")]
 start = Vector2(2100, 800)
 end = Vector2(2500, 800)
 easing_type = 30
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=194688139]
 offset = Vector2(1300, 500)
-zoom = Vector2(0.8, 0.8)
+zoom = Vector2(0.5, 0.5)

@@ -1,9 +1,0 @@
-[gd_scene format=3 uid="uid://xd5ypktimw0x"]
-
-[ext_resource type="Script" uid="uid://crnqgbui34vce" path="res://scripts/singletons/singleton_sfx.gd" id="1_rxam0"]
-
-[node name="SingletonSfx" type="Node" unique_id=1847291055]
-script = ExtResource("1_rxam0")
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=-1447804204]
-max_polyphony = 8

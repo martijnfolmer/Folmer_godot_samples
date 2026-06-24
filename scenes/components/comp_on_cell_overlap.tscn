@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://g1n38uj15vxs"]
-
-[ext_resource type="Script" uid="uid://c4j7v1uucandb" path="res://scripts/components/comp_on_cell_overlap.gd" id="1_f6adp"]
-
-[node name="CompOnCellOverlap" type="Node" unique_id=2104572019]
-script = ExtResource("1_f6adp")

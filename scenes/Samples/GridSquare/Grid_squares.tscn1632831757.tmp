@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://c3punqjxtaeyy"]
-
-[ext_resource type="Script" uid="uid://buumstoq1vlif" path="res://scripts/Samples/GridSquare/grid_spawn.gd" id="1_bvpfx"]
-[ext_resource type="PackedScene" uid="uid://dsf0xhgp0hrv" path="res://scenes/Samples/GridSquare/cell_square.tscn" id="2_xio5h"]
-
-[node name="GridSquares" type="Node" unique_id=237438149]
-script = ExtResource("1_bvpfx")
-cell_scene = ExtResource("2_xio5h")

@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://ba3wxx0rj0ek0"]
-
-[ext_resource type="Script" uid="uid://cmdq5pp47s5t3" path="res://scripts/components/pathfinding/comp_pathfinding_astar.gd" id="1_wm781"]
-
-[node name="CompPathfindingAstar" type="Node2D" unique_id=1591297447]
-script = ExtResource("1_wm781")
-BottomRight = Vector2(500, 500)
-CellSize = Vector2(32, 64)

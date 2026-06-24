@@ -1,6 +1,33 @@
 [gd_scene format=3 uid="uid://c1el4la3b1k0n"]
 
-[ext_resource type="Script" uid="uid://cjoxhl3da8syv" path="res://scripts/Samples/Testing.gd" id="1_m7t78"]
+[sub_resource type="GDScript" id="GDScript_i6icq"]
+script/source = "extends Node
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	var polygon := PackedVector2Array([
+		Vector2(0, 0),
+		Vector2(4, 0),
+		Vector2(4, 3),
+		Vector2(0, 3)
+	])
+
+	print(Geom2Util.polygon_area(polygon)) # 12.0
+
+	polygon = PackedVector2Array([
+		Vector2(0, 0),
+		Vector2(4, 0),
+		Vector2(4, 4),
+		Vector2(0, 4)
+	])
+	print(Geom2Util.polygon_area(polygon)) # 16.0
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
 
 [node name="Testing" type="Node2D" unique_id=2070984071]
-script = ExtResource("1_m7t78")
+script = SubResource("GDScript_i6icq")

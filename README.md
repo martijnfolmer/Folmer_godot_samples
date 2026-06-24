@@ -1,6 +1,6 @@
 # Godot Samples Repository
 
-Welcome to my Godot samples repository! This project serves as a collection of various godot functions
+Welcome to my Godot samples repository! This project serves as a collection of various godot functions. I'll be updating this over time with things I think others could use
 
 > **Usage:** Everyone is completely free to use, modify, and incorporate these samples into their own projects, in any and all ways
 

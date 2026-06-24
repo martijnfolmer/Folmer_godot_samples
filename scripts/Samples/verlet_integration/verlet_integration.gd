@@ -1,7 +1,7 @@
 extends Node2D
 
 """
-Small sample of what it looks like to simulate lines and cloth using verlet integration
+Small sample of what it looks like to simulate lines and cloth using verlet integration, using 2 classes located in scripts/classes/class_verlet_cloth and /class_verlet_line
 """
 
 var line_fixed_middle : verlet_line

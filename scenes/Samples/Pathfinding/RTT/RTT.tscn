@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://cuo4m3gtkwo0u"]
+
+[ext_resource type="Script" uid="uid://sppfu1ojcdr6" path="res://scripts/Samples/Pathfinding/RTT/PF_RTT.gd" id="1_pux6b"]
+
+[node name="Rtt" type="Node2D" unique_id=1917955625]
+script = ExtResource("1_pux6b")
+
+[node name="Obstacles" type="Node" parent="." unique_id=1777285320]
+
+[node name="Obstacle1" type="Node2D" parent="Obstacles" unique_id=371759535]
+
+[node name="Area2D" type="Area2D" parent="Obstacles/Obstacle1" unique_id=1629120199]
+position = Vector2(1213, 190)
+
+[node name="Polygon2D" type="Polygon2D" parent="Obstacles/Obstacle1/Area2D" unique_id=1455154948]
+polygon = PackedVector2Array(0, 1, 93, 15, 75, 103, -19, 107, -7, 38, 56, 31)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Obstacles/Obstacle1/Area2D" unique_id=1780749134]
+polygon = PackedVector2Array(94, 14, 75, 103, -19, 107, -7, 39, 56, 31, -1, -1)
+
+[node name="Obstacle2" type="Node2D" parent="Obstacles" unique_id=1735486572]
+position = Vector2(611, 474)
+
+[node name="Area2D" type="Area2D" parent="Obstacles/Obstacle2" unique_id=1401858097]
+
+[node name="Polygon2D" type="Polygon2D" parent="Obstacles/Obstacle2/Area2D" unique_id=263769255]
+polygon = PackedVector2Array(74, 103.335, 272, 136.66833, -4.666626, 226.66833, -226.66666, 146.00168, -79.33331, 72.668335, 3.333374, 186.00168, 26.666687, 54.00167, 117.333374, 23.335)
+uv = PackedVector2Array(74, 103.335, 272, 136.66833, -4.666626, 226.66833, -226.66666, 146.00168, -79.33331, 72.668335, 3.333374, 186.00168, 26.666687, 54.00167, 117.333374, 23.335)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Obstacles/Obstacle2/Area2D" unique_id=782260520]
+position = Vector2(-315.57288, 453.63693)
+scale = Vector2(10.313327, 4.9282885)
+polygon = PackedVector2Array(41.846138, -86.974815, 33.11956, -81.29333, 30.986403, -54.712097, 22.8416, -77.438034, 8.78212, -62.422684, 30.307669, -45.784042, 57.06916, -64.24887, 37.870697, -71.35072)
+
+[node name="Obstacle3" type="Node2D" parent="Obstacles" unique_id=324857499]
+position = Vector2(943, 354)
+
+[node name="Area2D" type="Area2D" parent="Obstacles/Obstacle3" unique_id=1643295389]
+
+[node name="Polygon2D" type="Polygon2D" parent="Obstacles/Obstacle3/Area2D" unique_id=93359931]
+polygon = PackedVector2Array(-80, 51.333344, 93, 15, 75, 103, -173.33331, 117.33334, -127.33331, -87.33333, -30, -86.666664)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Obstacles/Obstacle3/Area2D" unique_id=1562652254]
+polygon = PackedVector2Array(94, 14, 75, 103, -173, 117, -128, -88, -30, -87, -79, 51)
+
+[node name="Obstacle4" type="Node2D" parent="Obstacles" unique_id=789911339]
+position = Vector2(1545, 567)
+
+[node name="Area2D" type="Area2D" parent="Obstacles/Obstacle4" unique_id=731561911]
+
+[node name="Polygon2D" type="Polygon2D" parent="Obstacles/Obstacle4/Area2D" unique_id=905886656]
+polygon = PackedVector2Array(-156.00024, 50.666336, 163.99976, -42.666992, 111.33313, -96.000336, -224.00024, 23.999664)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Obstacles/Obstacle4/Area2D" unique_id=1533317238]
+polygon = PackedVector2Array(164, -43, -157, 52, -223, 24, 111, -96)
+
+[node name="Obstacle5" type="Node2D" parent="Obstacles" unique_id=1545234532]
+position = Vector2(1300, 885)
+
+[node name="Area2D" type="Area2D" parent="Obstacles/Obstacle5" unique_id=656142748]
+rotation = 1.6894788
+
+[node name="Polygon2D" type="Polygon2D" parent="Obstacles/Obstacle5/Area2D" unique_id=656895481]
+polygon = PackedVector2Array(-156.00024, 50.666336, 163.99976, -42.666992, 111.33313, -96.000336, -224.00024, 23.999664)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Obstacles/Obstacle5/Area2D" unique_id=1496847173]
+polygon = PackedVector2Array(164, -43, -157, 52, -223, 24, 111, -96)

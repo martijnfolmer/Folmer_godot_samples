@@ -30,8 +30,11 @@ Using verlet integration to simulate lines and cloth using gdscript.
 
 ## RTT (rapidly exploring random tree)
 Using RTT to find paths around irregular collision shapes
+
 [link to RTT sample scene](scenes/Samples/Pathfinding/RTT/RTT.tscn)
+
 [link to RTT sample script](scripts/Samples/Pathfinding/RTT/PF_RTT.gd)
+
 [link to RTT class](scripts/classes/class_PF_RTT.gd)
 
 ![an example of RTT](README_IMG/RTT_pathfinding.png?raw=true)
